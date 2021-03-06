@@ -1,4 +1,4 @@
-package com.pengugroup.pengushop.ui
+package store.pengu.mobile.ui
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

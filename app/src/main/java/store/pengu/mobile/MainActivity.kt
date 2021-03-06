@@ -1,4 +1,4 @@
-package com.pengugroup.pengushop
+package store.pengu.mobile
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -8,7 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.setContent
 import androidx.ui.tooling.preview.Preview
-import com.pengugroup.pengushop.ui.PenguShopTheme
+import store.pengu.mobile.ui.PenguShopTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
 
     defaultConfig {
-        applicationId "com.pengugroup.pengushop"
+        applicationId 'store.pengu.mobile'
         minSdkVersion 29
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 

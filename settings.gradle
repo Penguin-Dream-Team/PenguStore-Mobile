@@ -1,2 +1,2 @@
-rootProject.name = "PenguShop"
+rootProject.name = "PenguStore-Mobile"
 include ':app'
