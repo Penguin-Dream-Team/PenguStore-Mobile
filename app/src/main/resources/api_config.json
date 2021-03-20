@@ -1,0 +1,6 @@
+{
+  "protocol": "https",
+  "host": "pengu.store",
+  "port": 80,
+  "timeout": 3000
+}

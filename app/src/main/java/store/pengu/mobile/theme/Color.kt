@@ -1,4 +1,4 @@
-package store.pengu.mobile.ui
+package store.pengu.mobile.theme
 
 import androidx.compose.ui.graphics.Color
 

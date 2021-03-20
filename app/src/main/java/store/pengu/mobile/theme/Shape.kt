@@ -1,4 +1,4 @@
-package store.pengu.mobile.ui
+package store.pengu.mobile.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
