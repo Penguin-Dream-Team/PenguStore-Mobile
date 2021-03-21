@@ -1,6 +1,8 @@
 package store.pengu.mobile.views.dashboard.partials
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -9,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import store.pengu.mobile.states.StoreState
@@ -30,6 +33,8 @@ fun SetupScreen(navController: NavController, store: StoreState) {
             textAlign = TextAlign.Center
         )
     }
+
+    Spacer(modifier = Modifier.preferredHeight(32.dp))
 
     Button(
         onClick = {
