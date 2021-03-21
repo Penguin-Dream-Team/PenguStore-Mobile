@@ -10,15 +10,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.dashboard.DashboardScreen
+import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.pantry.PantryScreen
 import store.pengu.mobile.views.pantry.partials.NewPantry
 import store.pengu.mobile.views.shared.TopBar
 import store.pengu.mobile.views.shop.ShopScreen
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     @Inject
@@ -41,6 +44,10 @@ class MainActivity : AppCompatActivity() {
                     NavHost(navController = navController, startDestination = "dashboard") {
                         composable("dashboard") {
                             DashboardScreen(navController, storeState)
+                        }
+
+                        composable("setup") {
+                            SetupScreen(navController, storeState)
                         }
 
                         composable("pantry") {

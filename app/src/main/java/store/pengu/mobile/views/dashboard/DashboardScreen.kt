@@ -1,17 +1,15 @@
 package store.pengu.mobile.views.dashboard
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.dashboard.partials.UserInfo
 import store.pengu.mobile.views.pantry.PantryScreen
 import store.pengu.mobile.views.shop.ShopScreen
@@ -22,38 +20,16 @@ fun DashboardScreen(navController: NavController, store: StoreState) {
 
     Column {
         if (storeState.userType == "") {
-            Button(
-                onClick = {
-                    store.userType = "login"
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = "Login",
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            Button(
-                onClick = {
-                    store.userType = "guest"
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = "Continue as Guest",
-                    textAlign = TextAlign.Center
-                )
-            }
+           SetupScreen(navController, storeState)
         }
-        UserInfo(storeState)
+        else {
+            UserInfo(storeState)
 
-        PantryScreen(navController)
+            PantryScreen(navController)
 
-        Spacer(modifier = Modifier.preferredHeight(32.dp))
+            Spacer(modifier = Modifier.preferredHeight(32.dp))
 
-        ShopScreen(navController)
+            ShopScreen(navController)
+        }
     }
 }
