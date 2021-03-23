@@ -2,7 +2,7 @@ package store.pengu.mobile.views.dashboard.partials
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +34,7 @@ fun SetupScreen(navController: NavController, store: StoreState) {
         )
     }
 
-    Spacer(modifier = Modifier.preferredHeight(32.dp))
+    Spacer(modifier = Modifier.height(32.dp))
 
     Button(
         onClick = {

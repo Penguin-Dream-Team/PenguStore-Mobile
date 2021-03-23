@@ -3,22 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="store.pengu.mobile">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".PenguStore"
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PenguShop">
+        android:theme="@style/Theme.PenguShop"
+        android:fullBackupOnly="true"
+        android:usesCleartextTraffic="true"
+        android:allowBackup="true">
         <activity
             android:name=".views.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.PenguShop.NoActionBar"
-            tools:ignore="MissingClass">
+            tools:ignore="MissingClass"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

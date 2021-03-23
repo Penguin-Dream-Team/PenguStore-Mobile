@@ -6,4 +6,5 @@ import androidx.compose.runtime.setValue
 
 class StoreState {
     var userType by mutableStateOf("")
+    var token by mutableStateOf("")
 }

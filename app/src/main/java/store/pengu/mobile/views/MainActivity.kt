@@ -3,14 +3,18 @@ package store.pengu.mobile.views
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Scaffold
-import androidx.compose.ui.platform.setContent
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.api.Response
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.dashboard.DashboardScreen
@@ -27,6 +31,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var storeState: StoreState
 
+    @Inject
+    lateinit var api: PenguStoreApi
+
     private var navController: NavHostController? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -34,6 +41,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        lifecycleScope.launchWhenCreated {
+            try {
+                val res = api.dashboard()
+                Toast.makeText(applicationContext, res.data, Toast.LENGTH_LONG).show()
+            } catch(e: Exception) {
+                Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
 
         setContent {
             val navController = rememberNavController()
@@ -65,13 +81,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 }

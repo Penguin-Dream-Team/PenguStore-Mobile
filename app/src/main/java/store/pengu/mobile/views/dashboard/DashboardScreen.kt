@@ -1,6 +1,8 @@
 package store.pengu.mobile.views.dashboard
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +29,7 @@ fun DashboardScreen(navController: NavController, store: StoreState) {
 
             PantryScreen(navController)
 
-            Spacer(modifier = Modifier.preferredHeight(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             ShopScreen(navController)
         }
