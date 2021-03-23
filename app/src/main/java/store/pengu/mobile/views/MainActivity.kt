@@ -17,11 +17,13 @@ import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.api.Response
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
+import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.pantry.PantryScreen
 import store.pengu.mobile.views.pantry.partials.NewPantry
-import store.pengu.mobile.views.shared.TopBar
+import store.pengu.mobile.views.profile.ProfileScreen
+import store.pengu.mobile.views.shared.BottomBar
 import store.pengu.mobile.views.shop.ShopScreen
 import javax.inject.Inject
 
@@ -56,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             this.navController = navController
 
             PenguShopTheme {
-                Scaffold(topBar = { TopBar(navController) }) {
+                Scaffold(bottomBar = { BottomBar(navController) }) {
                     NavHost(navController = navController, startDestination = "dashboard") {
                         composable("dashboard") {
                             DashboardScreen(navController, storeState)
@@ -67,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("pantry") {
-                            PantryScreen(navController)
+                            PantryScreen(navController, storeState)
                         }
 
                         composable("new_pantry") {
@@ -76,6 +78,14 @@ class MainActivity : AppCompatActivity() {
 
                         composable("shop") {
                             ShopScreen(navController)
+                        }
+
+                        composable("cart") {
+                            CartScreen(navController)
+                        }
+
+                        composable("profile") {
+                            ProfileScreen(navController)
                         }
                     }
                 }
