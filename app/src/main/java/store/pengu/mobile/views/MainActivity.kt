@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("new_pantry") {
-                            NewPantry(navController, applicationContext)
+                            NewPantry(navController, storeState)
                         }
 
                         composable("shop") {

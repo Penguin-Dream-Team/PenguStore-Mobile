@@ -3,6 +3,7 @@ buildscript {
     ext {
         compose_version = '1.0.0-alpha07'
         kotlin_version = '1.4.10'
+        ktor_version = '1.4.3'
         nav_compose_version = "1.0.0-alpha02"
     }
 

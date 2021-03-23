@@ -24,7 +24,7 @@ fun DashboardScreen(navController: NavController, store: StoreState) {
         }
         else {
             UserInfo(storeState)
-
+            
             PantryScreen(navController)
 
             Spacer(modifier = Modifier.preferredHeight(32.dp))
