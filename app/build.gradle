@@ -44,6 +44,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
 
+    // More icons
+    implementation "androidx.compose.material:material-icons-extended:$compose_version"
+
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling:$compose_version"
@@ -56,6 +59,9 @@ dependencies {
     implementation 'com.google.dagger:hilt-android:2.33-beta'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     kapt 'com.google.dagger:hilt-android-compiler:2.33-beta'
+
+    // Ktor Client
+    implementation "io.ktor:ktor-client-gson:$ktor_version"
 
     // Config Json
     implementation 'com.sksamuel.hoplite:hoplite-json:1.4.0'
