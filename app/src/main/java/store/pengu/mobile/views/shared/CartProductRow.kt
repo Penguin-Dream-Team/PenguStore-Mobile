@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CarProductRow(image: String, productName: String, productPrice: String, productQuantity: String) {
+fun CartProductRow(image: String, productName: String, productPrice: String, productQuantity: String) {
     Row(horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .fillMaxWidth()

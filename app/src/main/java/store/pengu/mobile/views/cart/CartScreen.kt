@@ -6,14 +6,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.views.shared.CarProductRow
+import store.pengu.mobile.views.shared.CartProductRow
 
 @Composable
 fun CartScreen(navController: NavController) {
@@ -47,10 +41,10 @@ fun CartScreen(navController: NavController) {
                     .fillMaxHeight()
                     .verticalScroll(state = scrollState)
             ) {
-                CarProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
-                CarProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
-                CarProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
-                CarProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
+                CartProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
+                CartProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
+                CartProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
+                CartProductRow ("Image", "Product_Name", "Product_Price", "Product_Quantity")
             }
         }
 
