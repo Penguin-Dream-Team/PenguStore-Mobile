@@ -54,7 +54,7 @@ fun NewPantry(navController: NavController, store: StoreState) {
                             IconButton(
                                 onClick = {
                                     item.amountNeeded--
-                                },
+                                }
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Remove,
@@ -69,7 +69,7 @@ fun NewPantry(navController: NavController, store: StoreState) {
                             IconButton(
                                 onClick = {
                                     item.amountNeeded++
-                                },
+                                }
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Add,
