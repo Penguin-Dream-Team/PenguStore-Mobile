@@ -35,7 +35,7 @@ fun NewPantry(navController: NavController, store: StoreState) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(store.items) { item ->
+            items(store.products) { item ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier

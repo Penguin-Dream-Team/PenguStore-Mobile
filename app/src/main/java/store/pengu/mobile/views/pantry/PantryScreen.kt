@@ -24,7 +24,7 @@ import store.pengu.mobile.states.StoreState
 @Composable
 fun PantryScreen(navController: NavController, store: StoreState) {
     val openDialog = remember { mutableStateOf(false) }
-    val selectedPantry = remember { mutableStateOf(Pantry("",false, emptyList())) }
+    val selectedPantry = remember { mutableStateOf(Pantry(-1,"", "")) }
 
     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
         Button(
@@ -43,7 +43,7 @@ fun PantryScreen(navController: NavController, store: StoreState) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(store.user.pantries) { pantry ->
+            items(store.pantries) { pantry ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -93,7 +93,7 @@ fun PantryScreen(navController: NavController, store: StoreState) {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(selectedPantry.value.items) { item ->
+                        /*items(selectedPantry.value.items) { item ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
@@ -116,7 +116,7 @@ fun PantryScreen(navController: NavController, store: StoreState) {
                                     }
                                 }
                             }
-                        }
+                        }*/
                     }
                 },
                 confirmButton = {},

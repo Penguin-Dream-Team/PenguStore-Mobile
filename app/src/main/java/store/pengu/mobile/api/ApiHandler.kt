@@ -54,9 +54,58 @@ abstract class ApiHandler(open val store: StoreState) {
             handleApiException(e) as T
         }
 
+    protected suspend inline fun <reified T> get(path: String, id: String): T =
+        try {
+            api.get(path = path.replace("id", id)) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
     protected suspend inline fun <reified T> post(path: String, data: Any): T =
         try {
             api.post(path = path, body = data) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> post(path: String, id: String): T =
+        try {
+            api.post(path = path.replace("id", id)) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> post(path: String, id: String, data: Any): T =
+        try {
+            api.post(path = path.replace("id", id), body = data) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> put(path: String, data: Any): T =
+        try {
+            api.put(path = path, body = data) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> put(path: String, id: String): T =
+        try {
+            api.put(path = path.replace("id", id)) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> delete(path: String, id: String): T =
+        try {
+            api.delete(path = path.replace("id", id)) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> delete(path: String, data: Any): T =
+        try {
+            api.delete(path = path, body = data) { addJWTTokenToRequest(headers) }
         } catch (e: Exception) {
             handleApiException(e) as T
         }
