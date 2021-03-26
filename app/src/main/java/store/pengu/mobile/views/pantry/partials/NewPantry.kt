@@ -53,7 +53,7 @@ fun NewPantry(navController: NavController, store: StoreState) {
                         ) {
                             IconButton(
                                 onClick = {
-                                    item.amountNeeded--
+                                    //item.amountNeeded--
                                 }
                             ) {
                                 Icon(
@@ -63,12 +63,13 @@ fun NewPantry(navController: NavController, store: StoreState) {
                                 )
                             }
                             Text(
-                                text = "${item.name}: ${item.amountNeeded}",
+                                //text = "${item.name}: ${item.amountNeeded}",
+                                text = "${item.name}",
                                 fontWeight = FontWeight.SemiBold
                             )
                             IconButton(
                                 onClick = {
-                                    item.amountNeeded++
+                                    //item.amountNeeded++
                                 }
                             ) {
                                 Icon(

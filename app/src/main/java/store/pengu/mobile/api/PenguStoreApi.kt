@@ -8,8 +8,7 @@ class PenguStoreApi(
     store: StoreState
 ) : ApiHandler(store) {
 
-    suspend fun login(loginRequest: LoginRequest): Response.SuccessResponse<User> =
-        post(Routes.LOGIN, loginRequest)
+    suspend fun login(loginRequest: LoginRequest): Response.SuccessResponse<User> = post(Routes.LOGIN, loginRequest)
 
     suspend fun setup(): Response.SuccessResponse<User> {
         val setupRequest = SetupRequest(phonePublicKey = "DUMMY")
