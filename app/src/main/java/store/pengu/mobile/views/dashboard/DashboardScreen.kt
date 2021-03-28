@@ -3,6 +3,7 @@ package store.pengu.mobile.views.dashboard
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,24 +15,23 @@ import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.dashboard.partials.UserInfo
 import store.pengu.mobile.views.pantry.PantryScreen
-import store.pengu.mobile.views.shop.ShopScreen
 
 @Composable
 fun DashboardScreen(navController: NavController, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
 
-    Column {
+    Column (
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .padding(vertical = 32.dp)
+    ) {
         if (storeState.userType == "") {
            SetupScreen(navController, storeState)
         }
         else {
             UserInfo(storeState)
             
-            PantryScreen(navController, store)
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            ShopScreen(navController)
+            PantryScreen(navController, storeState)
         }
     }
 }

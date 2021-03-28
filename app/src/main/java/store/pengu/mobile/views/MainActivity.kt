@@ -14,7 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import store.pengu.mobile.api.PenguStoreApi
-import store.pengu.mobile.api.Response
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.cart.CartScreen
@@ -23,8 +22,8 @@ import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.pantry.PantryScreen
 import store.pengu.mobile.views.pantry.partials.NewPantry
 import store.pengu.mobile.views.profile.ProfileScreen
+import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.shared.BottomBar
-import store.pengu.mobile.views.shop.ShopScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -76,8 +75,8 @@ class MainActivity : AppCompatActivity() {
                             NewPantry(navController, storeState)
                         }
 
-                        composable("shop") {
-                            ShopScreen(navController)
+                        composable("search") {
+                            SearchScreen(navController, storeState)
                         }
 
                         composable("cart") {
