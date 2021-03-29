@@ -21,6 +21,7 @@ import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.pantry.PantryScreen
 import store.pengu.mobile.views.pantry.partials.NewPantry
+import store.pengu.mobile.views.pantry.partials.Pantry
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.shared.BottomBar
@@ -45,8 +46,9 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launchWhenCreated {
             try {
-                val res = api.dashboard()
-                Toast.makeText(applicationContext, res.data, Toast.LENGTH_LONG).show()
+                storeState.products = api.products().data
+                storeState.pantries = api.pantries().data
+
             } catch(e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
             }
@@ -67,12 +69,16 @@ class MainActivity : AppCompatActivity() {
                             SetupScreen(navController, storeState)
                         }
 
-                        composable("pantry") {
+                        composable("pantries") {
                             PantryScreen(navController, storeState)
                         }
 
                         composable("new_pantry") {
                             NewPantry(navController, storeState)
+                        }
+
+                        composable("pantry") {
+                            Pantry(navController, storeState)
                         }
 
                         composable("search") {

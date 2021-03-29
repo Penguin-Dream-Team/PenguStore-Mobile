@@ -7,9 +7,8 @@ import androidx.compose.material.*
 import androidx.compose.material.Button
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.More
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.Preview
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,28 +17,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.data.Pantry
 import store.pengu.mobile.states.StoreState
 
 @Composable
 fun PantryScreen(navController: NavController, store: StoreState) {
+    val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
-    val selectedPantry = remember { mutableStateOf(Pantry(-1,"", "")) }
+    var selectedPantry by remember { mutableStateOf(storeState.selectedPantry) }
 
     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-        Button(
-            onClick = {
-                navController.navigate("new_pantry")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Create new Pantry",
-                textAlign = TextAlign.Center
-            )
-        }
-
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -63,10 +49,24 @@ fun PantryScreen(navController: NavController, store: StoreState) {
                                 text = pantry.name,
                                 fontWeight = FontWeight.SemiBold
                             )
+
                             IconButton(
                                 onClick = {
-                                    selectedPantry.value = pantry
+                                    selectedPantry = pantry
                                     openDialog.value = true
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Preview,
+                                    tint = Color(52, 247, 133),
+                                    contentDescription = "Preview"
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    storeState.selectedPantry = pantry
+                                    navController.navigate("pantry")
                                 },
                             ) {
                                 Icon(
@@ -81,13 +81,26 @@ fun PantryScreen(navController: NavController, store: StoreState) {
             }
         }
 
+        Button(
+            onClick = {
+                navController.navigate("new_pantry")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Create new Pantry",
+                textAlign = TextAlign.Center
+            )
+        }
+
         if (openDialog.value) {
             AlertDialog(
                 onDismissRequest = {
                     openDialog.value = false
                 },
                 title = {
-                    Text(text = selectedPantry.value.name)
+                    Text(text = selectedPantry.name)
                 },
                 text = {
                     LazyColumn(

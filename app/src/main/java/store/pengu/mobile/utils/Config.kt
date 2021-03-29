@@ -5,8 +5,8 @@ import com.sksamuel.hoplite.ConfigLoader
 data class Config(
     val protocol: String,
     val host: String,
-    val port: Int = 80,
-    val secure_port: Int = 443,
+    val port: Int,
+    val secure_port: Int,
     val timeout: Long
 ) {
     companion object {
