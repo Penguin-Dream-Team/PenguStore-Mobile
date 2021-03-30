@@ -19,6 +19,7 @@ import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
+import store.pengu.mobile.views.maps.MapScreen
 import store.pengu.mobile.views.pantry.PantryScreen
 import store.pengu.mobile.views.pantry.partials.NewPantry
 import store.pengu.mobile.views.pantry.partials.Pantry
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("new_pantry") {
-                            NewPantry(navController, storeState)
+                            NewPantry(navController, supportFragmentManager)
                         }
 
                         composable("pantry") {

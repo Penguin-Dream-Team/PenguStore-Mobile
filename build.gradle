@@ -5,6 +5,7 @@ buildscript {
         kotlin_version = '1.4.31'
         nav_compose_version = "1.0.0-alpha09"
         ktor_version = "1.5.2"
+        google_maps_api_version = "17.0.0"
     }
 
     repositories {

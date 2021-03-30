@@ -1,20 +1,19 @@
 package store.pengu.mobile.views.pantry.partials
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.views.maps.MapScreen
 
 @Composable
-fun NewPantry(navController: NavController, store: StoreState) {
+fun NewPantry(navController: NavController, supportFragmentManager: FragmentManager) {
     var text by remember { mutableStateOf("") }
 
     Column(
@@ -32,18 +31,16 @@ fun NewPantry(navController: NavController, store: StoreState) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Box(
+        /*Box(
             modifier = Modifier
                 .height(400.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .background(color = MaterialTheme.colors.onSurface)
         ) {
-            Text(
-                text = "Should be a map to pick the location",
-                color = MaterialTheme.colors.primary
-            )
-        }
+            MapScreen(navController, store)
+        }*/
+        MapScreen(supportFragmentManager)
 
         Spacer(modifier = Modifier.height(32.dp))
 
