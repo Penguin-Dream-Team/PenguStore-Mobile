@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.Scaffold
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private var navController: NavHostController? = null
 
+    @ExperimentalAnimationApi
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
