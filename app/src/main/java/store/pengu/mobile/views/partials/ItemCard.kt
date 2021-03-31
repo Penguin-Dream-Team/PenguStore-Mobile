@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -25,6 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.coil.CoilImage
 import store.pengu.mobile.R
+import store.pengu.mobile.utils.Math
+import store.pengu.mobile.utils.lighten
 
 @ExperimentalAnimationApi
 @Composable
@@ -47,7 +48,7 @@ fun ItemCard(
             .clip(shape = RoundedCornerShape(8))
     ) {
         val maxHeight = maxHeight
-        val imageSize = 100.dp
+        val imageSize = Math.min(maxWidth - 40.dp, 100.dp)
         Column(
             modifier = Modifier
                 .background(
@@ -64,7 +65,7 @@ fun ItemCard(
         ) {
             Column(
                 modifier = Modifier
-                    .background(color = MaterialTheme.colors.background)
+                    .background(color = MaterialTheme.colors.background.lighten(0.05f))
                     .fillMaxWidth()
                     .height(maxHeight * 4 / 7)
                     .padding(

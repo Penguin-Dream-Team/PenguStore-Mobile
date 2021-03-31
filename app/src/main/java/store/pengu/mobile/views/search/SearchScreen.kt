@@ -1,9 +1,14 @@
 package store.pengu.mobile.views.search
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -24,18 +29,37 @@ import androidx.navigation.compose.navigate
 import store.pengu.mobile.data.Pantry
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.views.partials.ItemCard
 
+@ExperimentalAnimationApi
+@ExperimentalFoundationApi
 @Composable
 fun SearchScreen(navController: NavController, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
-    val selectedProduct = remember { mutableStateOf(Product(-1,"", "", 0.0, -1)) }
+    val selectedProduct = remember { mutableStateOf(Product(-1, "", "", 0.0, -1)) }
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .padding(vertical = 32.dp)
+            .padding(horizontal = 7.dp)
     ) {
+        LazyVerticalGrid(
+            cells = GridCells.Fixed(3),
+        ) {
+            repeat(10) {
+                items(storeState.products) { product ->
+                    ItemCard(name = product.name,
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp, vertical = 7.dp)
+                            .clickable(onClickLabel = "Add to pantry") {
+                                selectedProduct.value = product
+                                openDialog.value = true
+                            })
+                }
+            }
+        }
+
+/*
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -66,6 +90,7 @@ fun SearchScreen(navController: NavController, store: StoreState) {
                 }
             }
         }
+*/
     }
 
     if (openDialog.value) {

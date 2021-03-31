@@ -7,13 +7,21 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
@@ -39,6 +47,7 @@ class MainActivity : AppCompatActivity() {
 
     private var navController: NavHostController? = null
 
+    @ExperimentalFoundationApi
     @ExperimentalAnimationApi
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,12 +55,11 @@ class MainActivity : AppCompatActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                storeState.products = api.products().data
-                storeState.pantries = api.pantries().data
-
-            } catch(e: Exception) {
+                storeState.products = api.products().data.toMutableStateList()
+                storeState.pantries = api.pantries().data.toMutableStateList()
+            } catch (e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -60,39 +68,44 @@ class MainActivity : AppCompatActivity() {
             val navController = rememberNavController()
             this.navController = navController
 
+            // Init user is always guest on install
+            storeState.userType = "guest"
+
             PenguShopTheme {
                 Scaffold(bottomBar = { BottomBar(navController) }) {
-                    NavHost(navController = navController, startDestination = "dashboard") {
-                        composable("dashboard") {
-                            DashboardScreen(navController, storeState)
-                        }
+                    Surface(modifier = Modifier.fillMaxSize().padding(it)) {
+                        NavHost(navController = navController, startDestination = "search") {
+                            composable("dashboard") {
+                                DashboardScreen(navController, storeState)
+                            }
 
-                        composable("setup") {
-                            SetupScreen(navController, storeState)
-                        }
+                            composable("setup") {
+                                SetupScreen(navController, storeState)
+                            }
 
-                        composable("pantries") {
-                            PantryScreen(navController, storeState)
-                        }
+                            composable("pantries") {
+                                PantryScreen(navController, storeState)
+                            }
 
-                        composable("new_pantry") {
-                            NewPantry(navController, storeState)
-                        }
+                            composable("new_pantry") {
+                                NewPantry(navController, storeState)
+                            }
 
-                        composable("pantry") {
-                            Pantry(navController, storeState)
-                        }
+                            composable("pantry") {
+                                Pantry(navController, storeState)
+                            }
 
-                        composable("search") {
-                            SearchScreen(navController, storeState)
-                        }
+                            composable("search") {
+                                SearchScreen(navController, storeState)
+                            }
 
-                        composable("cart") {
-                            CartScreen(navController)
-                        }
+                            composable("cart") {
+                                CartScreen(navController)
+                            }
 
-                        composable("profile") {
-                            ProfileScreen(navController)
+                            composable("profile") {
+                                ProfileScreen(navController)
+                            }
                         }
                     }
                 }

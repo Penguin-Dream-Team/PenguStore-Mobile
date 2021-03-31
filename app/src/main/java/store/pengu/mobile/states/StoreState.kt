@@ -9,8 +9,7 @@ class StoreState {
     var token by mutableStateOf("")
     var selectedPantry by mutableStateOf(Pantry(-1, "", ""))
 
-    lateinit var products: List<Product>
-
-    lateinit var pantries: List<Pantry>
+    var products = mutableStateListOf<Product>()
+    var pantries = mutableStateListOf<Pantry>()
 }
 
