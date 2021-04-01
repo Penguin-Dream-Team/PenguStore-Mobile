@@ -1,9 +1,6 @@
 package store.pengu.mobile.views.maps
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -15,62 +12,175 @@ import com.google.android.gms.maps.model.MarkerOptions
 import store.pengu.mobile.R
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.os.Looper
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Marker
 
-class MapScreen : AppCompatActivity(), OnMapReadyCallback, LocationListener  {
-    lateinit var currentLocation : Location
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
-    @SuppressLint("SourceLockedOrientationActivity")
+    lateinit var mGoogleMap: GoogleMap
+    var mapFrag: SupportMapFragment? = null
+    lateinit var mLocationRequest: LocationRequest
+    var mLastLocation: Location? = null
+    internal var mCurrLocationMarker: Marker? = null
+    private var mFusedLocationClient: FusedLocationProviderClient? = null
+
+    private var mLocationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            val locationList = locationResult.locations
+            if (locationList.isNotEmpty()) {
+                //The last location in the list is the newest
+                val location = locationList.last()
+                Log.i("MapScreen", "Location: ${location.latitude} ${location.longitude}")
+                mLastLocation = location
+                if (mCurrLocationMarker != null) {
+                    mCurrLocationMarker?.remove()
+                }
+
+                //Place current location marker
+                val latLng = LatLng(location.latitude, location.longitude)
+                val markerOptions = MarkerOptions()
+                markerOptions.position(latLng)
+                markerOptions.title("Current Position")
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                mCurrLocationMarker = mGoogleMap.addMarker(markerOptions)
+
+                //move map camera
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11.0F))
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.map_layout)
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        supportActionBar?.title = "Google Maps"
 
-        // Check permissions
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        mapFrag = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFrag?.getMapAsync(this)
+    }
+
+    public override fun onPause() {
+        super.onPause()
+
+        //stop location updates when Activity is no longer active
+        mFusedLocationClient?.removeLocationUpdates(mLocationCallback)
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mGoogleMap = googleMap
+        mGoogleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+
+        mLocationRequest = LocationRequest()
+        mLocationRequest.interval = 120000 // two minute interval
+        mLocationRequest.fastestInterval = 120000
+        mLocationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            //Location Permission already granted
+            mFusedLocationClient?.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
+            mGoogleMap.isMyLocationEnabled = true
+        } else {
+            //Request Location Permission
+            checkLocationPermission()
+        }
+    }
+
+    private fun checkLocationPermission() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                101)
-            return
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                AlertDialog.Builder(this)
+                    .setTitle("Location Permission Needed")
+                    .setMessage("This app needs the Location permission, please accept to use location functionality")
+                    .setPositiveButton(
+                        "OK"
+                    ) { _, _ ->
+                        //Prompt the user once explanation has been shown
+                        ActivityCompat.requestPermissions(
+                            this@MapScreen,
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                            MY_PERMISSIONS_REQUEST_LOCATION
+                        )
+                    }
+                    .create()
+                    .show()
+
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    MY_PERMISSIONS_REQUEST_LOCATION
+                )
+            }
         }
-
-        //val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
-
-        setContentView(R.layout.map_layout)
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
     }
 
-    override fun onMapReady(googleMap: GoogleMap?) {
-        //val latLng = LatLng(currentLocation.latitude, currentLocation.longitude)
-        val latLng = LatLng(0.0, 0.0)
-        googleMap?.apply {
-            addMarker(
-                MarkerOptions()
-                    .position(latLng)
-                    .title("Current Location")
-            )
-            moveCamera(CameraUpdateFactory.newLatLng(latLng))
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            MY_PERMISSIONS_REQUEST_LOCATION -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // location-related task you need to do.
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        mFusedLocationClient?.requestLocationUpdates(
+                            mLocationRequest,
+                            mLocationCallback,
+                            Looper.myLooper()
+                        )
+                        mGoogleMap.isMyLocationEnabled = true
+                    }
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
+                }
+                return
+            }
         }
     }
 
-    override fun onLocationChanged(location: Location?) {
-        currentLocation.latitude = location!!.latitude
-        currentLocation.longitude = location.longitude
+    companion object {
+        const val MY_PERMISSIONS_REQUEST_LOCATION = 99
     }
-
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-    override fun onProviderEnabled(provider: String?) {}
-    override fun onProviderDisabled(provider: String?) {}
 }

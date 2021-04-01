@@ -13,14 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
-import store.pengu.mobile.R
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
@@ -36,7 +29,7 @@ import store.pengu.mobile.views.shared.BottomBar
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var storeState: StoreState
@@ -61,10 +54,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
             }
         }
-
-        setContentView(R.layout.map_layout)
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
 
         setContent {
             val navController = rememberNavController()
@@ -107,20 +96,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             }
-        }
-    }
-
-    override fun onMapReady(googleMap: GoogleMap?) {
-        googleMap?.apply {
-            val sydney = LatLng(-33.852, 151.211)
-            addMarker(
-                MarkerOptions()
-                    .position(sydney)
-                    .title("Marker in Sydney")
-            )
-            // [START_EXCLUDE silent]
-            moveCamera(CameraUpdateFactory.newLatLng(sydney))
-            // [END_EXCLUDE]
         }
     }
 }
