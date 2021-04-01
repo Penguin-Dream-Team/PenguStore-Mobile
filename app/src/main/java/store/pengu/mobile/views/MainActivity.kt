@@ -7,19 +7,26 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Scaffold
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
+import store.pengu.mobile.R
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
-import store.pengu.mobile.views.maps.MapScreen
 import store.pengu.mobile.views.pantry.PantryScreen
 import store.pengu.mobile.views.pantry.partials.NewPantry
 import store.pengu.mobile.views.pantry.partials.Pantry
@@ -29,7 +36,7 @@ import store.pengu.mobile.views.shared.BottomBar
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Inject
     lateinit var storeState: StoreState
@@ -55,6 +62,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        setContentView(R.layout.map_layout)
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
+
         setContent {
             val navController = rememberNavController()
             this.navController = navController
@@ -75,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("new_pantry") {
-                            NewPantry(navController, supportFragmentManager)
+                            NewPantry(navController, LocalContext.current)
                         }
 
                         composable("pantry") {
@@ -96,6 +107,20 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap?) {
+        googleMap?.apply {
+            val sydney = LatLng(-33.852, 151.211)
+            addMarker(
+                MarkerOptions()
+                    .position(sydney)
+                    .title("Marker in Sydney")
+            )
+            // [START_EXCLUDE silent]
+            moveCamera(CameraUpdateFactory.newLatLng(sydney))
+            // [END_EXCLUDE]
         }
     }
 }

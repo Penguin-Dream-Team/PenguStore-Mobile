@@ -18,7 +18,7 @@ import store.pengu.mobile.states.StoreState
 @Composable
 fun Pantry(navController: NavController, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
-    var selectedPantry by remember { mutableStateOf(storeState.selectedPantry) }
+    val selectedPantry by remember { mutableStateOf(storeState.selectedPantry) }
 
     Column(
         modifier = Modifier
