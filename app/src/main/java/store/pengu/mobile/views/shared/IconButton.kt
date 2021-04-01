@@ -9,7 +9,7 @@ fun IconButton(
     onClick: () -> Unit,
     icon: ImageVector,
     description: String,
-    selected: Boolean
+    selected: Boolean = false
 ) {
     IconButton(onClick) {
         Icon(

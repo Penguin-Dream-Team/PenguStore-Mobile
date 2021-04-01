@@ -35,11 +35,12 @@ fun ItemCard(
     tagLine: String? = null,
     image: String? = null
 ) {
+    val height = if (tagLine.isNullOrBlank()) 150.dp else 190.dp
     BoxWithConstraints(
         modifier = Modifier
             .then(modifier)
             .width(150.dp)
-            .height(190.dp)
+            .height(height)
             .border(
                 color = MaterialTheme.colors.onBackground.copy(alpha = 0.3f),
                 width = 2.dp,

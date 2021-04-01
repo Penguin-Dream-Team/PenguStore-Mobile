@@ -2,8 +2,6 @@ package store.pengu.mobile.views.search
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -12,25 +10,24 @@ import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.data.Pantry
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.partials.ItemCard
+import store.pengu.mobile.views.partials.SearchTopBar
 
+@ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @Composable
@@ -39,12 +36,13 @@ fun SearchScreen(navController: NavController, store: StoreState) {
     val openDialog = remember { mutableStateOf(false) }
     val selectedProduct = remember { mutableStateOf(Product(-1, "", "", 0.0, -1)) }
 
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 7.dp)
-    ) {
+    Column {
+        SearchTopBar()
+
         LazyVerticalGrid(
             cells = GridCells.Fixed(3),
+            modifier = Modifier
+                .padding(horizontal = 7.dp)
         ) {
             repeat(10) {
                 items(storeState.products) { product ->
@@ -58,39 +56,6 @@ fun SearchScreen(navController: NavController, store: StoreState) {
                 }
             }
         }
-
-/*
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(storeState.products) { product ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 20.dp)
-                        .background(MaterialTheme.colors.secondaryVariant),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = product.name,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    IconButton(
-                        onClick = {
-                            selectedProduct.value = product
-                            openDialog.value = true
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "Add to a pantry"
-                        )
-                    }
-                }
-            }
-        }
-*/
     }
 
     if (openDialog.value) {
