@@ -14,6 +14,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -22,15 +23,14 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
-    lateinit var mGoogleMap: GoogleMap
     var mapFrag: SupportMapFragment? = null
-    lateinit var mLocationRequest: LocationRequest
-    var mLastLocation: Location? = null
-    internal var mCurrLocationMarker: Marker? = null
-    private var mFusedLocationClient: FusedLocationProviderClient? = null
+    var lastLocation: Location? = null
+    lateinit var googleMap: GoogleMap
+    lateinit var locationRequest: LocationRequest
+    internal var currentLocationMarker: Marker? = null
+    private var fusedLocationClient: FusedLocationProviderClient? = null
 
     private var mLocationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -39,9 +39,9 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                 //The last location in the list is the newest
                 val location = locationList.last()
                 Log.i("MapScreen", "Location: ${location.latitude} ${location.longitude}")
-                mLastLocation = location
-                if (mCurrLocationMarker != null) {
-                    mCurrLocationMarker?.remove()
+                lastLocation = location
+                if (currentLocationMarker != null) {
+                    currentLocationMarker?.remove()
                 }
 
                 //Place current location marker
@@ -50,11 +50,21 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                 markerOptions.position(latLng)
                 markerOptions.title("Current Position")
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-                mCurrLocationMarker = mGoogleMap.addMarker(markerOptions)
+                currentLocationMarker = googleMap.addMarker(markerOptions)
 
                 //move map camera
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11.0F))
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11.0F))
             }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
+        android.R.id.home -> {
+            finish()
+            true
+        }
+        else -> {
+            super.onOptionsItemSelected(item)
         }
     }
 
@@ -63,8 +73,9 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.map_layout)
 
         supportActionBar?.title = "Google Maps"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         mapFrag = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFrag?.getMapAsync(this)
@@ -73,18 +84,18 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
     public override fun onPause() {
         super.onPause()
 
-        //stop location updates when Activity is no longer active
-        mFusedLocationClient?.removeLocationUpdates(mLocationCallback)
+        //stop location updates when Screen is no longer active
+        fusedLocationClient?.removeLocationUpdates(mLocationCallback)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        mGoogleMap = googleMap
-        mGoogleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+        this.googleMap = googleMap
+        this.googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
 
-        mLocationRequest = LocationRequest()
-        mLocationRequest.interval = 120000 // two minute interval
-        mLocationRequest.fastestInterval = 120000
-        mLocationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        locationRequest = LocationRequest()
+        locationRequest.interval = 120000 // two minute interval
+        locationRequest.fastestInterval = 120000
+        locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -92,11 +103,42 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             //Location Permission already granted
-            mFusedLocationClient?.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
-            mGoogleMap.isMyLocationEnabled = true
+            fusedLocationClient?.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper()!!)
+            this.googleMap.isMyLocationEnabled = true
         } else {
             //Request Location Permission
             checkLocationPermission()
+        }
+
+        // Setting a click event handler for the map
+        googleMap.setOnMapClickListener { latLng ->
+            val markerOptions = MarkerOptions()
+            markerOptions.position(latLng)
+            markerOptions.title(latLng.latitude.toString() + " : " + latLng.longitude)
+
+            // Clears the previously touched position
+            googleMap.clear()
+            // Animating to the touched position
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+            // Placing a marker on the touched position
+            googleMap.addMarker(markerOptions)
+        }
+
+        googleMap.setOnMyLocationButtonClickListener {
+            val latLng = LatLng(lastLocation!!.latitude, lastLocation!!.longitude)
+
+            val markerOptions = MarkerOptions()
+            markerOptions.position(latLng)
+            markerOptions.title("Current Position")
+
+            // Clears the previously touched position
+            googleMap.clear()
+            // Animating to the touched position
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+            // Placing a marker on the touched position
+            googleMap.addMarker(markerOptions)
+
+            true
         }
     }
 
@@ -106,15 +148,11 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
             ) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
                 AlertDialog.Builder(this)
                     .setTitle("Location Permission Needed")
                     .setMessage("This app needs the Location permission, please accept to use location functionality")
@@ -130,10 +168,8 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                     }
                     .create()
                     .show()
-
-
             } else {
-                // No explanation needed, we can request the permission.
+                // No explanation needed, we can request the permission
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -150,29 +186,27 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_LOCATION -> {
-                // If request is cancelled, the result arrays are empty.
+                // If request is cancelled, the result arrays are empty
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    // permission was granted, yay! Do the
-                    // location-related task you need to do.
+                    // permission was granted | Do the location-related task
                     if (ContextCompat.checkSelfPermission(
                             this,
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
 
-                        mFusedLocationClient?.requestLocationUpdates(
-                            mLocationRequest,
+                        fusedLocationClient?.requestLocationUpdates(
+                            locationRequest,
                             mLocationCallback,
-                            Looper.myLooper()
+                            Looper.myLooper()!!
                         )
-                        mGoogleMap.isMyLocationEnabled = true
+                        googleMap.isMyLocationEnabled = true
                     }
 
                 } else {
 
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // permission was denied | Disable the location-related task
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
                 }
                 return
