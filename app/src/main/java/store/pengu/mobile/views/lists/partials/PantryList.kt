@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.pantry.partials
+package store.pengu.mobile.views.lists.partials
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,12 +13,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.states.StoreState
 
 @Composable
-fun Pantry(navController: NavController, store: StoreState) {
+fun PantryList(navController: NavController, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
-    val selectedPantry by remember { mutableStateOf(storeState.selectedPantry) }
+    val selectedPantry = storeState.selectedList as PantryList
 
     Column(
         modifier = Modifier

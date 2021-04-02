@@ -1,7 +1,11 @@
 package store.pengu.mobile.api
 
 import store.pengu.mobile.api.requests.*
-import store.pengu.mobile.data.*
+import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.Product
+import store.pengu.mobile.data.Shop
+import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.data.User
 import store.pengu.mobile.states.StoreState
 
 class PenguStoreApi(
@@ -43,13 +47,13 @@ class PenguStoreApi(
         return delete(Routes.ADD_USER_PANTRY, addUserPantryRequest)
     }
 
-    suspend fun getUserPantries(userId: String): Response.SuccessResponse<List<Pantry>> = get(Routes.GET_USER_PANTRIES, userId)
+    suspend fun getUserPantries(userId: String): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_USER_PANTRIES, userId)
 
     suspend fun getUserShoppingList(shopId: String): Response.SuccessResponse<List<ShoppingList>> = get(Routes.GET_USER_SHOPPING_LIST, shopId)
 
-    suspend fun pantries(): Response.SuccessResponse<List<Pantry>> = get(Routes.PANTRIES)
+    suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.PANTRIES)
 
-    suspend fun getPantry(pantryId: String): Response.SuccessResponse<Pantry> = get(Routes.GET_PANTRY, pantryId)
+    suspend fun getPantry(pantryId: String): Response.SuccessResponse<PantryList> = get(Routes.GET_PANTRY, pantryId)
 
     suspend fun addPantry(pantryId: Long, pantryCode: String, pantryName: String): Response.SuccessResponse<String> {
         val addPantryRequest = AddPantryRequest(pantryId, pantryCode, pantryName)

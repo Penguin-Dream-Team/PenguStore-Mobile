@@ -11,8 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
-import store.pengu.mobile.views.dashboard.partials.UserInfo
-import store.pengu.mobile.views.pantry.PantryScreen
+import store.pengu.mobile.views.lists.ListsScreen
 
 @Composable
 fun DashboardScreen(navController: NavController, store: StoreState) {
@@ -23,13 +22,9 @@ fun DashboardScreen(navController: NavController, store: StoreState) {
             .padding(horizontal = 24.dp)
             .padding(vertical = 32.dp)
     ) {
-        if (storeState.userType == "") {
-           SetupScreen(navController, storeState)
-        }
-        else {
-            UserInfo(storeState)
-            
-            PantryScreen(navController, storeState)
-        }
+        if (storeState.userType == "")
+            SetupScreen(navController, storeState)
+        else
+            ListsScreen(navController, storeState)
     }
 }

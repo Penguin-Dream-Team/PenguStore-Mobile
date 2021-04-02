@@ -20,9 +20,11 @@ import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
-import store.pengu.mobile.views.pantry.PantryScreen
-import store.pengu.mobile.views.pantry.partials.NewPantry
-import store.pengu.mobile.views.pantry.partials.Pantry
+import store.pengu.mobile.views.lists.ListsScreen
+import store.pengu.mobile.views.lists.partials.NewPantryList
+import store.pengu.mobile.views.lists.partials.PantryList
+import store.pengu.mobile.views.lists.partials.NewShoppingList
+import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.shared.BottomBar
@@ -70,16 +72,24 @@ class MainActivity : AppCompatActivity() {
                             SetupScreen(navController, storeState)
                         }
 
-                        composable("pantries") {
-                            PantryScreen(navController, storeState)
+                        composable("lists") {
+                            ListsScreen(navController, storeState)
                         }
 
-                        composable("new_pantry") {
-                            NewPantry(navController, LocalContext.current)
+                        composable("new_pantry_list") {
+                            NewPantryList(navController, LocalContext.current)
                         }
 
-                        composable("pantry") {
-                            Pantry(navController, storeState)
+                        composable("pantry_list") {
+                            PantryList(navController, storeState)
+                        }
+
+                        composable("new_shopping_list") {
+                            NewShoppingList(navController, LocalContext.current)
+                        }
+
+                        composable("shopping_list") {
+                            ShoppingList(navController, storeState)
                         }
 
                         composable("search") {
