@@ -1,6 +1,6 @@
 package store.pengu.mobile.views.lists.partials
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -8,13 +8,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.views.maps.MapScreen
 
 @Composable
-fun NewPantryList(navController: NavController, context: Context) {
+fun NewPantryList(navController: NavController, activity: Activity) {
     var text by remember { mutableStateOf("") }
+    var api: PenguStoreApi
 
     Column(
         modifier = Modifier
@@ -26,14 +29,14 @@ fun NewPantryList(navController: NavController, context: Context) {
         TextField(
             value = text,
             onValueChange = { text = it },
-            label = { Text("Pantry Name") }
+            label = { Text("Pantry List Name") }
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             onClick = {
-                context.startActivity(Intent(context, MapScreen::class.java))
+                startActivityForResult(activity, Intent(activity, MapScreen::class.java), 111, null)
             }) {
             Text("Pick a Location")
         }

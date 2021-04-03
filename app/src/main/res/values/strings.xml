@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PenguShop</string>
+    <string name="confirm_location">Confirm Location</string>
 </resources>

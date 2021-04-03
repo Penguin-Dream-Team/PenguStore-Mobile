@@ -12,9 +12,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import store.pengu.mobile.R
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -22,11 +24,13 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
+import android.content.Intent
 
 class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
     var mapFrag: SupportMapFragment? = null
     var lastLocation: Location? = null
+    var selectedLocation: Location? = null
     lateinit var googleMap: GoogleMap
     lateinit var locationRequest: LocationRequest
     internal var currentLocationMarker: Marker? = null
@@ -79,6 +83,14 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
         mapFrag = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFrag?.getMapAsync(this)
+
+        val button = findViewById<Button>(R.id.confirmButton)
+        button.setOnClickListener {
+            setResult(RESULT_OK, Intent()
+                .putExtra("LATITUDE", selectedLocation!!.latitude)
+                .putExtra("LONGITUDE", selectedLocation!!.longitude))
+            finish()
+        }
     }
 
     public override fun onPause() {
@@ -112,6 +124,11 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
         // Setting a click event handler for the map
         googleMap.setOnMapClickListener { latLng ->
+            selectedLocation = Location(LocationManager.GPS_PROVIDER).apply {
+                latitude = latLng.latitude
+                longitude = latLng.longitude
+            }
+
             val markerOptions = MarkerOptions()
             markerOptions.position(latLng)
             markerOptions.title(latLng.latitude.toString() + " : " + latLng.longitude)

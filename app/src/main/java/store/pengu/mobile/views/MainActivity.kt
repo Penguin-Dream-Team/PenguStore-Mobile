@@ -1,20 +1,25 @@
 package store.pengu.mobile.views
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Scaffold
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.cart.CartScreen
@@ -50,7 +55,9 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launchWhenCreated {
             try {
                 storeState.products = api.products().data
-                storeState.pantries = api.pantries().data
+                storeState.pantryLists = api.pantries().data
+                storeState.shoppingLists = emptyList()
+                storeState.lists = arrayOf(storeState.pantryLists, storeState.shoppingLists)
 
             } catch(e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
@@ -77,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("new_pantry_list") {
-                            NewPantryList(navController, LocalContext.current)
+                            NewPantryList(navController, this@MainActivity)
                         }
 
                         composable("pantry_list") {
@@ -85,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("new_shopping_list") {
-                            NewShoppingList(navController, LocalContext.current)
+                            NewShoppingList(navController, this@MainActivity)
                         }
 
                         composable("shopping_list") {
@@ -106,6 +113,16 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data != null && resultCode == RESULT_OK && requestCode == 111) {
+            storeState.listLocation = LatLng(
+                data.extras!!.getDouble("LATITUDE"),
+                data.extras!!.getDouble("LONGITUDE")
+            )
         }
     }
 }

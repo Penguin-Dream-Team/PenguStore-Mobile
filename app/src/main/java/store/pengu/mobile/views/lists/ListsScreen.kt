@@ -16,16 +16,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.states.StoreState
 
 @Composable
 fun ListsScreen(navController: NavController, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
-    val selectedTabList by remember { mutableStateOf(storeState.pantries) }
 
-    var type by mutableStateOf(0)
+    var type by remember { mutableStateOf(0) }
+    val selectedTabList by remember {
+        mutableStateOf(storeState.lists)
+    }
     val sectionTypes = ListTypesEnum.values().map { it.type }
 
     Column {
@@ -46,7 +47,7 @@ fun ListsScreen(navController: NavController, store: StoreState) {
                 .align(Alignment.CenterHorizontally)
                 .padding(vertical = 20.dp)
         ) {
-            items(selectedTabList) { item ->
+            items(selectedTabList[type]) { item ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -83,7 +84,10 @@ fun ListsScreen(navController: NavController, store: StoreState) {
                             IconButton(
                                 onClick = {
                                     storeState.selectedList = item
-                                    navController.navigate("pantry")
+                                    if (type == 0)
+                                        navController.navigate("pantry_list")
+                                    else
+                                        navController.navigate("shopping_list")
                                 },
                             ) {
                                 Icon(

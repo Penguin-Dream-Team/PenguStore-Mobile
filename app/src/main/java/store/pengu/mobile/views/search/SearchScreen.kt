@@ -77,7 +77,7 @@ fun SearchScreen(navController: NavController, store: StoreState) {
                         .fillMaxWidth()
                         .padding(vertical = 10.dp)
                 ) {
-                    items(storeState.pantries) { pantry ->
+                    items(storeState.pantryLists) { pantry ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
