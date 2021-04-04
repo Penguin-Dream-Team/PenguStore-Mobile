@@ -1,7 +1,7 @@
 package store.pengu.mobile.api.requests
 
 data class UpdatePantryListRequest(
-    val userId: Long = -1,
+    val id: Long = -1,
     val code: String = "abc",
     val name: String = "",
     val latitude: Double = 0.0,

@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                 Scaffold(bottomBar = { BottomBar(navController) }) {
                     NavHost(navController = navController, startDestination = "dashboard") {
                         composable("dashboard") {
-                            DashboardScreen(navController, loginService, storeState)
+                            DashboardScreen(navController, loginService, listsService, storeState)
                         }
 
                         composable("setup") {
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("lists") {
-                            ListsScreen(navController, storeState)
+                            ListsScreen(navController, listsService, storeState)
                         }
 
                         composable("new_list") {

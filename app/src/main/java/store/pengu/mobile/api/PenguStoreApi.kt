@@ -77,23 +77,13 @@ class PenguStoreApi(
 
     suspend fun getPantry(pantryId: String): Response.SuccessResponse<PantryList> = get(Routes.GET_PANTRY_LIST, pantryId)
 
-    suspend fun addPantry(userId: Long, pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<String> {
-        val addPantryRequest = AddPantryListRequest(
-            userId = userId,
-            name = pantryName,
-            latitude = pantryLocation.latitude,
-            longitude = pantryLocation.longitude
-        )
+    suspend fun addPantry(pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<String> {
+        val addPantryRequest = AddPantryListRequest(name = pantryName, latitude = pantryLocation.latitude, longitude = pantryLocation.longitude)
         return post(Routes.ADD_PANTRY_LIST, addPantryRequest)
     }
 
-    suspend fun updatePantry(userId: Long, pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<String> {
-        val updatePantryRequest = UpdatePantryListRequest(
-            userId = userId,
-            name = pantryName,
-            latitude = pantryLocation.latitude,
-            longitude = pantryLocation.longitude
-        )
+    suspend fun updatePantry(pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<String> {
+        val updatePantryRequest = UpdatePantryListRequest(name = pantryName, latitude = pantryLocation.latitude, longitude = pantryLocation.longitude)
         return put(Routes.UPDATE_PANTRY_LIST, updatePantryRequest)
     }
 

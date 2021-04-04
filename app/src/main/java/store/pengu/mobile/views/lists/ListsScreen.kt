@@ -16,18 +16,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 
 @Composable
-fun ListsScreen(navController: NavController, store: StoreState) {
+fun ListsScreen(navController: NavController, listsService: ListsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
-
     var type by remember { mutableStateOf(0) }
-    val selectedTabList by remember {
-        mutableStateOf(storeState.lists)
-    }
+    val selectedTabList by remember { mutableStateOf(storeState.lists) }
     val sectionTypes = ListTypesEnum.values().map { it.type }
+
+    if (type == 0) listsService.refreshPantryList(storeState.userId)
+    else listsService.refreshShoppingList(storeState.userId)
 
     Column {
         TabRow(selectedTabIndex = type) {

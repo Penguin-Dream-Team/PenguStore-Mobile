@@ -12,6 +12,17 @@ class ListsService(
 ) {
 
     fun createList(listName: String) = GlobalScope.launch(Dispatchers.Main) {
-        api.addPantry(store.userId, listName, store.listLocation)
+        api.addPantry(listName, store.listLocation)
+        api.addUserPantry(store.userId, "abc")
+    }
+
+    fun refreshPantryList(userId: Long) = GlobalScope.launch(Dispatchers.Main) {
+        store.pantryLists = api.getUserPantries(userId).data
+        store.lists[0] = store.pantryLists
+    }
+
+    fun refreshShoppingList(userId: Long) = GlobalScope.launch(Dispatchers.Main) {
+        store.shoppingLists = api.getUserShoppingLists(userId).data
+        store.lists[1] = store.shoppingLists
     }
 }
