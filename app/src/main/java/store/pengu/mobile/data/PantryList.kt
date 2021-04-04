@@ -3,7 +3,9 @@ package store.pengu.mobile.data
 import com.google.gson.annotations.SerializedName
 
 data class PantryList(
-    @SerializedName("name") override val name: String,
     @SerializedName("id") val id: Long,
-    @SerializedName("code") val code: String
+    @SerializedName("name") override val name: String,
+    @SerializedName("code") val code: String,
+    @SerializedName("latitude") val latitude: Float,
+    @SerializedName("longitude") val longitude: Float
 ) : ListTypes

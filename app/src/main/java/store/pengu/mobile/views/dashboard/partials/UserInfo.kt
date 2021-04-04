@@ -29,7 +29,7 @@ fun UserInfo(storeState: StoreState) {
         )
 
         Text(
-            storeState.userType,
+            storeState.userId.toString(),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center

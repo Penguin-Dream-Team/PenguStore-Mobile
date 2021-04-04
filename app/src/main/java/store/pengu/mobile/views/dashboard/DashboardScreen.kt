@@ -9,12 +9,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.lists.ListsScreen
 
 @Composable
-fun DashboardScreen(navController: NavController, store: StoreState) {
+fun DashboardScreen(navController: NavController, loginService: LoginService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
 
     Column (
@@ -22,8 +23,8 @@ fun DashboardScreen(navController: NavController, store: StoreState) {
             .padding(horizontal = 24.dp)
             .padding(vertical = 32.dp)
     ) {
-        if (storeState.userType == "")
-            SetupScreen(navController, storeState)
+        if (storeState.userId == -1L)
+            SetupScreen(navController, loginService)
         else
             ListsScreen(navController, storeState)
     }

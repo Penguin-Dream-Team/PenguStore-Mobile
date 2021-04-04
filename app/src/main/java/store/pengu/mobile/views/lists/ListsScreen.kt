@@ -105,10 +105,8 @@ fun ListsScreen(navController: NavController, store: StoreState) {
 
     Button(
         onClick = {
-            if (type == 0)
-                navController.navigate("new_pantry_list")
-            else
-                navController.navigate("new_shopping_list")
+            store.listType = type
+            navController.navigate("new_list")
         },
         modifier = Modifier
             .fillMaxWidth()

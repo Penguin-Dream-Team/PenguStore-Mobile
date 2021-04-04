@@ -8,9 +8,6 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -19,16 +16,16 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import store.pengu.mobile.api.PenguStoreApi
-import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.services.ListsService
+import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.lists.ListsScreen
-import store.pengu.mobile.views.lists.partials.NewPantryList
+import store.pengu.mobile.views.lists.partials.NewList
 import store.pengu.mobile.views.lists.partials.PantryList
-import store.pengu.mobile.views.lists.partials.NewShoppingList
 import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
@@ -37,6 +34,12 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var loginService: LoginService
+
+    @Inject
+    lateinit var listsService: ListsService
 
     @Inject
     lateinit var storeState: StoreState
@@ -55,9 +58,6 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launchWhenCreated {
             try {
                 storeState.products = api.products().data
-                storeState.pantryLists = api.pantries().data
-                storeState.shoppingLists = emptyList()
-                storeState.lists = arrayOf(storeState.pantryLists, storeState.shoppingLists)
 
             } catch(e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
@@ -72,27 +72,23 @@ class MainActivity : AppCompatActivity() {
                 Scaffold(bottomBar = { BottomBar(navController) }) {
                     NavHost(navController = navController, startDestination = "dashboard") {
                         composable("dashboard") {
-                            DashboardScreen(navController, storeState)
+                            DashboardScreen(navController, loginService, storeState)
                         }
 
                         composable("setup") {
-                            SetupScreen(navController, storeState)
+                            SetupScreen(navController, loginService)
                         }
 
                         composable("lists") {
                             ListsScreen(navController, storeState)
                         }
 
-                        composable("new_pantry_list") {
-                            NewPantryList(navController, this@MainActivity)
+                        composable("new_list") {
+                            NewList(navController, listsService, this@MainActivity, storeState)
                         }
 
                         composable("pantry_list") {
                             PantryList(navController, storeState)
-                        }
-
-                        composable("new_shopping_list") {
-                            NewShoppingList(navController, this@MainActivity)
                         }
 
                         composable("shopping_list") {

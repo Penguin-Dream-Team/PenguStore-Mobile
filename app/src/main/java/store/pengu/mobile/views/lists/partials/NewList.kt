@@ -11,11 +11,19 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.services.ListsService
+import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.maps.MapScreen
 
 @Composable
-fun NewShoppingList(navController: NavController, activity: Activity) {
-    var text by remember { mutableStateOf("") }
+fun NewList(
+    navController: NavController,
+    listsService: ListsService,
+    activity: Activity,
+    store: StoreState
+) {
+    var listName by remember { mutableStateOf("") }
+    val label = if (store.listType == 0) "Pantry List Name" else "Shopping List Name"
 
     Column(
         modifier = Modifier
@@ -25,9 +33,9 @@ fun NewShoppingList(navController: NavController, activity: Activity) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextField(
-            value = text,
-            onValueChange = { text = it },
-            label = { Text("Shopping List Name") }
+            value = listName,
+            onValueChange = { listName = it },
+            label = { Text(label) }
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -42,8 +50,9 @@ fun NewShoppingList(navController: NavController, activity: Activity) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            enabled = text != "",
+            enabled = listName != "",
             onClick = {
+                listsService.createList(listName)
                 navController.navigate("search")
             }) {
             Text("Continue")

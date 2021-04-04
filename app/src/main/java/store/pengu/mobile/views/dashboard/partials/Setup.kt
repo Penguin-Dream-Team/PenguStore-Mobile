@@ -6,24 +6,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.services.LoginService
 
 @Composable
-fun SetupScreen(navController: NavController, store: StoreState) {
-    val storeState by remember { mutableStateOf(store) }
+fun SetupScreen(navController: NavController, loginService: LoginService) {
 
     Button(
         onClick = {
-            store.userType = "login"
-            navController.navigate("dashboard")
+            navController.navigate("login")
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -38,8 +33,7 @@ fun SetupScreen(navController: NavController, store: StoreState) {
 
     Button(
         onClick = {
-            store.userType = "guest"
-            navController.navigate("dashboard")
+            loginService.guestLogin(navController)
         },
         modifier = Modifier
             .fillMaxWidth()
