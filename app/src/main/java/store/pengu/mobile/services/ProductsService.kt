@@ -15,6 +15,14 @@ class ProductsService(
         store.products = api.products().data
     }
 
+    fun getPantryProducts(pantryId: Long) = GlobalScope.launch(Dispatchers.Main) {
+        store.pantryProducts = api.getPantryProducts(pantryId).data
+    }
+
+    fun getShoppingListProducts(shoppingListId: Long) = GlobalScope.launch(Dispatchers.Main) {
+        store.shoppingListProducts = api.getUserShoppingListProducts(shoppingListId).data
+    }
+
     fun addProduct(
         pantryId: Long,
         productId: Long,
@@ -22,5 +30,23 @@ class ProductsService(
         amountNeeded: Int
     ) = GlobalScope.launch(Dispatchers.Main) {
         api.addPantryProduct(pantryId, productId, amountAvailable, amountNeeded)
+    }
+
+    fun updateProduct(
+        pantryId: Long,
+        productId: Long,
+        amountAvailable: Int,
+        amountNeeded: Int
+    ) = GlobalScope.launch(Dispatchers.Main) {
+        api.updatePantryProduct(pantryId, productId, amountAvailable, amountNeeded)
+        getProducts()
+    }
+
+    fun deleteProduct(
+        pantryId: Long,
+        productId: Long
+    ) = GlobalScope.launch(Dispatchers.Main) {
+        api.deletePantryProduct(pantryId, productId)
+        getProducts()
     }
 }

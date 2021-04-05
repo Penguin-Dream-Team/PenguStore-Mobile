@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("pantry_list") {
-                            PantryList(navController, storeState)
+                            PantryList(navController, productsService, storeState)
                         }
 
                         composable("shopping_list") {

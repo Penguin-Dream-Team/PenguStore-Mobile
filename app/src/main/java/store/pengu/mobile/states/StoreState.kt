@@ -18,6 +18,8 @@ class StoreState {
     var selectedProduct: Long = -1L
     var amountAvailable: Int = 0
     var amountNeeded: Int = 0
+    var pantryProducts = emptyList<Product>()
+    var shoppingListProducts = emptyList<Product>()
 
     lateinit var selectedList: ListTypes
     lateinit var listLocation: LatLng

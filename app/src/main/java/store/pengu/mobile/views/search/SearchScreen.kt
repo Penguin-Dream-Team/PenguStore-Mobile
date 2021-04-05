@@ -54,7 +54,7 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                     )
                     IconButton(
                         onClick = {
-                            selectedProductId.value = product.id
+                            selectedProductId.value = product.productId
                             alertDialogView.value = 0
                             amountAvailable.value = 0
                             amountNeeded.value = 0
@@ -246,6 +246,8 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                                     amountAvailable.value,
                                     amountNeeded.value
                                 )
+                                alertDialogView.value = 0
+                                openDialog.value = false
                             }
                         }) {
                         Text("Add Product")

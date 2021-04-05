@@ -30,7 +30,7 @@ class ListsService(
             }
         } //else {
             // api.addShoppingList(listName, store.listLocation)
-            // refreshPantryList(store.userId)
+            // refreshShoppingList(store.userId)
         //}
     }
 

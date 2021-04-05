@@ -52,7 +52,7 @@ class PenguStoreApi(
 
     suspend fun getUserPantries(userId: Long): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_USER_PANTRIES, userId.toString())
 
-    suspend fun getUserShoppingListProducts(shopId: String): Response.SuccessResponse<List<ShoppingList>> = get(Routes.GET_USER_SHOPPING_LIST_PRODUCTS, shopId)
+    suspend fun getUserShoppingListProducts(shopId: Long): Response.SuccessResponse<List<Product>> = get(Routes.GET_USER_SHOPPING_LIST_PRODUCTS, shopId.toString())
 
     suspend fun addShoppingList(shopId: Long, userId: Long, name: String): Response.SuccessResponse<String> {
         val addShoppingListRequest = AddShoppingListRequest(shopId, userId, name)
@@ -102,7 +102,7 @@ class PenguStoreApi(
         return delete(Routes.DELETE_PANTRY_PRODUCT, deletePantryProductRequest)
     }
 
-    suspend fun getPantryProducts(pantryId: String): Response.SuccessResponse<List<Product>> = get(Routes.GET_PANTRY_PRODUCTS, pantryId)
+    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<Product>> = get(Routes.GET_PANTRY_PRODUCTS, pantryId.toString())
 
     suspend fun products(): Response.SuccessResponse<List<Product>> = get(Routes.PRODUCTS)
 
