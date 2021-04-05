@@ -15,6 +15,9 @@ class StoreState {
     var shoppingLists = emptyList<ShoppingList>()
     var lists = Array(2) { emptyList<ListTypes>() }
     var listType = -1
+    var selectedProduct: Long = -1L
+    var amountAvailable: Int = 0
+    var amountNeeded: Int = 0
 
     lateinit var selectedList: ListTypes
     lateinit var listLocation: LatLng

@@ -128,33 +128,21 @@ fun ListsScreen(navController: NavController, listsService: ListsService, store:
                 Text(text = storeState.selectedList.name)
             },
             text = {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
                 ) {
-                    /*items(selectedPantry.value.items) { item ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 10.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "${item.name}: ${item.amountAvailable} out of ${item.amountNeeded}",
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
-                            }
-                        }
-                    }*/
+                    Row(modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Items ", fontWeight = FontWeight.Bold)
+                        Text(text = "0")
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Location ", fontWeight = FontWeight.Bold)
+                        Text(text = "0")
+                    }
                 }
             },
             confirmButton = {},

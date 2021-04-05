@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.states.StoreState
 
@@ -60,6 +61,21 @@ fun PantryList(navController: NavController, store: StoreState) {
             Text(
                 text = "Should be a QRCode to scan the pantry",
                 color = MaterialTheme.colors.primary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = {
+                navController.navigate("search")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Add new Item",
+                textAlign = TextAlign.Center
             )
         }
     }

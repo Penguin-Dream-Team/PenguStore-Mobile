@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.LoginService
+import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import javax.inject.Singleton
 
@@ -20,7 +21,11 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun getListsService(api: PenguStoreApi, store: StoreState): ListsService = ListsService(api, store)
+    fun getListsService(api: PenguStoreApi, productsService: ProductsService, store: StoreState): ListsService = ListsService(api, productsService, store)
+
+    @Singleton
+    @Provides
+    fun getProductsService(api: PenguStoreApi, store: StoreState): ProductsService = ProductsService(api, store)
 
     @Singleton
     @Provides

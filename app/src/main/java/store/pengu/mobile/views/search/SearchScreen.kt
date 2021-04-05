@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,14 +18,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.data.Product
+import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 
 @Composable
-fun SearchScreen(navController: NavController, store: StoreState) {
+fun SearchScreen(navController: NavController, productsService: ProductsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
-    val selectedProduct = remember { mutableStateOf(Product(-1,"", "", 0.0, -1)) }
+    val selectedProductId = remember { mutableStateOf(-2L) }
+    val selectedPantryId = remember { mutableStateOf(-2L) }
+    val alertDialogView = remember { mutableStateOf(0) }
+    val amountAvailable = remember { mutableStateOf(0) }
+    val amountNeeded = remember { mutableStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -49,7 +54,11 @@ fun SearchScreen(navController: NavController, store: StoreState) {
                     )
                     IconButton(
                         onClick = {
-                            selectedProduct.value = product
+                            selectedProductId.value = product.id
+                            alertDialogView.value = 0
+                            amountAvailable.value = 0
+                            amountNeeded.value = 0
+                            selectedPantryId.value = -2L
                             openDialog.value = true
                         }
                     ) {
@@ -64,79 +73,185 @@ fun SearchScreen(navController: NavController, store: StoreState) {
     }
 
     if (openDialog.value) {
-        AlertDialog(
-            onDismissRequest = {
-                openDialog.value = false
-            },
-            title = {
-                Text(text = "Select a pantry to add the item")
-            },
-            text = {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp)
-                ) {
-                    items(storeState.pantryLists) { pantry ->
+        if (alertDialogView.value == 0) {
+            AlertDialog(
+                onDismissRequest = {
+                    openDialog.value = false
+                },
+                title = {
+                    Text(text = "Select the amount available and desired")
+                },
+                text = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = pantry.name,
-                                fontWeight = FontWeight.SemiBold
-                            )
+                            IconButton(
+                                onClick = {
+                                    if (amountAvailable.value > 0)
+                                        amountAvailable.value--
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.RemoveCircle,
+                                    contentDescription = "Remove"
+                                )
+                            }
+
+                            Text(text = "Amount Available: ${amountAvailable.value}")
 
                             IconButton(
                                 onClick = {
-                                    // Add to the given pantry
+                                    amountAvailable.value++
                                 }
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.AddCircle,
-                                    contentDescription = "Add to the pantry"
+                                    contentDescription = "Add"
                                 )
                             }
                         }
-                    }
 
-                    item {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = "Create a new Pantry",
-                                fontWeight = FontWeight.SemiBold
-                            )
+                            IconButton(
+                                onClick = {
+                                    if (amountNeeded.value > 0)
+                                        amountNeeded.value--
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.RemoveCircle,
+                                    contentDescription = "Remove"
+                                )
+                            }
+
+                            Text(text = "Amount Needed: ${amountNeeded.value}")
 
                             IconButton(
                                 onClick = {
-                                    navController.navigate("new_pantry")
+                                    amountNeeded.value++
                                 }
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.AddCircle,
-                                    contentDescription = "Create a new Pantry"
+                                    contentDescription = "Add"
                                 )
                             }
                         }
                     }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            openDialog.value = false
+                        }) {
+                        Text("Cancel")
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            alertDialogView.value = 1
+                        }) {
+                        Text("Next")
+                    }
                 }
-            },
-            confirmButton = {},
-            dismissButton = {
-                Button(
-                    onClick = {
-                        openDialog.value = false
-                    }) {
-                    Text("Close")
+            )
+        } else {
+            AlertDialog(
+                onDismissRequest = {
+                    openDialog.value = false
+                },
+                title = {
+                    Text(text = "Select a pantry to add the item")
+                },
+                text = {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        items(storeState.pantryLists) { pantry ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = pantry.name,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                RadioButton(
+                                    selected = selectedPantryId.value == pantry.id,
+                                    onClick = { selectedPantryId.value = pantry.id }
+                                )
+                            }
+                        }
+
+                        item {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Create a new Pantry",
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                RadioButton(
+                                    selected = selectedPantryId.value == -1L,
+                                    onClick = { selectedPantryId.value = -1L }
+                                )
+                            }
+                        }
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            alertDialogView.value = 0
+                        }) {
+                        Text("Back")
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        enabled = selectedPantryId.value != -2L,
+                        onClick = {
+                            if (selectedPantryId.value == -1L) {
+                                alertDialogView.value = 0
+                                openDialog.value = false
+                                storeState.selectedProduct = selectedProductId.value
+                                storeState.amountAvailable = amountAvailable.value
+                                storeState.amountNeeded = amountNeeded.value
+                                navController.navigate("new_pantry")
+                            } else {
+                                productsService.addProduct(
+                                    selectedPantryId.value,
+                                    selectedProductId.value,
+                                    amountAvailable.value,
+                                    amountNeeded.value
+                                )
+                            }
+                        }) {
+                        Text("Add Product")
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }

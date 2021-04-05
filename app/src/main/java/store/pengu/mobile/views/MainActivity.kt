@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Scaffold
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.LoginService
+import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.views.cart.CartScreen
@@ -42,6 +41,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var listsService: ListsService
 
     @Inject
+    lateinit var productsService: ProductsService
+
+    @Inject
     lateinit var storeState: StoreState
 
     @Inject
@@ -55,14 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        lifecycleScope.launchWhenCreated {
-            try {
-                storeState.products = api.products().data
-
-            } catch(e: Exception) {
-                Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-            }
-        }
+        productsService.getProducts()
 
         setContent {
             val navController = rememberNavController()
@@ -96,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("search") {
-                            SearchScreen(navController, storeState)
+                            SearchScreen(navController, productsService, storeState)
                         }
 
                         composable("cart") {
