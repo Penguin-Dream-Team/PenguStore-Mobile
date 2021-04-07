@@ -20,6 +20,7 @@ class StoreState {
     var amountNeeded: Int = 0
     var pantryProducts = emptyList<Product>()
     var shoppingListProducts = emptyList<Product>()
+    var cartProducts: MutableList<Pair<Product, Int>> = mutableListOf()
 
     lateinit var selectedList: ListTypes
     lateinit var listLocation: LatLng

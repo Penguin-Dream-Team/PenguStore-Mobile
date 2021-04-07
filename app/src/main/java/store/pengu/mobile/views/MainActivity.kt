@@ -19,6 +19,7 @@ import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
+import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
@@ -87,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("shopping_list") {
-                            ShoppingList(navController, storeState)
+                            ShoppingList(navController, productsService, storeState)
                         }
 
                         composable("search") {
@@ -95,7 +96,11 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("cart") {
-                            CartScreen(navController)
+                            CartScreen(navController, storeState)
+                        }
+
+                        composable("cart_confirmation") {
+                            CartConfirmationScreen(navController, storeState)
                         }
 
                         composable("profile") {

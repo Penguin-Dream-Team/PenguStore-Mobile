@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 
@@ -133,11 +134,16 @@ fun ListsScreen(navController: NavController, listsService: ListsService, store:
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                 ) {
-                    Row(modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Items ", fontWeight = FontWeight.Bold)
-                        Text(text = "0")
+                    if (type == 0) {
+                        val list = storeState.selectedList as PantryList
+
+                        Row(modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "Products ", fontWeight = FontWeight.Bold)
+                            Text(text = list.productsCount.toString())
+                        }
                     }
+
                     Row(modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(text = "Location ", fontWeight = FontWeight.Bold)

@@ -15,14 +15,13 @@ class ListsService(
 
     fun createList(listName: String) = GlobalScope.launch(Dispatchers.Main) {
         if (store.listType == 0) {
-            val pantry = api.addPantry(listName, store.listLocation)
-            api.addUserPantry(store.userId, "abc")
+            val pantry = api.addPantry(listName, store.listLocation).data
             //refreshPantryList(pantry)
             refreshPantryList(store.userId)
 
             if (store.selectedProduct != -1L) {
                 productsService.addProduct(
-                    0, //pantry.id,
+                    pantry.id,
                     store.selectedProduct,
                     store.amountAvailable,
                     store.amountNeeded

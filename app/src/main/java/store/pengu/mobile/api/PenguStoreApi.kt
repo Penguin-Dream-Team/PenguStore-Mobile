@@ -15,7 +15,7 @@ class PenguStoreApi(
 
     suspend fun login(loginRequest: LoginRequest): Response.SuccessResponse<User> = post(Routes.LOGIN, loginRequest)
 
-    suspend fun guestLogin(): Response.SuccessResponse<Long> = post(Routes.GUEST_LOGIN)
+    suspend fun guestLogin(username: String): Response.SuccessResponse<User> = post(Routes.GUEST_LOGIN, username)
 
     suspend fun setup(): Response.SuccessResponse<User> {
         val setupRequest = SetupRequest(phonePublicKey = "DUMMY")
@@ -77,7 +77,7 @@ class PenguStoreApi(
 
     suspend fun getPantry(pantryId: String): Response.SuccessResponse<PantryList> = get(Routes.GET_PANTRY_LIST, pantryId)
 
-    suspend fun addPantry(pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<String> {
+    suspend fun addPantry(pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<PantryList> {
         val addPantryRequest = AddPantryListRequest(name = pantryName, latitude = pantryLocation.latitude, longitude = pantryLocation.longitude)
         return post(Routes.ADD_PANTRY_LIST, addPantryRequest)
     }

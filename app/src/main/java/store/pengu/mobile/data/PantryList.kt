@@ -7,5 +7,6 @@ data class PantryList(
     @SerializedName("name") override val name: String,
     @SerializedName("code") val code: String,
     @SerializedName("latitude") val latitude: Float,
-    @SerializedName("longitude") val longitude: Float
+    @SerializedName("longitude") val longitude: Float,
+    @SerializedName("productsCount") val productsCount: Int
 ) : ListTypes

@@ -3,7 +3,7 @@ package store.pengu.mobile.api
 object Routes {
     const val DASHBOARD = "/dashboard"
     const val LOGIN = "/login"
-    const val GUEST_LOGIN = "/guestLogin"
+    const val GUEST_LOGIN = "/register/guest"
     const val SETUP = "/setup"
 
     const val USERS = "/users"
