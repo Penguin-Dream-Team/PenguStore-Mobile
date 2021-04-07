@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.shared
+package store.pengu.mobile.views.partials
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*

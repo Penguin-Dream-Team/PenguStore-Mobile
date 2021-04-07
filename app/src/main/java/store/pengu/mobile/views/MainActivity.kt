@@ -1,43 +1,51 @@
 package store.pengu.mobile.views
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.services.ListsService
+import store.pengu.mobile.services.LoginService
+import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
+import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
-import store.pengu.mobile.views.pantry.PantryScreen
-import store.pengu.mobile.views.pantry.partials.NewPantry
-import store.pengu.mobile.views.pantry.partials.Pantry
+import store.pengu.mobile.views.lists.ListsScreen
+import store.pengu.mobile.views.lists.partials.NewList
+import store.pengu.mobile.views.lists.partials.PantryList
+import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
-import store.pengu.mobile.views.shared.BottomBar
+import store.pengu.mobile.views.partials.BottomBar
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var loginService: LoginService
+
+    @Inject
+    lateinit var listsService: ListsService
+
+    @Inject
+    lateinit var productsService: ProductsService
 
     @Inject
     lateinit var storeState: StoreState
@@ -47,6 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     private var navController: NavHostController? = null
 
+    @ExperimentalComposeUiApi
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
     @SuppressLint("SourceLockedOrientationActivity")
@@ -55,61 +64,67 @@ class MainActivity : AppCompatActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                storeState.products = api.products().data.toMutableStateList()
-                storeState.pantries = api.pantries().data.toMutableStateList()
-            } catch (e: Exception) {
-                Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-            }
-        }
+        productsService.getProducts()
 
         setContent {
             val navController = rememberNavController()
             this.navController = navController
 
-            // Init user is always guest on install
-            storeState.userType = "guest"
-
             PenguShopTheme {
                 Scaffold(bottomBar = { BottomBar(navController) }) {
-                    Surface(modifier = Modifier.fillMaxSize().padding(it)) {
-                        NavHost(navController = navController, startDestination = "search") {
-                            composable("dashboard") {
-                                DashboardScreen(navController, storeState)
-                            }
+                    NavHost(navController = navController, startDestination = "dashboard") {
+                        composable("dashboard") {
+                            DashboardScreen(navController, loginService, listsService, storeState)
+                        }
 
-                            composable("setup") {
-                                SetupScreen(navController, storeState)
-                            }
+                        composable("setup") {
+                            SetupScreen(navController, loginService)
+                        }
 
-                            composable("pantries") {
-                                PantryScreen(navController, storeState)
-                            }
+                        composable("lists") {
+                            ListsScreen(navController, listsService, storeState)
+                        }
 
-                            composable("new_pantry") {
-                                NewPantry(navController, storeState)
-                            }
+                        composable("new_list") {
+                            NewList(navController, listsService, this@MainActivity, storeState)
+                        }
 
-                            composable("pantry") {
-                                Pantry(navController, storeState)
-                            }
+                        composable("pantry_list") {
+                            PantryList(navController, productsService, storeState)
+                        }
 
-                            composable("search") {
-                                SearchScreen(navController, storeState)
-                            }
+                        composable("shopping_list") {
+                            ShoppingList(navController, productsService, storeState)
+                        }
 
-                            composable("cart") {
-                                CartScreen(navController)
-                            }
+                        composable("search") {
+                            SearchScreen(navController, productsService, storeState)
+                        }
 
-                            composable("profile") {
-                                ProfileScreen(navController)
-                            }
+                        composable("cart") {
+                            CartScreen(navController, storeState)
+                        }
+
+                        composable("cart_confirmation") {
+                            CartConfirmationScreen(navController, storeState)
+                        }
+
+                        composable("profile") {
+                            ProfileScreen(navController)
                         }
                     }
                 }
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data != null && resultCode == RESULT_OK && requestCode == 111) {
+            storeState.listLocation = LatLng(
+                data.extras!!.getDouble("LATITUDE"),
+                data.extras!!.getDouble("LONGITUDE")
+            )
         }
     }
 }

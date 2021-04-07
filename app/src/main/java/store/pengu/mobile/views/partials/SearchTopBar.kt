@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import store.pengu.mobile.views.shared.IconButton
 
 @ExperimentalComposeUiApi
 @Composable
@@ -60,7 +59,7 @@ fun SearchTopBar() {
                     if (query.isNotBlank()) {
                         IconButton(
                             onClick = {
-                                query=""
+                                query = ""
                             },
                             icon = Icons.Filled.Clear,
                             description = "Clear"

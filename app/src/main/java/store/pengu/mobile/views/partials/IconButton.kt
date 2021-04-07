@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.shared
+package store.pengu.mobile.views.partials
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable

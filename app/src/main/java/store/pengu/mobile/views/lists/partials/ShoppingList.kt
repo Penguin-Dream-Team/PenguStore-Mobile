@@ -1,12 +1,14 @@
-package store.pengu.mobile.views.cart
+package store.pengu.mobile.views.lists.partials
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.RemoveShoppingCart
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,95 +16,97 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
 import store.pengu.mobile.data.Product
+import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 
 @Composable
-fun CartScreen(navController: NavController, store: StoreState) {
+fun ShoppingList(navController: NavController, productsService: ProductsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
-    val products by remember { mutableStateOf(store.cartProducts) }
+    val selectedShoppingList = storeState.selectedList as ShoppingList
+    val products by remember { mutableStateOf(store.shoppingListProducts) }
+    val cartProducts by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
     val currentProduct = remember { mutableStateOf(Product(0L, 0L, "", "", 0.0, -1, -1, -1)) }
 
-    Column(verticalArrangement = Arrangement.SpaceEvenly,
+    productsService.getShoppingListProducts(selectedShoppingList.userId)
+
+    Column(
         modifier = Modifier
             .padding(horizontal = 24.dp)
             .padding(vertical = 32.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Cart", fontWeight = FontWeight.Bold)
+        Text(
+            selectedShoppingList.name,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        if (products.isEmpty()) {
-            Text(text = "Your cart is empty")
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                items(products) { product ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "${product.first.name}: ${product.second}",
-                            fontWeight = FontWeight.SemiBold
-                        )
+        Text(
+            "Shopping List View",
+            textAlign = TextAlign.Center
+        )
 
-                        if ((product.first.amountNeeded!! - product.first.amountAvailable!!) != 1) {
-                            IconButton(
-                                onClick = {
-                                    currentProduct.value = product.first
-                                    desiredAmount.value = product.second
-                                    openDialog.value = true
-                                },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Edit,
-                                    tint = Color(52, 247, 133),
-                                    contentDescription = "Edit"
-                                )
-                            }
-                        }
+        Spacer(modifier = Modifier.height(32.dp))
 
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            items(products) { product ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "${product.name}: ${product.amountAvailable} out of ${product.amountNeeded}",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    if (cartProducts.map { it.first }.contains(product)) {
                         IconButton(
                             onClick = {
-                                storeState.cartProducts.removeAt(products.indexOf(product))
+                                storeState.cartProducts.removeAt(cartProducts.map { it.first }.indexOf(product))
                             },
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.RemoveCircle,
+                                imageVector = Icons.Filled.RemoveShoppingCart,
                                 tint = Color(52, 247, 133),
-                                contentDescription = "Remove"
+                                contentDescription = "Remove from Cart"
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = {
+                                if ((product.amountNeeded!! - product.amountAvailable!!) == 1) {
+                                    storeState.cartProducts.add(Pair(product, 1))
+                                } else {
+                                    currentProduct.value = product
+                                    desiredAmount.value = 0
+                                    openDialog.value = true
+                                }
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.AddShoppingCart,
+                                tint = Color(52, 247, 133),
+                                contentDescription = "Add to Cart"
                             )
                         }
                     }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = {
-                navController.navigate("cart_confirmation")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Checkout",
-                textAlign = TextAlign.Center
-            )
         }
     }
 
@@ -139,7 +143,7 @@ fun CartScreen(navController: NavController, store: StoreState) {
                     IconButton(
                         onClick = {
                             if (desiredAmount.value < (currentProduct.value.amountNeeded!! - currentProduct.value.amountAvailable!!))
-                                desiredAmount.value++
+                            desiredAmount.value++
                         }
                     ) {
                         Icon(

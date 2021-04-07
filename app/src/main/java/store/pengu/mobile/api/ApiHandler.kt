@@ -61,6 +61,13 @@ abstract class ApiHandler(open val store: StoreState) {
             handleApiException(e) as T
         }
 
+    protected suspend inline fun <reified T> post(path: String): T =
+        try {
+            api.post(path = path) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
     protected suspend inline fun <reified T> post(path: String, data: Any): T =
         try {
             api.post(path = path, body = data) { addJWTTokenToRequest(headers) }
