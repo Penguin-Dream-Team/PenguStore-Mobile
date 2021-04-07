@@ -6,7 +6,10 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Scaffold
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,7 +32,7 @@ import store.pengu.mobile.views.lists.partials.PantryList
 import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
-import store.pengu.mobile.views.shared.BottomBar
+import store.pengu.mobile.views.partials.BottomBar
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -52,6 +55,9 @@ class MainActivity : AppCompatActivity() {
 
     private var navController: NavHostController? = null
 
+    @ExperimentalComposeUiApi
+    @ExperimentalFoundationApi
+    @ExperimentalAnimationApi
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

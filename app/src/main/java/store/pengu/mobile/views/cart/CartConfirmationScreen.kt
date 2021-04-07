@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.views.shared.CartProductRow
+import store.pengu.mobile.views.partials.CartProductRow
 
 @Composable
 fun CartConfirmationScreen(navController: NavController, store: StoreState) {

@@ -22,8 +22,8 @@ class LoginService(
         val userId = 6L
 
         store.userId = userId
-        store.pantryLists = api.getUserPantries(userId).data
-        store.shoppingLists = api.getUserShoppingLists(userId).data
+        store.pantryLists.addAll(api.getUserPantries(userId).data)
+        store.shoppingLists.addAll(api.getUserShoppingLists(userId).data)
         store.lists = arrayOf(store.pantryLists, store.shoppingLists)
 
         navController.navigate("dashboard")

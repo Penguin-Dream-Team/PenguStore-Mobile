@@ -1,7 +1,7 @@
 package store.pengu.mobile.views.dashboard
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +15,7 @@ import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.dashboard.partials.SetupScreen
 import store.pengu.mobile.views.lists.ListsScreen
 
+@ExperimentalAnimationApi
 @Composable
 fun DashboardScreen(
     navController: NavController,
@@ -24,7 +25,7 @@ fun DashboardScreen(
 ) {
     val storeState by remember { mutableStateOf(store) }
 
-    Column (
+    Column(
         modifier = Modifier
             .padding(horizontal = 24.dp)
             .padding(vertical = 32.dp)

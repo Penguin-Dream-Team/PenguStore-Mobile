@@ -34,17 +34,19 @@ class ListsService(
     }
 
     fun refreshPantryList(pantry: PantryList) = GlobalScope.launch(Dispatchers.Main) {
-        store.pantryLists += pantry
+        store.pantryLists.add(pantry)
         store.lists[0] = store.pantryLists
     }
 
     fun refreshPantryList(userId: Long) = GlobalScope.launch(Dispatchers.Main) {
-        store.pantryLists = api.getUserPantries(userId).data
+        store.pantryLists.clear()
+        store.pantryLists.addAll(api.getUserPantries(userId).data)
         store.lists[0] = store.pantryLists
     }
 
     fun refreshShoppingList(userId: Long) = GlobalScope.launch(Dispatchers.Main) {
-        store.shoppingLists = api.getUserShoppingLists(userId).data
+        store.shoppingLists.clear()
+        store.shoppingLists.addAll(api.getUserShoppingLists(userId).data)
         store.lists[1] = store.shoppingLists
     }
 }

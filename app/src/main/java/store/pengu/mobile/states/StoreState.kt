@@ -10,17 +10,17 @@ import store.pengu.mobile.data.ShoppingList
 class StoreState {
     var userId: Long by mutableStateOf(-1)
     var token: String by mutableStateOf("")
-    var products = emptyList<Product>()
-    var pantryLists = emptyList<PantryList>()
-    var shoppingLists = emptyList<ShoppingList>()
+    var products = mutableStateListOf<Product>()
+    var pantryLists = mutableStateListOf<PantryList>()
+    var shoppingLists = mutableStateListOf<ShoppingList>()
     var lists = Array(2) { emptyList<ListTypes>() }
     var listType = -1
     var selectedProduct: Long = -1L
     var amountAvailable: Int = 0
     var amountNeeded: Int = 0
-    var pantryProducts = emptyList<Product>()
-    var shoppingListProducts = emptyList<Product>()
-    var cartProducts: MutableList<Pair<Product, Int>> = mutableListOf()
+    var pantryProducts = mutableStateListOf<Product>()
+    var shoppingListProducts = mutableStateListOf<Product>()
+    var cartProducts = mutableStateListOf<Pair<Product, Int>>()
 
     lateinit var selectedList: ListTypes
     lateinit var listLocation: LatLng

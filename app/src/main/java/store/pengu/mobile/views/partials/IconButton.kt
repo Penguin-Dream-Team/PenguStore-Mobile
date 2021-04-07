@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.shared
+package store.pengu.mobile.views.partials
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -9,7 +9,7 @@ fun IconButton(
     onClick: () -> Unit,
     icon: ImageVector,
     description: String,
-    selected: Boolean
+    selected: Boolean = false
 ) {
     IconButton(onClick) {
         Icon(

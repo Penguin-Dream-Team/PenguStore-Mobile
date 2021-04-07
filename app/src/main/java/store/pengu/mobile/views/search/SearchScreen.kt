@@ -1,9 +1,10 @@
 package store.pengu.mobile.views.search
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -13,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,7 +22,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.views.partials.ItemCard
+import store.pengu.mobile.views.partials.SearchTopBar
 
+@ExperimentalComposeUiApi
+@ExperimentalAnimationApi
+@ExperimentalFoundationApi
 @Composable
 fun SearchScreen(navController: NavController, productsService: ProductsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
@@ -36,38 +43,28 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
             .padding(horizontal = 24.dp)
             .padding(vertical = 32.dp)
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
+        SearchTopBar()
+
+        LazyVerticalGrid(
+            cells = GridCells.Fixed(3),
+            modifier = Modifier
+                .padding(horizontal = 7.dp),
+            state = rememberLazyListState()
         ) {
             items(storeState.products) { product ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                ItemCard(
+                    name = product.name,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 20.dp)
-                        .background(MaterialTheme.colors.secondaryVariant),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(horizontal = 5.dp, vertical = 7.dp)
+                        .clickable(onClickLabel = "Add to pantry"
                 ) {
-                    Text(
-                        text = product.name,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    IconButton(
-                        onClick = {
-                            selectedProductId.value = product.productId
-                            alertDialogView.value = 0
-                            amountAvailable.value = 0
-                            amountNeeded.value = 0
-                            selectedPantryId.value = -2L
-                            openDialog.value = true
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "Add to a pantry"
-                        )
-                    }
-                }
+                    selectedProductId.value = product.productId
+                    alertDialogView.value = 0
+                    amountAvailable.value = 0
+                    amountNeeded.value = 0
+                    selectedPantryId.value = -2L
+                    openDialog.value = true
+                })
             }
         }
     }
