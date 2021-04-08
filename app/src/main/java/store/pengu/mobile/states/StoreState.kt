@@ -1,15 +1,33 @@
 package store.pengu.mobile.states
 
 import androidx.compose.runtime.*
+import com.google.android.gms.maps.model.LatLng
+import store.pengu.mobile.data.ListTypes
 import store.pengu.mobile.data.Product
-import store.pengu.mobile.data.Pantry
+import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.ShoppingList
 
 class StoreState {
-    var userType by mutableStateOf("")
-    var token by mutableStateOf("")
-    var selectedPantry by mutableStateOf(Pantry(-1, "", ""))
-
+    var userId: Long by mutableStateOf(-1)
+    var token: String by mutableStateOf("")
     var products = mutableStateListOf<Product>()
-    var pantries = mutableStateListOf<Pantry>()
+    var pantryLists = mutableStateListOf<PantryList>()
+    var shoppingLists = mutableStateListOf<ShoppingList>()
+    var lists = Array(2) { emptyList<ListTypes>() }
+    var listType = -1
+    var selectedProduct: Long = -1L
+    var amountAvailable: Int = 0
+    var amountNeeded: Int = 0
+    var pantryProducts = mutableStateListOf<Product>()
+    var shoppingListProducts = mutableStateListOf<Product>()
+    var cartProducts = mutableStateListOf<Pair<Product, Int>>()
+
+    lateinit var selectedList: ListTypes
+    lateinit var listLocation: LatLng
+
+    fun logout() {
+        token = ""
+        // TODO ADD
+    }
 }
 

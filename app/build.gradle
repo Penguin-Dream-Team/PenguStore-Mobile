@@ -71,6 +71,7 @@ dependencies {
     // Hilt for dependency injection
     implementation 'com.google.dagger:hilt-android:2.33-beta'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
     kapt 'com.google.dagger:hilt-android-compiler:2.33-beta'
 
     // Ktor Client
@@ -84,11 +85,9 @@ dependencies {
     implementation "io.ktor:ktor-client-android:$ktor_version"
     implementation "io.ktor:ktor-client-jackson:$ktor_version"
 
-    // Image loading
-/*
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
-*/
+    // Google Maps API
+    implementation "com.google.android.gms:play-services-maps:$google_maps_api_version"
 
+    // Image loading
     implementation "com.google.accompanist:accompanist-coil:0.7.0"
 }

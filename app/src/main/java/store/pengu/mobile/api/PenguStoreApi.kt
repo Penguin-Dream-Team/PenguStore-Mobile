@@ -1,7 +1,12 @@
 package store.pengu.mobile.api
 
+import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.api.requests.*
-import store.pengu.mobile.data.*
+import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.Product
+import store.pengu.mobile.data.Shop
+import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.data.User
 import store.pengu.mobile.states.StoreState
 
 class PenguStoreApi(
@@ -9,6 +14,8 @@ class PenguStoreApi(
 ) : ApiHandler(store) {
 
     suspend fun login(loginRequest: LoginRequest): Response.SuccessResponse<User> = post(Routes.LOGIN, loginRequest)
+
+    suspend fun guestLogin(username: String): Response.SuccessResponse<User> = post(Routes.GUEST_LOGIN, username)
 
     suspend fun setup(): Response.SuccessResponse<User> {
         val setupRequest = SetupRequest(phonePublicKey = "DUMMY")
@@ -39,26 +46,45 @@ class PenguStoreApi(
     }
 
     suspend fun deleteUserPantry(userId: Long, pantryCode: String): Response.SuccessResponse<String> {
-        val addUserPantryRequest = DeleteUserPantryRequest(userId, pantryCode)
-        return delete(Routes.ADD_USER_PANTRY, addUserPantryRequest)
+        val deleteUserPantryRequest = DeleteUserPantryRequest(userId, pantryCode)
+        return delete(Routes.DELETE_USER_PANTRY, deleteUserPantryRequest)
     }
 
-    suspend fun getUserPantries(userId: String): Response.SuccessResponse<List<Pantry>> = get(Routes.GET_USER_PANTRIES, userId)
+    suspend fun getUserPantries(userId: Long): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_USER_PANTRIES, userId.toString())
 
-    suspend fun getUserShoppingList(shopId: String): Response.SuccessResponse<List<ShoppingList>> = get(Routes.GET_USER_SHOPPING_LIST, shopId)
+    suspend fun getUserShoppingListProducts(shopId: Long): Response.SuccessResponse<List<Product>> = get(Routes.GET_USER_SHOPPING_LIST_PRODUCTS, shopId.toString())
 
-    suspend fun pantries(): Response.SuccessResponse<List<Pantry>> = get(Routes.PANTRIES)
-
-    suspend fun getPantry(pantryId: String): Response.SuccessResponse<Pantry> = get(Routes.GET_PANTRY, pantryId)
-
-    suspend fun addPantry(pantryId: Long, pantryCode: String, pantryName: String): Response.SuccessResponse<String> {
-        val addPantryRequest = AddPantryRequest(pantryId, pantryCode, pantryName)
-        return post(Routes.ADD_PANTRY, addPantryRequest)
+    suspend fun addShoppingList(shopId: Long, userId: Long, name: String): Response.SuccessResponse<String> {
+        val addShoppingListRequest = AddShoppingListRequest(shopId, userId, name)
+        return post(Routes.ADD_SHOPPING_LIST, addShoppingListRequest)
     }
 
-    suspend fun updatePantry(pantryId: Long, pantryCode: String, pantryName: String): Response.SuccessResponse<String> {
-        val updatePantryRequest = UpdatePantryRequest(pantryId, pantryCode, pantryName)
-        return put(Routes.UPDATE_PANTRY, updatePantryRequest)
+    suspend fun updateShoppingList(shopId: Long, userId: Long, name: String): Response.SuccessResponse<String> {
+        val updateShoppingListRequest = UpdateShoppingListRequest(shopId, userId, name)
+        return post(Routes.UPDATE_SHOPPING_LIST, updateShoppingListRequest)
+    }
+
+    suspend fun deleteShoppingList(shopId: Long, userId: Long, name: String): Response.SuccessResponse<String> {
+        val deleteShoppingListRequest = DeleteShoppingListRequest(shopId, userId, name)
+        return post(Routes.DELETE_SHOPPING_LIST, deleteShoppingListRequest)
+    }
+
+    suspend fun getUserShoppingLists(userId: Long): Response.SuccessResponse<List<ShoppingList>> = get(Routes.GET_USER_SHOPPING_LISTS, userId.toString())
+
+    suspend fun getUserShoppingList(userId: Long, shopId: String): Response.SuccessResponse<ShoppingList> = get(Routes.GET_USER_SHOPPING_LIST + shopId, userId.toString())
+
+    suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.PANTRIES)
+
+    suspend fun getPantry(pantryId: String): Response.SuccessResponse<PantryList> = get(Routes.GET_PANTRY_LIST, pantryId)
+
+    suspend fun addPantry(pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<PantryList> {
+        val addPantryRequest = AddPantryListRequest(name = pantryName, latitude = pantryLocation.latitude, longitude = pantryLocation.longitude)
+        return post(Routes.ADD_PANTRY_LIST, addPantryRequest)
+    }
+
+    suspend fun updatePantry(pantryName: String, pantryLocation: LatLng): Response.SuccessResponse<String> {
+        val updatePantryRequest = UpdatePantryListRequest(name = pantryName, latitude = pantryLocation.latitude, longitude = pantryLocation.longitude)
+        return put(Routes.UPDATE_PANTRY_LIST, updatePantryRequest)
     }
 
     suspend fun addPantryProduct(pantryId: Long, productId: Long, amountAvailable: Int, amountNeeded: Int): Response.SuccessResponse<String> {
@@ -76,7 +102,7 @@ class PenguStoreApi(
         return delete(Routes.DELETE_PANTRY_PRODUCT, deletePantryProductRequest)
     }
 
-    suspend fun getPantryProducts(pantryId: String): Response.SuccessResponse<List<Product>> = get(Routes.GET_PANTRY_PRODUCTS, pantryId)
+    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<Product>> = get(Routes.GET_PANTRY_PRODUCTS, pantryId.toString())
 
     suspend fun products(): Response.SuccessResponse<List<Product>> = get(Routes.PRODUCTS)
 

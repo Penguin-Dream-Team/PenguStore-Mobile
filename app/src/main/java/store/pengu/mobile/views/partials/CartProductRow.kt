@@ -1,6 +1,7 @@
-package store.pengu.mobile.views.shared
+package store.pengu.mobile.views.partials
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -39,7 +40,7 @@ fun CartProductRow(image: String, productName: String, productPrice: String, pro
                 .fillMaxWidth()
                 .padding(6.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(color = MaterialTheme.colors.secondary)
+                //.border(color = MaterialTheme.colors.primary)
         ) {
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -60,31 +61,7 @@ fun CartProductRow(image: String, productName: String, productPrice: String, pro
 
                     Text(text = productPrice, color = MaterialTheme.colors.primary)
 
-                    /*IconButton(
-                        onClick = {
-                            //item.amountNeeded--
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Remove,
-                            contentDescription = "Remove",
-                            tint = Color(52, 247, 133)
-                        )
-                    }*/
-
                     Text(text = productQuantity, color = MaterialTheme.colors.primary)
-
-                    /*IconButton(
-                        onClick = {
-                            //item.amountNeeded--
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Remove,
-                            contentDescription = "Remove",
-                            tint = Color(52, 247, 133)
-                        )
-                    }*/
                 }
             }
         }
