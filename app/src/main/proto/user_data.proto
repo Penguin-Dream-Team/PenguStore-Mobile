@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "store.pengu.mobile.storage.proto";
+option java_multiple_files = true;
+
+message UserData {
+  string username = 1;
+  string password = 2;
+  string token = 3;
+  string refresh_token = 4;
+}

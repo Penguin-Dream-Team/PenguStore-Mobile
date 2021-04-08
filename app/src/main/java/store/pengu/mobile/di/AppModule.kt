@@ -1,14 +1,18 @@
 package store.pengu.mobile.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.storage.UserDataService
+import store.pengu.mobile.storage.userDataStore
 import javax.inject.Singleton
 
 @Module
@@ -37,5 +41,6 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun getStore(): String = "skkr"
+    fun getUserDataService(@ApplicationContext context: Context): UserDataService =
+        UserDataService(context.userDataStore)
 }

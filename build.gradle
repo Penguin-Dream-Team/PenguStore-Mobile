@@ -1,11 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        compose_version = '1.0.0-beta03'
-        kotlin_version = '1.4.31'
-        nav_compose_version = "1.0.0-alpha09"
-        ktor_version = "1.5.2"
+        compose_version = '1.0.0-beta04'
+        kotlin_version = '1.4.32'
+        nav_compose_version = "1.0.0-alpha10"
+        ktor_version = '1.5.3'
         google_maps_api_version = "17.0.0"
+        datastore_version = "1.0.0-alpha08"
     }
 
     repositories {
@@ -13,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0-alpha12'
+        classpath 'com.android.tools.build:gradle:7.0.0-alpha14'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.28-alpha'
 
