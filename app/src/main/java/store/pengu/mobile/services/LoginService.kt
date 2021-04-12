@@ -30,5 +30,4 @@ class LoginService(
     }
 
     val userId: Long get() = store.userId
-    fun logout() = store.logout()
 }

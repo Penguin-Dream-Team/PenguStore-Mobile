@@ -25,6 +25,7 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import android.content.Intent
+import store.pengu.mobile.views.MainActivity
 
 class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 

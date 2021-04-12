@@ -125,6 +125,7 @@ abstract class ApiHandler(open val store: StoreState) {
             is TimeoutException,
             is ConnectTimeoutException -> Response.ErrorResponse("Can't reach the server")
             is ClientRequestException -> Response.ErrorResponse(e.response.receive())
+            is ServerResponseException -> Response.ErrorResponse(e.response.receive())
             else -> {
                 e.printStackTrace()
                 Response.ErrorResponse(e.message ?: "Unknown error")

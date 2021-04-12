@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.services.ProductsService
@@ -21,15 +22,36 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun getLoginService(api: PenguStoreApi, store: StoreState): LoginService = LoginService(api, store)
+    fun getLoginService(
+        api: PenguStoreApi,
+        store: StoreState
+    ): LoginService =
+        LoginService(api, store)
 
     @Singleton
     @Provides
-    fun getListsService(api: PenguStoreApi, productsService: ProductsService, store: StoreState): ListsService = ListsService(api, productsService, store)
+    fun getListsService(
+        api: PenguStoreApi,
+        productsService: ProductsService,
+        store: StoreState
+    ): ListsService = ListsService(api, productsService, store)
 
     @Singleton
     @Provides
-    fun getProductsService(api: PenguStoreApi, store: StoreState): ProductsService = ProductsService(api, store)
+    fun getProductsService(
+        api: PenguStoreApi,
+        store: StoreState
+    ): ProductsService =
+        ProductsService(api, store)
+
+    @Singleton
+    @Provides
+    fun getAccountService(
+        userDataService: UserDataService,
+        api: PenguStoreApi,
+        store: StoreState
+    ): AccountService =
+        AccountService(userDataService, api, store)
 
     @Singleton
     @Provides

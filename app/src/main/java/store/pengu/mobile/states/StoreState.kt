@@ -8,8 +8,13 @@ import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.ShoppingList
 
 class StoreState {
-    var userId: Long by mutableStateOf(-1)
     var token: String by mutableStateOf("")
+    var username: String by mutableStateOf("")
+
+
+
+
+    var userId: Long by mutableStateOf(-1)
     var products = mutableStateListOf<Product>()
     var pantryLists = mutableStateListOf<PantryList>()
     var shoppingLists = mutableStateListOf<ShoppingList>()
@@ -24,10 +29,5 @@ class StoreState {
 
     lateinit var selectedList: ListTypes
     lateinit var listLocation: LatLng
-
-    fun logout() {
-        token = ""
-        // TODO ADD
-    }
 }
 

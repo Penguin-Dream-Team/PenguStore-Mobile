@@ -30,7 +30,7 @@ fun SearchTopBar() {
         if (it.isNotBlank()) {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
-        keyboardController?.hideSoftwareKeyboard()
+        keyboardController?.hide()
     }
 
     TopAppBar(

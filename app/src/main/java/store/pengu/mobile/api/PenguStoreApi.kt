@@ -2,6 +2,11 @@ package store.pengu.mobile.api
 
 import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.api.requests.*
+import store.pengu.mobile.api.requests.account.LoginRequest
+import store.pengu.mobile.api.requests.account.RefreshTokenRequest
+import store.pengu.mobile.api.requests.account.RegisterRequest
+import store.pengu.mobile.api.responses.account.LoginResponse
+import store.pengu.mobile.api.responses.account.RegisterResponse
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.Shop
@@ -13,9 +18,25 @@ class PenguStoreApi(
     store: StoreState
 ) : ApiHandler(store) {
 
-    suspend fun login(loginRequest: LoginRequest): Response.SuccessResponse<User> = post(Routes.LOGIN, loginRequest)
+    suspend fun registerGuest(username: String): RegisterResponse {
+        val registerRequest = RegisterRequest(username)
+        return post(Routes.REGISTER_GUEST, registerRequest)
+    }
 
-    suspend fun guestLogin(username: String): Response.SuccessResponse<User> = post(Routes.GUEST_LOGIN, username)
+    suspend fun login(username: String, password: String): LoginResponse {
+        val loginRequest = LoginRequest(username, password)
+        return post(Routes.LOGIN, loginRequest)
+    }
+
+    suspend fun refreshToken(refreshToken: String): LoginResponse {
+        val refreshRequest = RefreshTokenRequest(refreshToken)
+        return post(Routes.REFRESH_TOKEN, refreshRequest)
+    }
+
+
+
+
+    suspend fun guestLogin(username: String): Response.SuccessResponse<User> = post(Routes.REGISTER_GUEST, username)
 
     suspend fun setup(): Response.SuccessResponse<User> {
         val setupRequest = SetupRequest(phonePublicKey = "DUMMY")

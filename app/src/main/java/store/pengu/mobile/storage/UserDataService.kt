@@ -22,13 +22,38 @@ class UserDataService(
         }
     }
 
-    suspend fun getUserData() = userDataFlow.firstOrNull() ?: UserData.getDefaultInstance()
+    suspend fun getUserData(): UserData = userDataFlow.firstOrNull() ?: UserData.getDefaultInstance()
+
+    suspend fun getCredentials(): Pair<String, String> {
+        val userData = getUserData()
+        return userData.username to userData.password
+    }
+
+    suspend fun getUsername(): String {
+        val userData = getUserData()
+        return userData.username
+    }
+
+    suspend fun getToken(): String {
+        val userData = getUserData()
+        return userData.token
+    }
+
+    suspend fun getRefreshToken(): String {
+        val userData = getUserData()
+        return userData.refreshToken
+    }
+
+    suspend fun isLoggedIn(): Boolean {
+        val userData = getUserData()
+        return userData.token.isNotBlank()
+    }
 
     suspend fun storeUserData(
-        username: String?,
-        password: String?,
-        token: String?,
-        refreshToken: String?
+        username: String? = null,
+        password: String? = null,
+        token: String? = null,
+        refreshToken: String? = null
     ) {
         dataStore.updateData {
             val userDataBuilder = it.toBuilder()
