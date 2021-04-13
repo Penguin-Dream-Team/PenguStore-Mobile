@@ -45,7 +45,7 @@ import store.pengu.mobile.views.partials.BottomBar
 import store.pengu.mobile.views.partials.PenguSnackbar
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
-import store.pengu.mobile.views.splash.LoginScreen
+import store.pengu.mobile.views.login.LoginScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -168,9 +168,7 @@ class MainActivity : AppCompatActivity() {
                         verticalArrangement = Arrangement.Bottom,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        PenguSnackbar(snackbarHostState = scaffoldState.snackbarHostState) {
-
-                        }
+                        PenguSnackbar(snackbarHostState = scaffoldState.snackbarHostState)
                     }
                 }
             }

@@ -11,8 +11,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PenguSnackbar(
     snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier,
-    onDismiss: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     SnackbarHost(
         modifier = modifier,
@@ -23,18 +22,6 @@ fun PenguSnackbar(
                 modifier = Modifier
                     .padding(16.dp),
             )
-/*
-            Snackbar(
-                modifier = Modifier
-                    .padding(16.dp),
-            ) {
-                Text(
-                    text = data.message,
-                    style = MaterialTheme.typography.body2,
-                    color = Color.White
-                )
-            }
-*/
         }
     )
 }
