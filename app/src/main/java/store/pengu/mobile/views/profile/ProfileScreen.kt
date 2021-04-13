@@ -1,64 +1,74 @@
 package store.pengu.mobile.views.profile
 
-import android.view.ContextMenu
-import android.view.Window
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
+import store.pengu.mobile.services.AccountService
+import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.utils.SnackbarController
 
+@ExperimentalComposeUiApi
+@SuppressLint("RestrictedApi")
+@ExperimentalAnimationApi
 @Composable
-fun ProfileScreen(navController: NavController) {
-    var name by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-
-    Column(verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier
-            .fillMaxHeight()
-            .padding(16.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(250.dp)
-                .clip(CircleShape)
-                .background(color = MaterialTheme.colors.onBackground)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Text(
-                text = "image",
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.align(Alignment.Center)
-            )
+fun ProfileScreen(
+    navController: NavController,
+    accountService: AccountService,
+    snackbarController: SnackbarController,
+    store: StoreState,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var loggedIn by remember { mutableStateOf(store.isLoggedIn()) }
+    Box {
+        if (!loggedIn) {
+            loggedIn = true
+            coroutineScope.launch {
+                accountService.registerGuest()
+            }
         }
+    }
 
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth()
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxSize()
+    ) {
+        ProfileScreenInformation(
+            navController,
+            accountService,
+            snackbarController,
+            store,
+            coroutineScope
         )
 
-        TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
-            modifier = Modifier.fillMaxWidth()
+        ProfileScreenAccountCreation(
+            navController,
+            accountService,
+            snackbarController,
+            store,
+            coroutineScope
         )
 
-        TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
+        ProfileScreenFooter(
+            navController,
+            accountService,
+            snackbarController,
+            store,
+            coroutineScope
         )
     }
 }

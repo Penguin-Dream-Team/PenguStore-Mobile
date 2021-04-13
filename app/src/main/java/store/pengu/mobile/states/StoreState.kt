@@ -10,7 +10,12 @@ import store.pengu.mobile.data.ShoppingList
 class StoreState {
     var token: String by mutableStateOf("")
     var username: String by mutableStateOf("")
+    var guest: Boolean by mutableStateOf(true)
+    var email: String by mutableStateOf("")
 
+    fun isLoggedIn(): Boolean {
+        return token.isNotBlank()
+    }
 
 
 

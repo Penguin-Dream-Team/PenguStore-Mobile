@@ -8,4 +8,6 @@ message UserData {
   string password = 2;
   string token = 3;
   string refresh_token = 4;
+  bool guest = 5;
+  string email = 6;
 }

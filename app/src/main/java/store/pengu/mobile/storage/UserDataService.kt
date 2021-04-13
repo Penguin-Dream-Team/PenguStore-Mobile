@@ -22,7 +22,8 @@ class UserDataService(
         }
     }
 
-    suspend fun getUserData(): UserData = userDataFlow.firstOrNull() ?: UserData.getDefaultInstance()
+    suspend fun getUserData(): UserData =
+        userDataFlow.firstOrNull() ?: UserData.getDefaultInstance()
 
     suspend fun getCredentials(): Pair<String, String> {
         val userData = getUserData()
@@ -49,11 +50,18 @@ class UserDataService(
         return userData.token.isNotBlank()
     }
 
+    suspend fun isGuest(): Boolean {
+        val userData = getUserData()
+        return userData.guest
+    }
+
     suspend fun storeUserData(
         username: String? = null,
         password: String? = null,
         token: String? = null,
-        refreshToken: String? = null
+        refreshToken: String? = null,
+        guest: Boolean? = null,
+        email: String? = null,
     ) {
         dataStore.updateData {
             val userDataBuilder = it.toBuilder()
@@ -72,6 +80,14 @@ class UserDataService(
 
             if (refreshToken != null) {
                 userDataBuilder.refreshToken = refreshToken
+            }
+
+            if (guest != null) {
+                userDataBuilder.guest = guest
+            }
+
+            if (email != null) {
+                userDataBuilder.email = email
             }
 
             userDataBuilder.build()

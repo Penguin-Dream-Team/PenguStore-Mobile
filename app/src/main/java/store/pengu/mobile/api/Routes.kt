@@ -4,6 +4,8 @@ object Routes {
     const val LOGIN = "/login"
     const val REFRESH_TOKEN = "/login/refresh"
     const val REGISTER_GUEST = "/register/guest"
+    const val USER_PROFILE = "/profile"
+    const val UPDATE_USER = "/users/update"
 
 
     const val DASHBOARD = "/dashboard"
@@ -13,7 +15,6 @@ object Routes {
     const val USERS = "/users"
     const val GET_USER = "/users/id"
     const val ADD_USER = "/users/add"
-    const val UPDATE_USER = "/users/update"
     const val ADD_USER_PANTRY = "/users/addPantry"
     const val DELETE_USER_PANTRY = "/users/deletePantry"
     const val GET_USER_PANTRIES = "/users/id/pantries"

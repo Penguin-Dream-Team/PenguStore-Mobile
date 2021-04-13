@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -41,11 +42,11 @@ import store.pengu.mobile.views.lists.ListsScreen
 import store.pengu.mobile.views.lists.partials.NewList
 import store.pengu.mobile.views.lists.partials.PantryList
 import store.pengu.mobile.views.lists.partials.ShoppingList
+import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.BottomBar
 import store.pengu.mobile.views.partials.PenguSnackbar
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
-import store.pengu.mobile.views.login.LoginScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -82,6 +83,19 @@ class MainActivity : AppCompatActivity() {
 
         //productsService.getProducts()
 
+        var loaded = false
+        val startDestination: String
+
+        runBlocking {
+            accountService.loadData()
+            startDestination = if (storeState.isLoggedIn()) {
+                "dashboard"
+            } else {
+                //"login"
+                "profile"
+            }
+        }
+
         setContent {
             val navController = rememberNavController()
             this.navController = navController
@@ -92,14 +106,6 @@ class MainActivity : AppCompatActivity() {
             val noBottomBarRoutes = listOf("login")
             val showBottomBar = !noBottomBarRoutes.contains(currentRoute)
 
-            val startDestination = runBlocking {
-                if (accountService.needsLogin()) {
-                    "login"
-                } else {
-                    "dashboard"
-                }
-            }
-
             val scaffoldState = rememberScaffoldState()
             val snackbarController =
                 SnackbarController(scaffoldState.snackbarHostState, lifecycleScope)
@@ -107,8 +113,10 @@ class MainActivity : AppCompatActivity() {
             PenguShopTheme {
                 Scaffold(
                     bottomBar = {
-                        if (showBottomBar) {
-                            BottomBar(navController)
+                        if (loaded) {
+                            AnimatedVisibility(visible = showBottomBar) {
+                                BottomBar(navController)
+                            }
                         }
                     },
                     scaffoldState = scaffoldState,
@@ -117,6 +125,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 ) {
                     NavHost(navController = navController, startDestination = startDestination) {
+                        loaded = true
+
                         composable("login") {
                             LoginScreen(navController, accountService, snackbarController)
                         }
@@ -158,7 +168,12 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("profile") {
-                            ProfileScreen(navController)
+                            ProfileScreen(
+                                navController,
+                                accountService,
+                                snackbarController,
+                                storeState
+                            )
                         }
                     }
                     Column(

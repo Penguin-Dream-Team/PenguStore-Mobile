@@ -9,6 +9,7 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.network.sockets.*
+import store.pengu.mobile.errors.PenguStoreApiAuthorizationException
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.Config
@@ -125,7 +126,12 @@ abstract class ApiHandler(open val store: StoreState) {
             is TimeoutException,
             is ConnectTimeoutException -> Response.ErrorResponse("Can't reach the server")
             is ClientRequestException -> Response.ErrorResponse(e.response.receive())
-            is ServerResponseException -> Response.ErrorResponse(e.response.receive())
+            is ServerResponseException -> {
+                if (e.response.status == HttpStatusCode.Forbidden || e.response.status == HttpStatusCode.Unauthorized) {
+                    throw PenguStoreApiAuthorizationException("You need to login")
+                }
+                Response.ErrorResponse(e.response.receive())
+            }
             else -> {
                 e.printStackTrace()
                 Response.ErrorResponse(e.message ?: "Unknown error")
