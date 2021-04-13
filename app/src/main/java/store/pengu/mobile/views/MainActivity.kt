@@ -92,7 +92,6 @@ class MainActivity : AppCompatActivity() {
                 "dashboard"
             } else {
                 "login"
-                //"profile"
             }
         }
 

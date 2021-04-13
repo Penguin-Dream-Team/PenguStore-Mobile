@@ -110,7 +110,6 @@ fun canSubmitValues(
 @ExperimentalAnimationApi
 @Composable
 fun ProfileScreenAccountCreation(
-    navController: NavController,
     accountService: AccountService,
     snackbarController: SnackbarController,
     store: StoreState,

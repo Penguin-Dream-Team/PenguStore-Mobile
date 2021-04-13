@@ -4,9 +4,10 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -29,6 +30,11 @@ fun ProfileScreenFooter(
     store: StoreState,
     coroutineScope: CoroutineScope
 ) {
+    var showAlert by remember { mutableStateOf(false) }
+    val dismissAlert: () -> Unit = {
+        showAlert = false
+    }
+
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxWidth()
@@ -36,16 +42,7 @@ fun ProfileScreenFooter(
         AnimatedVisibility(visible = store.isLoggedIn()) {
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        try {
-                            accountService.logout()
-                            navController.backStack.clear()
-                            navController.navigate("login")
-                            snackbarController.showDismissibleSnackbar("Logged out")
-                        } catch (e: PenguStoreApiException) {
-                            snackbarController.showDismissibleSnackbar(e.message)
-                        }
-                    }
+                    showAlert = true
                 },
                 enabled = true,
                 modifier = Modifier
@@ -53,6 +50,44 @@ fun ProfileScreenFooter(
             ) {
                 Text(text = "Logout")
             }
+        }
+
+        AnimatedVisibility(visible = showAlert) {
+            AlertDialog(
+                onDismissRequest = {
+                    dismissAlert()
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                try {
+                                    accountService.logout()
+                                    navController.backStack.clear()
+                                    navController.navigate("login")
+                                    snackbarController.showDismissibleSnackbar("Logged out")
+                                } catch (e: PenguStoreApiException) {
+                                    snackbarController.showDismissibleSnackbar(e.message)
+                                }
+                            }
+                        }) {
+                        Text("Logout")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = dismissAlert
+                    ) {
+                        Text("Dismiss")
+                    }
+                },
+                title = {
+                    Text("Are you sure you want to logout?")
+                },
+                text = {
+                    Text("You will lose access to your account and all data")
+                }
+            )
         }
     }
 }

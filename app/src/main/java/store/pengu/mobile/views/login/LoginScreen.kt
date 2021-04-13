@@ -2,6 +2,7 @@ package store.pengu.mobile.views.login
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavController
+import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.navigate
 import kotlinx.coroutines.launch
 import store.pengu.mobile.errors.PenguStoreApiException
@@ -44,6 +46,15 @@ fun LoginScreen(
                 snackbarController.showDismissibleSnackbar(e.message)
                 canRegister.value = true
             }
+        }
+    }
+
+    Box {
+        val ok = remember {
+            mutableStateOf(coroutineScope.launch {
+                accountService.login("Tux", "tux")
+                navController.navigate("dashboard")
+            })
         }
     }
 

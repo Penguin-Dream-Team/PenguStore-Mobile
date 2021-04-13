@@ -1,7 +1,6 @@
 package store.pengu.mobile.views.profile
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,15 +30,6 @@ fun ProfileScreen(
     store: StoreState,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var loggedIn by remember { mutableStateOf(store.isLoggedIn()) }
-    Box {
-        if (!loggedIn) {
-            loggedIn = true
-            coroutineScope.launch {
-                accountService.registerGuest()
-            }
-        }
-    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -48,7 +38,6 @@ fun ProfileScreen(
             .fillMaxSize()
     ) {
         ProfileScreenInformation(
-            navController,
             accountService,
             snackbarController,
             store,
@@ -56,7 +45,6 @@ fun ProfileScreen(
         )
 
         ProfileScreenAccountCreation(
-            navController,
             accountService,
             snackbarController,
             store,
