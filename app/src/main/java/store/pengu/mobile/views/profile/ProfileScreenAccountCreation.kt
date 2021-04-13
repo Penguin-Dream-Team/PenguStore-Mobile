@@ -129,6 +129,10 @@ fun ProfileScreenAccountCreation(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    if (!creating.value && !store.guest) {
+        username = store.username
+        email = store.email
+    }
 
     val submit: () -> Unit = {
         keyboardController?.hide()
@@ -146,8 +150,8 @@ fun ProfileScreenAccountCreation(
                 store.guest
             )
 
-            username = ""
-            email = ""
+            username = if (store.guest) "" else store.username
+            email = if (store.guest) "" else store.email
             password = ""
             confirmPassword = ""
             submitting.value = false
@@ -161,16 +165,6 @@ fun ProfileScreenAccountCreation(
             .padding(bottom = 10.dp)
     ) {
         AnimatedVisibility(visible = creating.value) {
-
-            if (!store.guest) {
-                if (username.isBlank()) {
-                    username = store.username
-                }
-                if (email.isBlank()) {
-                    email = store.email
-                }
-            }
-
             Column(
                 modifier = Modifier
                     .padding(top = 20.dp)

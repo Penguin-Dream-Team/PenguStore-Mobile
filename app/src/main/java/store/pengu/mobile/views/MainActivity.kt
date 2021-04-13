@@ -91,8 +91,8 @@ class MainActivity : AppCompatActivity() {
             startDestination = if (storeState.isLoggedIn()) {
                 "dashboard"
             } else {
-                //"login"
-                "profile"
+                "login"
+                //"profile"
             }
         }
 
