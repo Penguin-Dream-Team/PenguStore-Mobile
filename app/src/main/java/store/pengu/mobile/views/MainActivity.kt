@@ -8,13 +8,20 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
@@ -25,6 +32,7 @@ import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
+import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.dashboard.DashboardScreen
@@ -34,9 +42,10 @@ import store.pengu.mobile.views.lists.partials.NewList
 import store.pengu.mobile.views.lists.partials.PantryList
 import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.partials.BottomBar
+import store.pengu.mobile.views.partials.PenguSnackbar
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
-import store.pengu.mobile.views.splash.SplashScreen
+import store.pengu.mobile.views.splash.LoginScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -76,76 +85,91 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val navController = rememberNavController()
             this.navController = navController
-            var showBottomBar by remember { mutableStateOf(false) }
+
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+            // put all routes that should not show bottom bar navigation
+            val noBottomBarRoutes = listOf("login")
+            val showBottomBar = !noBottomBarRoutes.contains(currentRoute)
 
             val startDestination = runBlocking {
-                if (accountService.hasLoggedInBefore()) {
-                    "splash"
+                if (accountService.needsLogin()) {
+                    "login"
                 } else {
                     "dashboard"
                 }
             }
 
+            val scaffoldState = rememberScaffoldState()
+            val snackbarController =
+                SnackbarController(scaffoldState.snackbarHostState, lifecycleScope)
+
             PenguShopTheme {
-                Scaffold(bottomBar = {
-                    if (showBottomBar) {
-                        BottomBar(navController)
+                Scaffold(
+                    bottomBar = {
+                        if (showBottomBar) {
+                            BottomBar(navController)
+                        }
+                    },
+                    scaffoldState = scaffoldState,
+                    snackbarHost = {
+                        scaffoldState.snackbarHostState
                     }
-                }) {
+                ) {
                     NavHost(navController = navController, startDestination = startDestination) {
-                        composable("splash") {
-                            showBottomBar = false
-                            SplashScreen(navController, accountService)
+                        composable("login") {
+                            LoginScreen(navController, accountService, snackbarController)
                         }
 
                         composable("dashboard") {
-                            showBottomBar = true
                             DashboardScreen(navController, loginService, listsService, storeState)
                         }
 
                         composable("setup") {
-                            showBottomBar = true
                             SetupScreen(navController, loginService)
                         }
 
                         composable("lists") {
-                            showBottomBar = true
                             ListsScreen(navController, listsService, storeState)
                         }
 
                         composable("new_list") {
-                            showBottomBar = true
                             NewList(navController, listsService, this@MainActivity, storeState)
                         }
 
                         composable("pantry_list") {
-                            showBottomBar = true
                             PantryList(navController, productsService, storeState)
                         }
 
                         composable("shopping_list") {
-                            showBottomBar = true
                             ShoppingList(navController, productsService, storeState)
                         }
 
                         composable("search") {
-                            showBottomBar = true
                             SearchScreen(navController, productsService, storeState)
                         }
 
                         composable("cart") {
-                            showBottomBar = true
                             CartScreen(navController, storeState)
                         }
 
                         composable("cart_confirmation") {
-                            showBottomBar = true
                             CartConfirmationScreen(navController, storeState)
                         }
 
                         composable("profile") {
-                            showBottomBar = true
                             ProfileScreen(navController)
+                        }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .padding(bottom = 8.dp + it.calculateBottomPadding())
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        PenguSnackbar(snackbarHostState = scaffoldState.snackbarHostState) {
+
                         }
                     }
                 }

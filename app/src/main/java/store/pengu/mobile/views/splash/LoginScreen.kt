@@ -1,6 +1,6 @@
 package store.pengu.mobile.views.splash
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -34,12 +34,14 @@ import kotlinx.coroutines.launch
 import store.pengu.mobile.R
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.AccountService
+import store.pengu.mobile.utils.SnackbarController
 
 @ExperimentalComposeUiApi
 @Composable
-fun SplashScreen(
+fun LoginScreen(
     navController: NavController,
     accountService: AccountService,
+    snackbarController: SnackbarController
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -91,10 +93,10 @@ fun SplashScreen(
                 coroutineScope.launch {
                     try {
                         username = accountService.login(username, password)
-                        Toast.makeText(context, "Welcome $username", Toast.LENGTH_SHORT).show()
                         navController.navigate("dashboard")
+                        snackbarController.showDismissibleSnackbar("Welcome $username")
                     } catch (e: PenguStoreApiException) {
-                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                        snackbarController.showDismissibleSnackbar(e.message)
                         canRegister = true
                     }
                 }
@@ -164,10 +166,10 @@ fun SplashScreen(
                 coroutineScope.launch {
                     try {
                         val username = accountService.registerGuest()
-                        Toast.makeText(context, "Welcome $username", Toast.LENGTH_SHORT).show()
                         navController.navigate("dashboard")
+                        snackbarController.showDismissibleSnackbar("Welcome $username")
                     } catch (e: PenguStoreApiException) {
-                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                        snackbarController.showDismissibleSnackbar(e.message)
                         canRegister = true
                     }
                 }

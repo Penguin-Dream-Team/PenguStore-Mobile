@@ -13,7 +13,7 @@ class AccountService(
     private val store: StoreState
 ) {
 
-    suspend fun hasLoggedInBefore(): Boolean {
+    suspend fun needsLogin(): Boolean {
         return userDataService.getUserData() == UserData.getDefaultInstance()
     }
 

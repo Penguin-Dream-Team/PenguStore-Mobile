@@ -1,0 +1,40 @@
+package store.pengu.mobile.views.partials
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun PenguSnackbar(
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    SnackbarHost(
+        modifier = modifier,
+        hostState = snackbarHostState,
+        snackbar = { data ->
+            Snackbar(
+                snackbarData = data,
+                modifier = Modifier
+                    .padding(16.dp),
+            )
+/*
+            Snackbar(
+                modifier = Modifier
+                    .padding(16.dp),
+            ) {
+                Text(
+                    text = data.message,
+                    style = MaterialTheme.typography.body2,
+                    color = Color.White
+                )
+            }
+*/
+        }
+    )
+}
