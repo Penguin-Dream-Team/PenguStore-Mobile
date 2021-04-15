@@ -49,6 +49,7 @@ fun LoginScreen(
         }
     }
 
+/*
     Box {
         val ok = remember {
             mutableStateOf(coroutineScope.launch {
@@ -57,6 +58,7 @@ fun LoginScreen(
             })
         }
     }
+*/
 
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
