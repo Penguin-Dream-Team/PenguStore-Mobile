@@ -2,10 +2,10 @@ package store.pengu.mobile.states
 
 import androidx.compose.runtime.*
 import com.google.android.gms.maps.model.LatLng
-import store.pengu.mobile.data.ListTypes
+import store.pengu.mobile.data.UserList
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.PantryList
-import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.data.ShoppingList2
 
 class StoreState {
     var token: String by mutableStateOf("")
@@ -17,13 +17,15 @@ class StoreState {
         return token.isNotBlank()
     }
 
+    var shouldFindListInLocation: Boolean by mutableStateOf(true)
 
 
-    var userId: Long by mutableStateOf(-1)
+
+    var userId: Long by mutableStateOf(1)
     var products = mutableStateListOf<Product>()
     var pantryLists = mutableStateListOf<PantryList>()
-    var shoppingLists = mutableStateListOf<ShoppingList>()
-    var lists = Array(2) { emptyList<ListTypes>() }
+    var shoppingLists = mutableStateListOf<ShoppingList2>()
+    var lists = Array(2) { emptyList<UserList>() }
     var listType = -1
     var selectedProduct: Long = -1L
     var amountAvailable: Int = 0
@@ -32,7 +34,7 @@ class StoreState {
     var shoppingListProducts = mutableStateListOf<Product>()
     var cartProducts = mutableStateListOf<Pair<Product, Int>>()
 
-    lateinit var selectedList: ListTypes
+    lateinit var selectedList: UserList
     lateinit var listLocation: LatLng
 }
 

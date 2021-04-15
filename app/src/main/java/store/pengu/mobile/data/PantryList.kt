@@ -1,12 +1,13 @@
 package store.pengu.mobile.data
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+@JsonDeserialize
 data class PantryList(
-    @SerializedName("id") val id: Long,
-    @SerializedName("name") override val name: String,
-    @SerializedName("code") val code: String,
-    @SerializedName("latitude") val latitude: Float,
-    @SerializedName("longitude") val longitude: Float,
-    @SerializedName("productsCount") val productsCount: Int
-) : ListTypes
+    override val id: Long,
+    val code: String,
+    override val name: String,
+    override val latitude: Float,
+    override val longitude: Float,
+    val productCount: Int
+) : UserList(id, name, latitude, longitude)

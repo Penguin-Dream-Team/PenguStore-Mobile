@@ -49,6 +49,9 @@ fun LoginScreen(
         }
     }
 
+    /**
+     * Uncomment to enable automatic login for testing
+     */
 /*
     Box {
         val ok = remember {

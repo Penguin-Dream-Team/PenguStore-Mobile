@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.data.ShoppingList2
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 
@@ -33,7 +34,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
     val desiredAmount = remember { mutableStateOf(1) }
     val currentProduct = remember { mutableStateOf(Product(0L, 0L, "", "", 0.0, -1, -1, -1)) }
 
-    productsService.getShoppingListProducts(selectedShoppingList.userId)
+    //productsService.getShoppingListProducts(selectedShoppingList.userId)
 
     Column(
         modifier = Modifier

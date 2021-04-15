@@ -11,10 +11,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.services.LoginService
 
 @Composable
-fun SetupScreen(navController: NavController, loginService: LoginService) {
+fun SetupScreen(navController: NavController) {
 
     Button(
         onClick = {
@@ -33,7 +32,6 @@ fun SetupScreen(navController: NavController, loginService: LoginService) {
 
     Button(
         onClick = {
-            loginService.guestLogin(navController)
         },
         modifier = Modifier
             .fillMaxWidth()

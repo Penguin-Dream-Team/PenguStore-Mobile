@@ -9,7 +9,6 @@ import dagger.hilt.components.SingletonComponent
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.storage.UserDataService
@@ -19,14 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Singleton
-    @Provides
-    fun getLoginService(
-        api: PenguStoreApi,
-        store: StoreState
-    ): LoginService =
-        LoginService(api, store)
 
     @Singleton
     @Provides

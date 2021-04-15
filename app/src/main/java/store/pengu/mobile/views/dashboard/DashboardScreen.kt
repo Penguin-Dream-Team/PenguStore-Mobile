@@ -1,38 +1,49 @@
 package store.pengu.mobile.views.dashboard
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
+import kotlinx.coroutines.launch
+import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.services.LoginService
-import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.views.dashboard.partials.SetupScreen
-import store.pengu.mobile.views.lists.ListsScreen
 
 @ExperimentalAnimationApi
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    loginService: LoginService,
-    listsService: ListsService,
-    store: StoreState
+    listsService: ListsService
 ) {
-    val storeState by remember { mutableStateOf(store) }
+    //val storeState by remember { mutableStateOf(store) }
+    val coroutineScope = rememberCoroutineScope()
+    var loading by remember { mutableStateOf(true) }
+    var type: UserListType? by remember { mutableStateOf(null) }
 
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .padding(vertical = 32.dp)
-    ) {
-        if (storeState.userId == -1L)
-            SetupScreen(navController, loginService)
-        else
-            ListsScreen(navController, listsService, storeState)
+    /**
+     * If there is a list in my location show list
+     */
+
+    AnimatedVisibility(visible = loading) {
+        coroutineScope.launch {
+            val latitude = 150.0f
+            val longitude = 150.0f
+            type = listsService.findListInLocation(latitude, longitude)
+            loading = false
+        }
+        Text("Loading")
+    }
+
+    if (!loading) {
+        when (type) {
+            UserListType.PANTRY ->
+                navController.navigate("pantry_list")
+            UserListType.SHOPPING_LIST ->
+                navController.navigate("shopping_list")
+            null -> TODO("LOAD ALL LISTS")
+        }
+    } else {
+        Text("Loaded")
     }
 }

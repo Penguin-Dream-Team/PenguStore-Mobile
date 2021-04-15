@@ -29,7 +29,6 @@ import kotlinx.coroutines.runBlocking
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.services.LoginService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
@@ -51,9 +50,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
-    @Inject
-    lateinit var loginService: LoginService
 
     @Inject
     lateinit var listsService: ListsService
@@ -131,11 +127,11 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("dashboard") {
-                            DashboardScreen(navController, loginService, listsService, storeState)
+                            DashboardScreen(navController, listsService)
                         }
 
                         composable("setup") {
-                            SetupScreen(navController, loginService)
+                            SetupScreen(navController)
                         }
 
                         composable("lists") {

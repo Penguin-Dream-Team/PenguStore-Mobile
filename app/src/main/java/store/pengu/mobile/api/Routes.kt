@@ -1,11 +1,26 @@
 package store.pengu.mobile.api
 
+import store.pengu.mobile.errors.PenguStoreApiException
+
 object Routes {
     const val LOGIN = "/login"
     const val REFRESH_TOKEN = "/login/refresh"
     const val REGISTER_GUEST = "/register/guest"
     const val USER_PROFILE = "/profile"
+
+    /**
+     * Update the user's profile
+     *
+     * @throws PenguStoreApiException
+     */
     const val UPDATE_USER = "/users/update"
+
+    /**
+     * Find list in specified location
+     *
+     * @throws PenguStoreApiException if no list found
+     */
+    const val FIND_LIST = "/lists/find"
 
 
     const val DASHBOARD = "/dashboard"

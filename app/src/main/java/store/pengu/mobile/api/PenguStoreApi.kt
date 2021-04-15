@@ -8,11 +8,8 @@ import store.pengu.mobile.api.requests.account.RegisterRequest
 import store.pengu.mobile.api.responses.account.LoginResponse
 import store.pengu.mobile.api.responses.account.ProfileResponse
 import store.pengu.mobile.api.responses.account.RegisterResponse
-import store.pengu.mobile.data.PantryList
-import store.pengu.mobile.data.Product
-import store.pengu.mobile.data.Shop
-import store.pengu.mobile.data.ShoppingList
-import store.pengu.mobile.data.User
+import store.pengu.mobile.api.responses.lists.UserListResponse
+import store.pengu.mobile.data.*
 import store.pengu.mobile.states.StoreState
 
 class PenguStoreApi(
@@ -45,6 +42,13 @@ class PenguStoreApi(
     ): ProfileResponse {
         val updateUserRequest = UpdateUserRequest(username, email, password)
         return put(Routes.UPDATE_USER, updateUserRequest)
+    }
+
+    suspend fun findList(
+        latitude: Float,
+        longitude: Float
+    ): UserListResponse {
+        return get(Routes.FIND_LIST, mapOf("latitude" to latitude, "longitude" to longitude))
     }
 
 
@@ -116,13 +120,13 @@ class PenguStoreApi(
         return post(Routes.DELETE_SHOPPING_LIST, deleteShoppingListRequest)
     }
 
-    suspend fun getUserShoppingLists(userId: Long): Response.SuccessResponse<List<ShoppingList>> =
+    suspend fun getUserShoppingLists(userId: Long): Response.SuccessResponse<List<ShoppingList2>> =
         get(Routes.GET_USER_SHOPPING_LISTS, userId.toString())
 
     suspend fun getUserShoppingList(
         userId: Long,
         shopId: String
-    ): Response.SuccessResponse<ShoppingList> =
+    ): Response.SuccessResponse<ShoppingList2> =
         get(Routes.GET_USER_SHOPPING_LIST + shopId, userId.toString())
 
     suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.PANTRIES)
@@ -216,9 +220,9 @@ class PenguStoreApi(
         return put(Routes.UPDATE_PRODUCT, updateProductRequest)
     }
 
-    suspend fun shops(): Response.SuccessResponse<List<Shop>> = get(Routes.SHOPS)
+    suspend fun shops(): Response.SuccessResponse<List<ShoppingList>> = get(Routes.SHOPS)
 
-    suspend fun getShop(shopId: String): Response.SuccessResponse<Shop> =
+    suspend fun getShop(shopId: String): Response.SuccessResponse<ShoppingList> =
         get(Routes.GET_SHOP, shopId)
 
     suspend fun addShop(

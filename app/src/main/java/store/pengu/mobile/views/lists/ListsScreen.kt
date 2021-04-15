@@ -140,7 +140,7 @@ fun ListsScreen(navController: NavController, listsService: ListsService, store:
                         Row(modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(text = "Products ", fontWeight = FontWeight.Bold)
-                            Text(text = list.productsCount.toString())
+                            Text(text = list.productCount.toString())
                         }
                     }
 
