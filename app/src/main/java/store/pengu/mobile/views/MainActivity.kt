@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,8 +36,7 @@ import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
-import store.pengu.mobile.views.dashboard.DashboardScreen
-import store.pengu.mobile.views.dashboard.partials.SetupScreen
+import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.lists.ListsScreen
 import store.pengu.mobile.views.lists.partials.NewList
 import store.pengu.mobile.views.lists.partials.PantryList
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         runBlocking {
             accountService.loadData()
             startDestination = if (storeState.isLoggedIn()) {
-                "dashboard"
+                "loading"
             } else {
                 "login"
             }
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
             // put all routes that should not show bottom bar navigation
-            val noBottomBarRoutes = listOf("login")
+            val noBottomBarRoutes = listOf("login", "loading")
             val showBottomBar = !noBottomBarRoutes.contains(currentRoute)
 
             val scaffoldState = rememberScaffoldState()
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     snackbarHost = {
                         scaffoldState.snackbarHostState
                     }
-                ) {
+                ) { paddingValues ->
                     NavHost(navController = navController, startDestination = startDestination) {
                         loaded = true
 
@@ -126,16 +126,14 @@ class MainActivity : AppCompatActivity() {
                             LoginScreen(navController, accountService, snackbarController)
                         }
 
-                        composable("dashboard") {
-                            DashboardScreen(navController, listsService)
-                        }
-
-                        composable("setup") {
-                            SetupScreen(navController)
+                        composable("loading") {
+                            LoadingScreen(navController, listsService)
                         }
 
                         composable("lists") {
-                            ListsScreen(navController, listsService, storeState)
+                            Surface(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                                ListsScreen(navController, listsService, storeState, snackbarController)
+                            }
                         }
 
                         composable("new_list") {
@@ -173,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     Column(
                         modifier = Modifier
-                            .padding(bottom = 8.dp + it.calculateBottomPadding())
+                            .padding(bottom = 8.dp + paddingValues.calculateBottomPadding())
                             .fillMaxSize(),
                         verticalArrangement = Arrangement.Bottom,
                         horizontalAlignment = Alignment.CenterHorizontally

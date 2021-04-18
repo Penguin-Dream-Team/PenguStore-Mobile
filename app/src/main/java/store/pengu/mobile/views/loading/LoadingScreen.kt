@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.dashboard
+package store.pengu.mobile.views.loading
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -12,7 +12,7 @@ import store.pengu.mobile.services.ListsService
 
 @ExperimentalAnimationApi
 @Composable
-fun DashboardScreen(
+fun LoadingScreen(
     navController: NavController,
     listsService: ListsService
 ) {
@@ -41,7 +41,7 @@ fun DashboardScreen(
                 navController.navigate("pantry_list")
             UserListType.SHOPPING_LIST ->
                 navController.navigate("shopping_list")
-            null -> Text("No list in location")
+            null -> navController.navigate("lists")
         }
     } else {
         Text("Loaded")

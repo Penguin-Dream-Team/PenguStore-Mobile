@@ -1,171 +1,167 @@
 package store.pengu.mobile.views.lists
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.More
-import androidx.compose.material.icons.filled.Preview
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
-import store.pengu.mobile.data.PantryList
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.views.lists.partials.ListItem
+import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.ShoppingList2
+import store.pengu.mobile.utils.SnackbarController
+import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
+@ExperimentalAnimationApi
 @Composable
-fun ListsScreen(navController: NavController, listsService: ListsService, store: StoreState) {
-    val storeState by remember { mutableStateOf(store) }
-    val openDialog = remember { mutableStateOf(false) }
-    var type by remember { mutableStateOf(0) }
-    val selectedTabList by remember { mutableStateOf(storeState.lists) }
-    val sectionTypes = ListTypesEnum.values().map { it.type }
+fun ListsScreen(
+    navController: NavController,
+    listsService: ListsService,
+    store: StoreState,
+    snackbarController: SnackbarController
+) {
+    var selectedList by remember { mutableStateOf(0) }
+    store.pantryLists.clear()
+    store.pantryLists.addAll(
+        listOf(
+            PantryList(1, "1", "Lista 1", 100f, 200f, 2, true),
+            PantryList(2, "2", "Lista 2", 20f, 5f, 3),
+            PantryList(3, "3", "Lista 3", 10f, 800f, 20),
+            PantryList(4, "4", "Lista 4", 400f, 600f, 15, true),
+            PantryList(5, "5", "Lista 5", 600f, 220f, 50),
+        )
+    )
+    store.shoppingLists.clear()
+    store.shoppingLists.addAll(
+        listOf(
+            ShoppingList2(1, 2, "Shop 1"),
+            ShoppingList2(2, 2, "Shop 2"),
+            ShoppingList2(3, 2, "Shop 3"),
+            ShoppingList2(4, 2, "Shop 4"),
+            ShoppingList2(5, 2, "Shop 5"),
+            ShoppingList2(6, 2, "Shop 6"),
+            ShoppingList2(1, 2, "Shop 1"),
+            ShoppingList2(2, 2, "Shop 2"),
+            ShoppingList2(3, 2, "Shop 3"),
+            ShoppingList2(4, 2, "Shop 4"),
+            ShoppingList2(5, 2, "Shop 5"),
+            ShoppingList2(6, 2, "Shop 6"),
+            ShoppingList2(1, 2, "Shop 1"),
+            ShoppingList2(2, 2, "Shop 2"),
+            ShoppingList2(3, 2, "Shop 3"),
+            ShoppingList2(4, 2, "Shop 4"),
+            ShoppingList2(5, 2, "Shop 5"),
+            ShoppingList2(6, 2, "Shop 6"),
+        )
+    )
+    val coroutineScope = rememberCoroutineScope()
 
-    if (type == 0) listsService.refreshPantryList(storeState.userId)
-    else listsService.refreshShoppingList(storeState.userId)
-
-    Column {
-        TabRow(selectedTabIndex = type) {
-            sectionTypes.forEachIndexed { index, content ->
-                Tab(
-                    modifier = Modifier.padding(bottom = 10.dp),
-                    selected = type == index,
-                    content = { Text(content) },
-                    onClick = { type = index }
-                )
-            }
-        }
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(vertical = 20.dp)
-        ) {
-            items(selectedTabList[type]) { item ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = item.name,
-                                fontWeight = FontWeight.SemiBold
-                            )
-
-                            IconButton(
-                                onClick = {
-                                    storeState.selectedList = item
-                                    openDialog.value = true
-                                },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Preview,
-                                    tint = Color(52, 247, 133),
-                                    contentDescription = "Preview"
-                                )
-                            }
-
-                            IconButton(
-                                onClick = {
-                                    storeState.selectedList = item
-                                    if (type == 0)
-                                        navController.navigate("pantry_list")
-                                    else
-                                        navController.navigate("shopping_list")
-                                },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.More,
-                                    tint = Color(52, 247, 133),
-                                    contentDescription = "See More"
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Button(
-        onClick = {
-            store.listType = type
-            navController.navigate("new_list")
-        },
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .padding(horizontal = 15.dp)
+            .padding(top = 10.dp)
+            .fillMaxSize()
     ) {
-        val text = if (type == 0) "Create new Pantry List" else "Create new Shopping List"
-        Text(
-            text = text,
-            textAlign = TextAlign.Center
-        )
-    }
+        TabRow(
+            selectedTabIndex = selectedList,
+            contentColor = MaterialTheme.colors.primary,
+        ) {
+            Tab(
+                modifier = Modifier.padding(top = 15.dp, bottom = 13.dp),
+                selected = selectedList == 0,
+                content = { Text("Pantries") },
+                onClick = { selectedList = 0 },
+                unselectedContentColor = MaterialTheme.colors.onSurface
+            )
+            Tab(
+                modifier = Modifier.padding(top = 15.dp, bottom = 13.dp),
+                selected = selectedList == 1,
+                content = { Text("Shopping") },
+                onClick = { selectedList = 1 },
+                unselectedContentColor = MaterialTheme.colors.onSurface
+            )
+        }
+        AnimatedVisibility(visible = selectedList == 0) {
+            var isRefreshing: Boolean by remember { mutableStateOf(false) }
 
-    if (openDialog.value) {
-        AlertDialog(
-            onDismissRequest = {
-                openDialog.value = false
-            },
-            title = {
-                Text(text = storeState.selectedList.name)
-            },
-            text = {
-                Column(
+            PullToRefresh(
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    isRefreshing = true
+                    // update items and set isRefreshing = false
+                    coroutineScope.launch {
+                        delay(1000L)
+                        store.pantryLists.reverse()
+                        isRefreshing = false
+                    }
+                }
+            ) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = 15.dp)
                 ) {
-                    if (type == 0) {
-                        val list = storeState.selectedList as PantryList
-
-                        Row(modifier = Modifier.fillMaxWidth()
+                    items(store.pantryLists) { item ->
+                        ListItem(
+                            title = item.name,
+                            productAmount = item.productCount,
+                            location = "${item.latitude}, ${item.longitude}",
+                            color = Color.Red,
+                            isShared = item.isShared,
+                            enabled = !isRefreshing
                         ) {
-                            Text(text = "Products ", fontWeight = FontWeight.Bold)
-                            Text(text = list.productCount.toString())
+                            snackbarController.showDismissibleSnackbar("Clicked ${item.name}")
                         }
                     }
-
-                    Row(modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Location ", fontWeight = FontWeight.Bold)
-                        Text(text = "0")
-                    }
-                }
-            },
-            confirmButton = {},
-            dismissButton = {
-                Button(
-                    onClick = {
-                        openDialog.value = false
-                    }) {
-                    Text("Close")
                 }
             }
-        )
+        }
+        AnimatedVisibility(visible = selectedList == 1) {
+            var isRefreshing: Boolean by remember { mutableStateOf(false) }
+
+            PullToRefresh(
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    isRefreshing = true
+                    // update items and set isRefreshing = false
+                    coroutineScope.launch {
+                        delay(1000L)
+                        store.shoppingLists.reverse()
+                        isRefreshing = false
+                    }
+                }
+            ) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = 15.dp)
+                ) {
+                    items(store.shoppingLists) { item ->
+                        ListItem(
+                            title = item.name,
+                            productAmount = 0,
+                            location = "Somewhere",
+                            color = Color.Green,
+                            isShared = false,
+                            enabled = !isRefreshing
+                        ) {
+                            snackbarController.showDismissibleSnackbar("Clicked ${item.name}")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
-
-private enum class ListTypesEnum(val type: String) {
-    PantryList("PantryList"),
-    ShoppingList("Shopping List")
-}
-

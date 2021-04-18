@@ -25,10 +25,10 @@ fun BottomBar(navController: NavHostController) {
         )
         {
             IconButton(
-                { navigate(navController, "dashboard") },
+                { navigate(navController, "lists") },
                 Icons.Filled.Home,
                 "Home",
-                currentRoute == "dashboard"
+                currentRoute == "lists"
             )
             IconButton(
                 { navigate(navController, "search") },

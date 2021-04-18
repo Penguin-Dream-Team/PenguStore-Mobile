@@ -40,7 +40,7 @@ fun LoginScreen(
             try {
                 val username = login()
                 navController.backStack.clear()
-                navController.navigate("dashboard")
+                navController.navigate("loading")
                 snackbarController.showDismissibleSnackbar("Welcome $username")
             } catch (e: PenguStoreApiException) {
                 snackbarController.showDismissibleSnackbar(e.message)
@@ -57,11 +57,19 @@ fun LoginScreen(
         val ok = remember {
             mutableStateOf(coroutineScope.launch {
                 accountService.login("Tux", "tux")
-                navController.navigate("dashboard")
+                navController.navigate("loading")
             })
         }
     }
 */
+    Box {
+        val ok = remember {
+            mutableStateOf(coroutineScope.launch {
+                accountService.registerGuest()
+                navController.navigate("loading")
+            })
+        }
+    }
 
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
