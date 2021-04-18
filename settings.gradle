@@ -1,2 +1,2 @@
 rootProject.name = "PenguStore-Mobile"
-include ':app'
+include ':app', ':termite'

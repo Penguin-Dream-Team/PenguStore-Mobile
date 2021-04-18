@@ -9,6 +9,7 @@ import store.pengu.mobile.data.ShoppingList2
 
 class StoreState {
     var token: String by mutableStateOf("")
+    var wifiDirect: Boolean by mutableStateOf(false)
     var username: String by mutableStateOf("")
     var guest: Boolean by mutableStateOf(true)
     var email: String by mutableStateOf("")
@@ -18,8 +19,6 @@ class StoreState {
     }
 
     var shouldFindListInLocation: Boolean by mutableStateOf(true)
-
-
 
     var userId: Long by mutableStateOf(1)
     var products = mutableStateListOf<Product>()

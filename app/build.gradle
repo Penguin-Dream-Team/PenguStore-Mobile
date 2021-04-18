@@ -98,6 +98,9 @@ dependencies {
     implementation  "com.google.protobuf:protobuf-javalite:3.13.0"
     implementation "androidx.datastore:datastore:$datastore_version"
     //implementation "androidx.datastore:datastore-preferences:$datastore_version"
+
+    // Termite
+    implementation project(':termite')
 }
 
 protobuf {

@@ -1,9 +1,14 @@
 package store.pengu.mobile.views
 
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.app.AlertDialog
+import android.content.*
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Messenger
+import android.view.View
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -24,12 +29,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.google.android.gms.maps.model.LatLng
+import dagger.Provides
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice
+import pt.inesc.termite.wifidirect.SimWifiP2pManager
+import pt.inesc.termite.wifidirect.SimWifiP2pManager.Channel
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
+import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
+import store.pengu.mobile.services.TermiteService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
@@ -44,12 +58,14 @@ import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.BottomBar
 import store.pengu.mobile.views.partials.PenguSnackbar
+import store.pengu.mobile.views.partials.WifiP2pBroadcastReceiver
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PeerListListener {
 
     @Inject
     lateinit var listsService: ListsService
@@ -66,7 +82,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var api: PenguStoreApi
 
+    private val termiteService = TermiteService(this)
     private var navController: NavHostController? = null
+    private var mReceiver: WifiP2pBroadcastReceiver? = null
 
     @ExperimentalComposeUiApi
     @ExperimentalFoundationApi
@@ -81,6 +99,15 @@ class MainActivity : AppCompatActivity() {
 
         var loaded = false
         val startDestination: String
+
+        // register broadcast receiver
+        val filter = IntentFilter()
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION)
+        mReceiver = WifiP2pBroadcastReceiver(this)
+        registerReceiver(mReceiver, filter)
 
         runBlocking {
             accountService.loadData()
@@ -127,7 +154,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("dashboard") {
-                            DashboardScreen(navController, listsService)
+                            DashboardScreen(navController, listsService, termiteService)
                         }
 
                         composable("setup") {
@@ -171,6 +198,7 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
                     }
+
                     Column(
                         modifier = Modifier
                             .padding(bottom = 8.dp + it.calculateBottomPadding())
@@ -193,5 +221,30 @@ class MainActivity : AppCompatActivity() {
                 data.extras!!.getDouble("LONGITUDE")
             )
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(mReceiver)
+    }
+
+    /*
+     * Termite listeners
+     */
+    override fun onPeersAvailable(peers: SimWifiP2pDeviceList) {
+        val peersStr = StringBuilder()
+
+        // compile list of devices in range
+        for (device in peers.deviceList) {
+            val dev = "${device.deviceName} (${device.virtIp})\n"
+            peersStr.append(dev)
+        }
+
+        // display list of devices in range
+        AlertDialog.Builder(this)
+            .setTitle("Devices in WiFi Range")
+            .setMessage(peersStr.toString())
+            .setNeutralButton("Dismiss") { _, _ -> }
+            .show()
     }
 }
