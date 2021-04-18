@@ -41,7 +41,7 @@ fun DashboardScreen(
                 navController.navigate("pantry_list")
             UserListType.SHOPPING_LIST ->
                 navController.navigate("shopping_list")
-            null -> TODO("LOAD ALL LISTS")
+            null -> Text("No list in location")
         }
     } else {
         Text("Loaded")
