@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.loading
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.Text
@@ -10,6 +11,7 @@ import kotlinx.coroutines.launch
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.services.ListsService
 
+@SuppressLint("RestrictedApi")
 @ExperimentalAnimationApi
 @Composable
 fun LoadingScreen(
@@ -36,6 +38,7 @@ fun LoadingScreen(
     }
 
     if (!loading) {
+        navController.backStack.clear()
         when (type) {
             UserListType.PANTRY ->
                 navController.navigate("pantry_list")

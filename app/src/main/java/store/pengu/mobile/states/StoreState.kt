@@ -12,6 +12,7 @@ class StoreState {
     var username: String by mutableStateOf("")
     var guest: Boolean by mutableStateOf(true)
     var email: String by mutableStateOf("")
+    var selectedListType = mutableStateOf(0)
 
     fun isLoggedIn(): Boolean {
         return token.isNotBlank()

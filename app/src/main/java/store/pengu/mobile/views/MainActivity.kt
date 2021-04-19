@@ -4,29 +4,27 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.services.ListsService
@@ -43,6 +41,8 @@ import store.pengu.mobile.views.lists.partials.PantryList
 import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.BottomBar
+import store.pengu.mobile.views.partials.BottomSheetMenus
+import store.pengu.mobile.views.partials.FloatingActionButtons
 import store.pengu.mobile.views.partials.PenguSnackbar
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
@@ -68,6 +68,13 @@ class MainActivity : AppCompatActivity() {
 
     private var navController: NavHostController? = null
 
+    @ExperimentalMaterialApi
+    private lateinit var bottomSheetState: BottomSheetState
+
+    private var isBottomSheetMenuOpen: Boolean = false
+    private lateinit var coroutineScope: CoroutineScope
+
+    @ExperimentalMaterialApi
     @ExperimentalComposeUiApi
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
@@ -104,82 +111,170 @@ class MainActivity : AppCompatActivity() {
             val scaffoldState = rememberScaffoldState()
             val snackbarController =
                 SnackbarController(scaffoldState.snackbarHostState, lifecycleScope)
+            coroutineScope = rememberCoroutineScope()
+
+            val buttonShape = CircleShape
+            val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+            bottomSheetState = bottomSheetScaffoldState.bottomSheetState
+
+            var executedOnce by remember { mutableStateOf(false) }
+            if (!executedOnce) {
+                navController.addOnDestinationChangedListener { _, _, _ ->
+                    if (bottomSheetScaffoldState.bottomSheetState.isExpanded) {
+                        collapseBottomSheetMenu()
+                    }
+                }
+                executedOnce = true
+            }
 
             PenguShopTheme {
-                Scaffold(
-                    bottomBar = {
-                        if (loaded) {
-                            AnimatedVisibility(visible = showBottomBar) {
-                                BottomBar(navController)
-                            }
-                        }
-                    },
-                    scaffoldState = scaffoldState,
-                    snackbarHost = {
-                        scaffoldState.snackbarHostState
-                    }
-                ) { paddingValues ->
-                    NavHost(navController = navController, startDestination = startDestination) {
-                        loaded = true
-
-                        composable("login") {
-                            LoginScreen(navController, accountService, snackbarController)
-                        }
-
-                        composable("loading") {
-                            LoadingScreen(navController, listsService)
-                        }
-
-                        composable("lists") {
-                            Surface(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                                ListsScreen(navController, listsService, storeState, snackbarController)
-                            }
-                        }
-
-                        composable("new_list") {
-                            NewList(navController, listsService, this@MainActivity, storeState)
-                        }
-
-                        composable("pantry_list") {
-                            PantryList(navController, productsService, storeState)
-                        }
-
-                        composable("shopping_list") {
-                            ShoppingList(navController, productsService, storeState)
-                        }
-
-                        composable("search") {
-                            SearchScreen(navController, productsService, storeState)
-                        }
-
-                        composable("cart") {
-                            CartScreen(navController, storeState)
-                        }
-
-                        composable("cart_confirmation") {
-                            CartConfirmationScreen(navController, storeState)
-                        }
-
-                        composable("profile") {
-                            ProfileScreen(
-                                navController,
-                                accountService,
+                BottomSheetScaffold(
+                    scaffoldState = bottomSheetScaffoldState,
+                    sheetContent = {
+                        Box {
+                            BottomSheetMenus(
+                                listsService,
+                                storeState,
+                                productsService,
                                 snackbarController,
-                                storeState
+                                currentRoute
                             )
                         }
-                    }
-                    Column(
-                        modifier = Modifier
-                            .padding(bottom = 8.dp + paddingValues.calculateBottomPadding())
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Bottom,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        PenguSnackbar(snackbarHostState = scaffoldState.snackbarHostState)
+                    },
+                    sheetPeekHeight = 0.dp,
+                    sheetGesturesEnabled = true,
+                ) {
+                    Scaffold(
+                        bottomBar = {
+                            if (loaded) {
+                                AnimatedVisibility(visible = showBottomBar) {
+                                    BottomBar(navController, buttonShape)
+                                }
+                            }
+                        },
+                        scaffoldState = scaffoldState,
+                        snackbarHost = {
+                            scaffoldState.snackbarHostState
+                        },
+                        isFloatingActionButtonDocked = true,
+                        floatingActionButton = {
+                            FloatingActionButtons(
+                                buttonShape,
+                                listsService,
+                                storeState,
+                                productsService,
+                                snackbarController,
+                                { expandBottomSheetMenu() },
+                                currentRoute,
+                            )
+                        },
+                        floatingActionButtonPosition = FabPosition.Center
+                    ) { paddingValues ->
+                        Surface(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                                .fillMaxSize(),
+                        ) {
+                            NavHost(
+                                navController = navController,
+                                startDestination = startDestination
+                            ) {
+                                loaded = true
+
+                                composable("login") {
+                                    LoginScreen(navController, accountService, snackbarController)
+                                }
+
+                                composable("loading") {
+                                    LoadingScreen(navController, listsService)
+                                }
+
+                                composable("lists") {
+                                    ListsScreen(
+                                        navController,
+                                        listsService,
+                                        storeState,
+                                        snackbarController,
+                                    )
+                                }
+
+                                composable("new_list") {
+                                    NewList(
+                                        navController,
+                                        listsService,
+                                        this@MainActivity,
+                                        storeState
+                                    )
+                                }
+
+                                composable("pantry_list") {
+                                    PantryList(navController, productsService, storeState)
+                                }
+
+                                composable("shopping_list") {
+                                    ShoppingList(navController, productsService, storeState)
+                                }
+
+                                composable("search") {
+                                    SearchScreen(navController, productsService, storeState)
+                                }
+
+                                composable("cart") {
+                                    CartScreen(navController, storeState)
+                                }
+
+                                composable("cart_confirmation") {
+                                    CartConfirmationScreen(navController, storeState)
+                                }
+
+                                composable("profile") {
+                                    ProfileScreen(
+                                        navController,
+                                        accountService,
+                                        snackbarController,
+                                        storeState
+                                    )
+                                }
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .padding(bottom = 8.dp)// + paddingValues.calculateBottomPadding())
+                                    .fillMaxSize()
+                                    .zIndex(10f),
+                                verticalArrangement = Arrangement.Bottom,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                PenguSnackbar(snackbarHostState = scaffoldState.snackbarHostState)
+                            }
+                        }
                     }
                 }
             }
+        }
+    }
+
+    @ExperimentalMaterialApi
+    override fun onBackPressed() {
+        if (isBottomSheetMenuOpen) {
+            collapseBottomSheetMenu()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    @ExperimentalMaterialApi
+    fun expandBottomSheetMenu() {
+        coroutineScope.launch {
+            bottomSheetState.expand()
+            isBottomSheetMenuOpen = true
+        }
+    }
+
+    @ExperimentalMaterialApi
+    fun collapseBottomSheetMenu() {
+        coroutineScope.launch {
+            bottomSheetState.collapse()
+            isBottomSheetMenuOpen = false
         }
     }
 

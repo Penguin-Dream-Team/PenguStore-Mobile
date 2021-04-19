@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -22,28 +23,27 @@ import store.pengu.mobile.data.ShoppingList2
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
 fun ListsScreen(
     navController: NavController,
     listsService: ListsService,
     store: StoreState,
-    snackbarController: SnackbarController
+    snackbarController: SnackbarController,
 ) {
-    var selectedList by remember { mutableStateOf(0) }
-    store.pantryLists.clear()
-    store.pantryLists.addAll(
-        listOf(
+    var selectedList by remember { store.selectedListType }
+    val pantryLists: MutableList<PantryList> = remember {
+        mutableListOf(
             PantryList(1, "1", "Lista 1", 100f, 200f, 2, true),
             PantryList(2, "2", "Lista 2", 20f, 5f, 3),
             PantryList(3, "3", "Lista 3", 10f, 800f, 20),
             PantryList(4, "4", "Lista 4", 400f, 600f, 15, true),
             PantryList(5, "5", "Lista 5", 600f, 220f, 50),
         )
-    )
-    store.shoppingLists.clear()
-    store.shoppingLists.addAll(
-        listOf(
+    }
+    val shoppingLists: MutableList<ShoppingList2> = remember {
+        mutableListOf(
             ShoppingList2(1, 2, "Shop 1"),
             ShoppingList2(2, 2, "Shop 2"),
             ShoppingList2(3, 2, "Shop 3"),
@@ -53,24 +53,15 @@ fun ListsScreen(
             ShoppingList2(1, 2, "Shop 1"),
             ShoppingList2(2, 2, "Shop 2"),
             ShoppingList2(3, 2, "Shop 3"),
-            ShoppingList2(4, 2, "Shop 4"),
-            ShoppingList2(5, 2, "Shop 5"),
-            ShoppingList2(6, 2, "Shop 6"),
-            ShoppingList2(1, 2, "Shop 1"),
-            ShoppingList2(2, 2, "Shop 2"),
-            ShoppingList2(3, 2, "Shop 3"),
-            ShoppingList2(4, 2, "Shop 4"),
-            ShoppingList2(5, 2, "Shop 5"),
-            ShoppingList2(6, 2, "Shop 6"),
+            ShoppingList2(4, 2, "Shop 4")
         )
-    )
+    }
     val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
             .padding(horizontal = 15.dp)
             .padding(top = 10.dp)
-            .fillMaxSize()
     ) {
         TabRow(
             selectedTabIndex = selectedList,
@@ -101,7 +92,7 @@ fun ListsScreen(
                     // update items and set isRefreshing = false
                     coroutineScope.launch {
                         delay(1000L)
-                        store.pantryLists.reverse()
+                        pantryLists.reverse()
                         isRefreshing = false
                     }
                 }
@@ -112,7 +103,7 @@ fun ListsScreen(
                         .align(Alignment.CenterHorizontally)
                         .padding(vertical = 15.dp)
                 ) {
-                    items(store.pantryLists) { item ->
+                    items(pantryLists) { item ->
                         ListItem(
                             title = item.name,
                             productAmount = item.productCount,
@@ -137,7 +128,7 @@ fun ListsScreen(
                     // update items and set isRefreshing = false
                     coroutineScope.launch {
                         delay(1000L)
-                        store.shoppingLists.reverse()
+                        shoppingLists.reverse()
                         isRefreshing = false
                     }
                 }
@@ -148,7 +139,7 @@ fun ListsScreen(
                         .align(Alignment.CenterHorizontally)
                         .padding(vertical = 15.dp)
                 ) {
-                    items(store.shoppingLists) { item ->
+                    items(shoppingLists) { item ->
                         ListItem(
                             title = item.name,
                             productAmount = 0,

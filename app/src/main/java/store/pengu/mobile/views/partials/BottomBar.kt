@@ -2,6 +2,7 @@ package store.pengu.mobile.views.partials
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,8 +15,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigate
 
 @Composable
-fun BottomBar(navController: NavHostController) {
-    BottomAppBar {
+fun BottomBar(navController: NavHostController, buttonShape: RoundedCornerShape) {
+    BottomAppBar(cutoutShape = buttonShape) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
 
