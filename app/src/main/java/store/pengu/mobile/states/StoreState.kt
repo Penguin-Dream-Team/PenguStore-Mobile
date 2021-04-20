@@ -36,6 +36,6 @@ class StoreState {
     var cartProducts = mutableStateListOf<Pair<Product, Int>>()
 
     lateinit var selectedList: UserList
-    lateinit var listLocation: LatLng
+    var listLocation: LatLng? = null
 }
 

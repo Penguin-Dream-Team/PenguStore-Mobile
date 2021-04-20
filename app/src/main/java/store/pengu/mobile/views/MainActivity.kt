@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -138,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                                 productsService,
                                 snackbarController,
                                 currentRoute
-                            )
+                            ) { collapseBottomSheetMenu() }
                         }
                     },
                     sheetPeekHeight = 0.dp,
@@ -238,7 +237,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             Column(
                                 modifier = Modifier
-                                    .padding(bottom = 8.dp)// + paddingValues.calculateBottomPadding())
+                                    .padding(bottom = 8.dp)
                                     .fillMaxSize()
                                     .zIndex(10f),
                                 verticalArrangement = Arrangement.Bottom,

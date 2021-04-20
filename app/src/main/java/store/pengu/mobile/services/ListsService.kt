@@ -54,8 +54,8 @@ class ListsService(
                 1,
                 listName,
                 "CODE",
-                store.listLocation.latitude.toFloat(),
-                store.listLocation.longitude.toFloat(),
+                store.listLocation?.latitude?.toFloat() ?: 0.0f,
+                store.listLocation?.longitude?.toFloat() ?: 0.0f,
                 0
             )
             store.pantryLists.add(pantry)

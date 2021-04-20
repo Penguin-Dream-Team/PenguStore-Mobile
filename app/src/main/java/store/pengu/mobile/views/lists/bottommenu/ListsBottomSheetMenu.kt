@@ -1,19 +1,15 @@
 package store.pengu.mobile.views.lists
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
+import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
 
+@ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
@@ -21,20 +17,36 @@ fun ListsBottomSheetMenu(
     listsService: ListsService,
     store: StoreState,
     snackbarController: SnackbarController,
+    closeMenu: () -> Unit,
 ) {
     val selectedListType by remember { store.selectedListType }
+
+    val shoppingListName = remember { mutableStateOf("") }
+    val location: MutableState<LatLng?> = remember { mutableStateOf(null) }
+    val selectedColor = remember { mutableStateOf(AvailableListColor.BLUE) }
+
     when (selectedListType) {
         0 -> {
             PantryBottomSheetMenu(
                 listsService,
                 store,
                 snackbarController,
+                closeMenu,
+                shoppingListName,
+                location,
+                selectedColor
             )
         }
         1 -> {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Text("Create shopping list")
-            }
+            ShopsBottomSheetMenu(
+                listsService,
+                store,
+                snackbarController,
+                closeMenu,
+                shoppingListName,
+                location,
+                selectedColor
+            )
         }
         else -> Unit
     }

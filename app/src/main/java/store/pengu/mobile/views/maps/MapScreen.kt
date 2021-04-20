@@ -1,12 +1,9 @@
 package store.pengu.mobile.views.maps
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import store.pengu.mobile.R
@@ -25,45 +22,21 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import android.content.Intent
-import store.pengu.mobile.views.MainActivity
+import com.google.android.gms.maps.*
 
 class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
-    var mapFrag: SupportMapFragment? = null
-    var lastLocation: Location? = null
-    var selectedLocation: Location? = null
-    lateinit var googleMap: GoogleMap
-    lateinit var locationRequest: LocationRequest
-    internal var currentLocationMarker: Marker? = null
+    private var mapFrag: SupportMapFragment? = null
+    private var lastLocation: Location? = null
+    private var selectedLocation: Location? = null
+    private lateinit var googleMap: GoogleMap
+    private lateinit var locationRequest: LocationRequest
     private var fusedLocationClient: FusedLocationProviderClient? = null
+    private lateinit var button: Button
+    private var receivedLatLng: LatLng? = null
+    private var pantryName: String = ""
 
-    private var mLocationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            val locationList = locationResult.locations
-            if (locationList.isNotEmpty()) {
-                //The last location in the list is the newest
-                val location = locationList.last()
-                Log.i("MapScreen", "Location: ${location.latitude} ${location.longitude}")
-                lastLocation = location
-                if (currentLocationMarker != null) {
-                    currentLocationMarker?.remove()
-                }
-
-                //Place current location marker
-                val latLng = LatLng(location.latitude, location.longitude)
-                val markerOptions = MarkerOptions()
-                markerOptions.position(latLng)
-                markerOptions.title("Current Position")
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-                currentLocationMarker = googleMap.addMarker(markerOptions)
-
-                //move map camera
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11.0F))
-            }
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             finish()
             true
@@ -71,6 +44,11 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         else -> {
             super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        button.isEnabled = selectedLocation != null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,39 +63,48 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         mapFrag = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFrag?.getMapAsync(this)
 
-        val button = findViewById<Button>(R.id.confirmButton)
-        button.setOnClickListener {
-            setResult(RESULT_OK, Intent()
-                .putExtra("LATITUDE", selectedLocation!!.latitude)
-                .putExtra("LONGITUDE", selectedLocation!!.longitude))
-            finish()
+        pantryName = intent.getStringExtra("NAME") ?: ""
+        val hasArgs = intent.getBooleanExtra("HAS_LOCATION", false)
+        val lat = intent.getDoubleExtra("LATITUDE", 0.0)
+        val lng = intent.getDoubleExtra("LONGITUDE", 0.0)
+        if (hasArgs) {
+            receivedLatLng = LatLng(lat, lng)
         }
-    }
 
-    public override fun onPause() {
-        super.onPause()
-
-        //stop location updates when Screen is no longer active
-        fusedLocationClient?.removeLocationUpdates(mLocationCallback)
+        button = findViewById(R.id.confirmButton)
+        button.isEnabled = false
+        button.setOnClickListener {
+            if (selectedLocation == null) {
+                button.isEnabled = false
+                Toast.makeText(applicationContext, "No location selected", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                setResult(
+                    RESULT_OK, Intent()
+                        .putExtra("LATITUDE", selectedLocation!!.latitude)
+                        .putExtra("LONGITUDE", selectedLocation!!.longitude)
+                )
+                finish()
+            }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         this.googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
 
-        locationRequest = LocationRequest()
-        locationRequest.interval = 120000 // two minute interval
-        locationRequest.fastestInterval = 120000
-        locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        locationRequest = LocationRequest.create().apply {
+            interval = 120000 // two minute interval
+            fastestInterval = 120000
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
 
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            //Location Permission already granted
-            fusedLocationClient?.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper()!!)
-            this.googleMap.isMyLocationEnabled = true
+            initMap()
         } else {
             //Request Location Permission
             checkLocationPermission()
@@ -125,38 +112,58 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
         // Setting a click event handler for the map
         googleMap.setOnMapClickListener { latLng ->
-            selectedLocation = Location(LocationManager.GPS_PROVIDER).apply {
-                latitude = latLng.latitude
-                longitude = latLng.longitude
-            }
+            selectLocation(pantryName, latLng)
 
-            val markerOptions = MarkerOptions()
-            markerOptions.position(latLng)
-            markerOptions.title(latLng.latitude.toString() + " : " + latLng.longitude)
-
-            // Clears the previously touched position
-            googleMap.clear()
-            // Animating to the touched position
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
-            // Placing a marker on the touched position
-            googleMap.addMarker(markerOptions)
+            button.isEnabled = true
         }
 
         googleMap.setOnMyLocationButtonClickListener {
             val latLng = LatLng(lastLocation!!.latitude, lastLocation!!.longitude)
-
-            val markerOptions = MarkerOptions()
-            markerOptions.position(latLng)
-            markerOptions.title("Current Position")
-
-            // Clears the previously touched position
-            googleMap.clear()
-            // Animating to the touched position
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
-            // Placing a marker on the touched position
-            googleMap.addMarker(markerOptions)
+            selectLocation(pantryName, latLng)
 
             true
+        }
+    }
+
+    private fun selectLocation(title: String, latLng: LatLng, zoom: Float? = null) {
+        selectedLocation = Location(LocationManager.GPS_PROVIDER).apply {
+            latitude = latLng.latitude
+            longitude = latLng.longitude
+        }
+
+        val markerOptions = MarkerOptions()
+        markerOptions.position(latLng)
+        markerOptions.title(title)
+
+        // Clears the previously touched position
+        googleMap.clear()
+        // Animating to the touched position
+        if (zoom != null) {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+        } else {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+        }
+        // Placing a marker on the touched position
+        googleMap.addMarker(markerOptions)
+        button.isEnabled = true
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initMap() {
+        googleMap.isMyLocationEnabled = true
+        if (receivedLatLng != null) {
+            selectLocation(pantryName, receivedLatLng!!, 15.0f)
+        } else {
+            //Location Permission already granted
+            fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
+                if (location != null) {
+                    lastLocation = location
+                    //Place current location marker
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    //move map camera
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0F))
+                }
+            }
         }
     }
 
@@ -213,17 +220,9 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-
-                        fusedLocationClient?.requestLocationUpdates(
-                            locationRequest,
-                            mLocationCallback,
-                            Looper.myLooper()!!
-                        )
-                        googleMap.isMyLocationEnabled = true
+                        initMap()
                     }
-
                 } else {
-
                     // permission was denied | Disable the location-related task
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
                 }
