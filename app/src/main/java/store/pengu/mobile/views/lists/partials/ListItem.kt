@@ -1,8 +1,6 @@
 package store.pengu.mobile.views.lists.partials
 
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -13,9 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -25,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.Border
 import store.pengu.mobile.utils.border
+import store.pengu.mobile.utils.pluralize
 
 @Composable
 fun ListItem(
@@ -63,9 +59,9 @@ fun ListItem(
                     fontSize = MaterialTheme.typography.h5.fontSize
                 )
                 if (isShared) {
-                    Icon(imageVector = Icons.Filled.Person, contentDescription = "private")
-                } else {
                     Icon(imageVector = Icons.Filled.People, contentDescription = "shared")
+                } else {
+                    Icon(imageVector = Icons.Filled.Person, contentDescription = "private")
                 }
             }
             Row(
@@ -86,7 +82,7 @@ fun ListItem(
                         fontSize = MaterialTheme.typography.h6.fontSize,
                     )
                     Text(
-                        text = "products",
+                        text = "product".pluralize(productAmount),
                         modifier = Modifier
                             .alpha(0.8f),
                         fontSize = MaterialTheme.typography.caption.fontSize,
@@ -99,29 +95,6 @@ fun ListItem(
                         .alpha(0.8f),
                     fontSize = MaterialTheme.typography.caption.fontSize
                 )
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun ListItemPreview() {
-    PenguShopTheme {
-        Surface() {
-            Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                Spacer(modifier = Modifier.height(10.dp))
-                repeat(5) {
-                    ListItem(
-                        title = "Frigorífico de Lisboa",
-                        color = Color.Red,
-                        productAmount = 32,
-                        location = "IST, Alameda, Lisboa",
-                        isShared = true,
-                        enabled = true
-                    ) { }
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
             }
         }
     }

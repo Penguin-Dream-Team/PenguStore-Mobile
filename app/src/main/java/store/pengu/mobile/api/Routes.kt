@@ -22,6 +22,16 @@ object Routes {
      */
     const val FIND_LIST = "/lists/find"
 
+    const val GET_PANTRIES = "/lists/pantries"
+    const val GET_SHOPPING_LISTS = "/lists/shops"
+
+    const val CREATE_PANTRY_LIST = "/lists/pantries"
+    const val CREATE_SHOPPING_LIST = "/lists/shops"
+
+
+    /**
+     * NEED REWRITE
+     */
 
     const val DASHBOARD = "/dashboard"
 
@@ -37,10 +47,8 @@ object Routes {
     const val ADD_SHOPPING_LIST = "/users/addShoppingList"
     const val UPDATE_SHOPPING_LIST = "/users/updateShoppingList"
     const val DELETE_SHOPPING_LIST = "/users/deleteShoppingList"
-    const val GET_USER_SHOPPING_LISTS = "/users/id/ShoppingLists"
     const val GET_USER_SHOPPING_LIST = "/users/id/ShoppingList/"
 
-    const val PANTRIES = "/pantries"
     const val GET_PANTRY_LIST = "/pantries/id"
     const val ADD_PANTRY_LIST = "/pantries/add"
     const val UPDATE_PANTRY_LIST= "/pantries/update"

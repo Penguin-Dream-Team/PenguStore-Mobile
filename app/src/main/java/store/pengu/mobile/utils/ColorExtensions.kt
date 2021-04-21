@@ -15,3 +15,7 @@ fun Color.darken(amount: Float) =
         green = green - amount,
         blue = blue - amount
     )
+
+fun String.toColor() = split(" ").run {
+     Color(get(0).toInt(), get(1).toInt(), get(2).toInt())
+}

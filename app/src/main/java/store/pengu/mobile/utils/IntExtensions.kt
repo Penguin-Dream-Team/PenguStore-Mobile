@@ -11,3 +11,5 @@ fun Int.toEuros(): String {
 }
 
 fun String.euroToInt(): Int = this.filter { it.isDigit() }.toInt()
+
+fun String.pluralize(amount: Int): String = if (amount == 1) this else "${this}s"

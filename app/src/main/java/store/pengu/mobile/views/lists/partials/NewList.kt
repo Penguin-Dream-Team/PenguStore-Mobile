@@ -52,7 +52,7 @@ fun NewList(
         Button(
             enabled = listName != "",
             onClick = {
-                listsService.createList(listName)
+                //listsService.createList(listName)
                 navController.navigate("search")
             }) {
             Text("Continue")

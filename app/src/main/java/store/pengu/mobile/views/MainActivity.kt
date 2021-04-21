@@ -83,8 +83,6 @@ class MainActivity : AppCompatActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        //productsService.getProducts()
-
         var loaded = false
         val startDestination: String
 
@@ -108,13 +106,13 @@ class MainActivity : AppCompatActivity() {
             val showBottomBar = !noBottomBarRoutes.contains(currentRoute)
 
             val scaffoldState = rememberScaffoldState()
-            val snackbarController =
-                SnackbarController(scaffoldState.snackbarHostState, lifecycleScope)
             coroutineScope = rememberCoroutineScope()
 
             val buttonShape = CircleShape
             val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
             bottomSheetState = bottomSheetScaffoldState.bottomSheetState
+            val snackbarController =
+                SnackbarController(bottomSheetScaffoldState.snackbarHostState, lifecycleScope)
 
             var executedOnce by remember { mutableStateOf(false) }
             if (!executedOnce) {
@@ -129,6 +127,9 @@ class MainActivity : AppCompatActivity() {
             PenguShopTheme {
                 BottomSheetScaffold(
                     scaffoldState = bottomSheetScaffoldState,
+                    snackbarHost = {
+                        bottomSheetScaffoldState.snackbarHostState
+                    },
                     sheetContent = {
                         Box {
                             BottomSheetMenus(
@@ -152,9 +153,6 @@ class MainActivity : AppCompatActivity() {
                             }
                         },
                         scaffoldState = scaffoldState,
-                        snackbarHost = {
-                            scaffoldState.snackbarHostState
-                        },
                         isFloatingActionButtonDocked = true,
                         floatingActionButton = {
                             FloatingActionButtons(
@@ -239,11 +237,11 @@ class MainActivity : AppCompatActivity() {
                                 modifier = Modifier
                                     .padding(bottom = 8.dp)
                                     .fillMaxSize()
-                                    .zIndex(10f),
+                                    .zIndex(1000f),
                                 verticalArrangement = Arrangement.Bottom,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                PenguSnackbar(snackbarHostState = scaffoldState.snackbarHostState)
+                                PenguSnackbar(snackbarHostState = bottomSheetScaffoldState.snackbarHostState)
                             }
                         }
                     }
@@ -271,19 +269,11 @@ class MainActivity : AppCompatActivity() {
 
     @ExperimentalMaterialApi
     fun collapseBottomSheetMenu() {
+        // uncomment to clear when popup is closed
+        //listsService.resetNewListData()
         coroutineScope.launch {
             bottomSheetState.collapse()
             isBottomSheetMenuOpen = false
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (data != null && resultCode == RESULT_OK && requestCode == 111) {
-            storeState.listLocation = LatLng(
-                data.extras!!.getDouble("LATITUDE"),
-                data.extras!!.getDouble("LONGITUDE")
-            )
         }
     }
 }

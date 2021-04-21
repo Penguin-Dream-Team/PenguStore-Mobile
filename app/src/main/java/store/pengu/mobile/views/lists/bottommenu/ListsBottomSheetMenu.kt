@@ -1,13 +1,18 @@
-package store.pengu.mobile.views.lists
+package store.pengu.mobile.views.lists.bottommenu
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
-import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.launch
+import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
+import store.pengu.mobile.views.lists.bottommenu.CreateListBottomMenu
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -20,32 +25,47 @@ fun ListsBottomSheetMenu(
     closeMenu: () -> Unit,
 ) {
     val selectedListType by remember { store.selectedListType }
-
-    val shoppingListName = remember { mutableStateOf("") }
-    val location: MutableState<LatLng?> = remember { mutableStateOf(null) }
-    val selectedColor = remember { mutableStateOf(AvailableListColor.BLUE) }
+    val coroutineScope = rememberCoroutineScope()
 
     when (selectedListType) {
         0 -> {
-            PantryBottomSheetMenu(
+            CreateListBottomMenu(
                 listsService,
                 store,
                 snackbarController,
                 closeMenu,
-                shoppingListName,
-                location,
-                selectedColor
+                title = "Pantry List",
+                onCreate = {
+                    coroutineScope.launch {
+                        try {
+                            listsService.createNewPantryList()
+                            closeMenu()
+                            snackbarController.showDismissibleSnackbar("Created new Pantry List")
+                        } catch (e: PenguStoreApiException) {
+                            snackbarController.showDismissibleSnackbar(e.message)
+                        }
+                    }
+                }
             )
         }
         1 -> {
-            ShopsBottomSheetMenu(
+            CreateListBottomMenu(
                 listsService,
                 store,
                 snackbarController,
                 closeMenu,
-                shoppingListName,
-                location,
-                selectedColor
+                title = "Shopping List",
+                onCreate = {
+                    coroutineScope.launch {
+                        try {
+                            listsService.createNewShoppingList()
+                            closeMenu()
+                            snackbarController.showDismissibleSnackbar("Created new Shopping List")
+                        } catch (e: PenguStoreApiException) {
+                            snackbarController.showDismissibleSnackbar(e.message)
+                        }
+                    }
+                }
             )
         }
         else -> Unit

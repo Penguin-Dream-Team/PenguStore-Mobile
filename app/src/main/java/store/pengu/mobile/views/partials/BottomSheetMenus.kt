@@ -9,7 +9,7 @@ import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
-import store.pengu.mobile.views.lists.ListsBottomSheetMenu
+import store.pengu.mobile.views.lists.bottommenu.ListsBottomSheetMenu
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi

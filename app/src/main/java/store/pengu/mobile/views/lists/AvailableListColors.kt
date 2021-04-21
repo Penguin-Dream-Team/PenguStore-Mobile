@@ -24,4 +24,6 @@ enum class AvailableListColor(
 
     fun toColor() =
         Color(red = red, green = green, blue = blue, alpha = (alpha * 255).roundToInt())
+
+    override fun toString() = "$red $green $blue"
 }

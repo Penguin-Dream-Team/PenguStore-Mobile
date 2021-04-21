@@ -7,8 +7,9 @@ data class PantryList(
     override val id: Long,
     val code: String,
     override val name: String,
-    override val latitude: Float,
-    override val longitude: Float,
+    override val latitude: Double,
+    override val longitude: Double,
     val productCount: Int,
-    val isShared: Boolean = false
-) : UserList(id, name, latitude, longitude)
+    override val color: String,
+    override val shared: Boolean,
+) : UserList(id, name, latitude, longitude, color, shared)

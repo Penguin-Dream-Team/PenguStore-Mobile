@@ -1,16 +1,21 @@
 package store.pengu.mobile.api
 
+import androidx.compose.runtime.MutableState
 import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.api.requests.*
 import store.pengu.mobile.api.requests.account.LoginRequest
 import store.pengu.mobile.api.requests.account.RefreshTokenRequest
 import store.pengu.mobile.api.requests.account.RegisterRequest
+import store.pengu.mobile.api.requests.lists.CreateListRequest
 import store.pengu.mobile.api.responses.account.LoginResponse
 import store.pengu.mobile.api.responses.account.ProfileResponse
 import store.pengu.mobile.api.responses.account.RegisterResponse
+import store.pengu.mobile.api.responses.lists.PantryListResponse
+import store.pengu.mobile.api.responses.lists.ShoppingListResponse
 import store.pengu.mobile.api.responses.lists.UserListResponse
 import store.pengu.mobile.data.*
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.views.lists.AvailableListColor
 
 class PenguStoreApi(
     store: StoreState
@@ -50,6 +55,40 @@ class PenguStoreApi(
     ): UserListResponse {
         return get(Routes.FIND_LIST, mapOf("latitude" to latitude, "longitude" to longitude))
     }
+
+    suspend fun getPantryLists(): PantryListResponse {
+        return get(Routes.GET_PANTRIES)
+    }
+
+    suspend fun getShoppingLists(): ShoppingListResponse {
+        return get(Routes.GET_SHOPPING_LISTS)
+    }
+
+    suspend fun createPantryList(
+        newListName: String,
+        newListLocation: LatLng,
+        newListColor: AvailableListColor
+    ): Response.SuccessResponse<PantryList> {
+        return post(
+            Routes.CREATE_PANTRY_LIST,
+            CreateListRequest(newListName, newListLocation.latitude, newListLocation.longitude, newListColor.toString())
+        )
+    }
+
+    suspend fun createShoppingList(
+        newListName: String,
+        newListLocation: LatLng,
+        newListColor: AvailableListColor
+    ): Response.SuccessResponse<ShoppingList> {
+        return post(
+            Routes.CREATE_SHOPPING_LIST,
+            CreateListRequest(newListName, newListLocation.latitude, newListLocation.longitude, newListColor.toString())
+        )
+    }
+
+    /**
+     * NEEDS REWRITE
+     */
 
 
     suspend fun guestLogin(username: String): Response.SuccessResponse<User> =
@@ -120,16 +159,13 @@ class PenguStoreApi(
         return post(Routes.DELETE_SHOPPING_LIST, deleteShoppingListRequest)
     }
 
-    suspend fun getUserShoppingLists(userId: Long): Response.SuccessResponse<List<ShoppingList2>> =
-        get(Routes.GET_USER_SHOPPING_LISTS, userId.toString())
-
     suspend fun getUserShoppingList(
         userId: Long,
         shopId: String
     ): Response.SuccessResponse<ShoppingList2> =
         get(Routes.GET_USER_SHOPPING_LIST + shopId, userId.toString())
 
-    suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.PANTRIES)
+    suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_PANTRIES)
 
     suspend fun getPantry(pantryId: String): Response.SuccessResponse<PantryList> =
         get(Routes.GET_PANTRY_LIST, pantryId)

@@ -7,7 +7,7 @@ sealed class Response<out T> {
     open class SuccessResponse2 : Response<Nothing>()
 
     @JsonDeserialize
-    data class SuccessResponse<T>(val token: String? = null, val data: T) : Response<T>()
+    data class SuccessResponse<T>(val data: T) : Response<T>()
 
     @JsonDeserialize
     data class ErrorResponse(val message: String) : Response<Nothing>()

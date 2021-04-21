@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.lists
+package store.pengu.mobile.views.lists.bottommenu
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -9,11 +9,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -26,9 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.services.ListsService
@@ -36,6 +41,7 @@ import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.Border
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.border
+import store.pengu.mobile.views.lists.AvailableListColor
 import store.pengu.mobile.views.maps.MapScreen
 import store.pengu.mobile.views.partials.IconButton
 
@@ -43,23 +49,23 @@ import store.pengu.mobile.views.partials.IconButton
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
-fun PantryBottomSheetMenu(
+fun CreateListBottomMenu(
     listsService: ListsService,
     store: StoreState,
     snackbarController: SnackbarController,
     closeMenu: () -> Unit,
-    nameState: MutableState<String>,
-    locationState: MutableState<LatLng?>,
-    selectedColorState: MutableState<AvailableListColor>,
+    title: String,
+    onCreate: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
-    var pantryName by nameState
-    var location by locationState
-    var selectedColor by selectedColorState
-    var canCreate by remember { mutableStateOf(false) }
-    var canPickLocation by remember { mutableStateOf(false) }
+
+    var shoppingListName by remember { listsService.newListName }
+    var location by remember { listsService.newListLocation }
+    var selectedColor by remember { listsService.newListColor }
+
     var colorExpanded by remember { mutableStateOf(false) }
+
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
             with(it) {
@@ -72,9 +78,6 @@ fun PantryBottomSheetMenu(
                 }
             }
         }
-
-    canPickLocation = pantryName.isNotBlank()
-    canCreate = canPickLocation && location != null
 
     Column(
         modifier = Modifier
@@ -90,7 +93,7 @@ fun PantryBottomSheetMenu(
                 description = "close create popup"
             )
             Text(
-                text = "Create pantry list",
+                text = "Create ${title.toLowerCase(Locale.current)}",
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -98,11 +101,11 @@ fun PantryBottomSheetMenu(
         Divider(modifier = Modifier.padding(top = 2.dp))
 
         OutlinedTextField(
-            value = pantryName,
+            value = shoppingListName,
             onValueChange = {
-                pantryName = it
+                shoppingListName = it
             },
-            placeholder = { Text("Pantry name") },
+            placeholder = { Text("${title.toLowerCase(Locale.current).capitalize(Locale.current)} name") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -111,7 +114,7 @@ fun PantryBottomSheetMenu(
                 keyboardController?.hide()
             }),
             leadingIcon = {
-                Icon(imageVector = Icons.Filled.Label, contentDescription = "pantry name")
+                Icon(imageVector = Icons.Filled.Label, contentDescription = "list name")
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -119,7 +122,7 @@ fun PantryBottomSheetMenu(
         )
 
         Text(
-            text = "Choose pantry color:",
+            text = "Choose ${title.toLowerCase(Locale.current)} color:",
             modifier = Modifier
                 .padding(bottom = 3.dp)
                 .alpha(0.8f),
@@ -197,12 +200,12 @@ fun PantryBottomSheetMenu(
         Button(
             onClick = {
                 launcher.launch(Intent(context, MapScreen::class.java).apply {
-                    putExtra("NAME", pantryName)
+                    putExtra("NAME", shoppingListName)
                     putExtra("HAS_LOCATION", location != null)
                     putExtra("LATITUDE", location?.latitude ?: 0.0)
                     putExtra("LONGITUDE", location?.longitude ?: 0.0)
                 })
-            }, enabled = canPickLocation,
+            }, enabled = listsService.newCanPickLocation(),
             modifier = Modifier
                 .padding(vertical = 25.dp)
                 .fillMaxWidth()
@@ -211,13 +214,12 @@ fun PantryBottomSheetMenu(
         }
 
         Button(
-            onClick = {
-            }, enabled = canCreate,
+            onClick = onCreate, enabled = listsService.newCanCreate(),
             modifier = Modifier
                 .padding(bottom = 25.dp)
                 .fillMaxWidth()
         ) {
-            Text(text = "Create Pantry List")
+            Text(text = "Create $title")
         }
     }
 }
