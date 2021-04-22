@@ -2,27 +2,23 @@ package store.pengu.mobile.views.maps
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import store.pengu.mobile.R
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
-import android.os.Looper
-import android.util.Log
+import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.Marker
-import android.content.Intent
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import store.pengu.mobile.R
 
 class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
@@ -118,10 +114,13 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         }
 
         googleMap.setOnMyLocationButtonClickListener {
-            val latLng = LatLng(lastLocation!!.latitude, lastLocation!!.longitude)
-            selectLocation(pantryName, latLng)
-
-            true
+            if (lastLocation != null) {
+                val latLng = LatLng(lastLocation!!.latitude, lastLocation!!.longitude)
+                selectLocation(pantryName, latLng)
+                false
+            } else {
+                true
+            }
         }
     }
 
@@ -150,7 +149,7 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun initMap() {
-        googleMap.isMyLocationEnabled = true
+        googleMap.isMyLocationEnabled = false
         if (receivedLatLng != null) {
             selectLocation(pantryName, receivedLatLng!!, 15.0f)
         } else {
@@ -158,6 +157,7 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
             fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
                 if (location != null) {
                     lastLocation = location
+                    googleMap.isMyLocationEnabled = true
                     //Place current location marker
                     val latLng = LatLng(location.latitude, location.longitude)
                     //move map camera

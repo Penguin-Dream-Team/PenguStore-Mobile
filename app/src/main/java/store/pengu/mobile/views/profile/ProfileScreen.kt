@@ -51,6 +51,8 @@ fun ProfileScreen(
             coroutineScope
         )
 
+        ProfileScreenLocationButton(snackbarController)
+
         ProfileScreenFooter(
             navController,
             accountService,

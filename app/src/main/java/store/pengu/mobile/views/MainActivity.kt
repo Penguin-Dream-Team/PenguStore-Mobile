@@ -2,7 +2,9 @@ package store.pengu.mobile.views
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -259,6 +261,11 @@ class MainActivity : AppCompatActivity() {
 
     @ExperimentalMaterialApi
     fun expandBottomSheetMenu() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(true)
+        } else {
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        }
         coroutineScope.launch {
             bottomSheetState.expand()
             isBottomSheetMenuOpen = true
@@ -268,6 +275,11 @@ class MainActivity : AppCompatActivity() {
     @ExperimentalMaterialApi
     fun collapseBottomSheetMenu() {
         // uncomment to clear when popup is closed
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+        } else {
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        }
         //listsService.resetNewListData()
         coroutineScope.launch {
             bottomSheetState.collapse()
