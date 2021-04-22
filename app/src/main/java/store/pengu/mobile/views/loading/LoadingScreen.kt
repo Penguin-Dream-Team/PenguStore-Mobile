@@ -46,12 +46,9 @@ fun LoadingScreen(
         launcherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { granted ->
-            Toast.makeText(context, "hello", Toast.LENGTH_SHORT).show()
             if (!granted) {
                 snackbarController.showDismissibleSnackbar("Cannot fetch current location")
                 loading = false
-            } else {
-                snackbarController.showDismissibleSnackbar("HEllo there")
             }
             canGetLocation = granted
         }
