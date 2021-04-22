@@ -3,9 +3,6 @@ package store.pengu.mobile.views.loading
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.widget.Toast
-import androidx.activity.compose.registerForActivityResult
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
