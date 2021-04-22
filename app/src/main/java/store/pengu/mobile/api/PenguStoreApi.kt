@@ -1,6 +1,5 @@
 package store.pengu.mobile.api
 
-import androidx.compose.runtime.MutableState
 import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.api.requests.*
 import store.pengu.mobile.api.requests.account.LoginRequest
@@ -89,15 +88,6 @@ class PenguStoreApi(
     /**
      * NEEDS REWRITE
      */
-
-
-    suspend fun guestLogin(username: String): Response.SuccessResponse<User> =
-        post(Routes.REGISTER_GUEST, username)
-
-    suspend fun setup(): Response.SuccessResponse<User> {
-        val setupRequest = SetupRequest(phonePublicKey = "DUMMY")
-        return post(Routes.SETUP, setupRequest)
-    }
 
     suspend fun dashboard(): Response.SuccessResponse<String> = get(Routes.DASHBOARD)
 
@@ -255,6 +245,8 @@ class PenguStoreApi(
             UpdateProductRequest(productId, productName, productBarCode, reviewScore, reviewNumber)
         return put(Routes.UPDATE_PRODUCT, updateProductRequest)
     }
+
+    suspend fun addBarcodeProduct(barcode: String): Response.SuccessResponse<String> = put(Routes.ADD_BARCODE_PRODUCT, barcode)
 
     suspend fun shops(): Response.SuccessResponse<List<ShoppingList>> = get(Routes.SHOPS)
 

@@ -20,8 +20,6 @@ class StoreState {
 
     var shouldFindListInLocation: Boolean by mutableStateOf(true)
 
-
-
     var userId: Long by mutableStateOf(1)
     var products = mutableStateListOf<Product>()
     var pantryLists = mutableStateListOf<PantryList>()

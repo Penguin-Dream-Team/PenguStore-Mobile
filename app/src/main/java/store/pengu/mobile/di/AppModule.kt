@@ -10,9 +10,11 @@ import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
+import store.pengu.mobile.services.TermiteService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.storage.UserDataService
 import store.pengu.mobile.storage.userDataStore
+import store.pengu.mobile.views.MainActivity
 import javax.inject.Singleton
 
 @Module
