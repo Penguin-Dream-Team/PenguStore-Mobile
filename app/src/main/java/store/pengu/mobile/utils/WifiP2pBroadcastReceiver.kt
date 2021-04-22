@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.partials
+package store.pengu.mobile.utils
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -36,6 +36,8 @@ class WifiP2pBroadcastReceiver(activity: MainActivity) : BroadcastReceiver() {
             // Request available peers from the wifi p2p manager. This is an
             // asynchronous call and the calling activity is notified with a
             // callback on PeerListListener.onPeersAvailable()
+
+
             Toast.makeText(
                 mActivity, "Peer list changed",
                 Toast.LENGTH_SHORT

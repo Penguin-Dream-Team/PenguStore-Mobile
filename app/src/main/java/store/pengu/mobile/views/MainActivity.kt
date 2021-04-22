@@ -5,10 +5,6 @@ import android.app.AlertDialog
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.os.IBinder
-import android.os.Messenger
-import android.view.View
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -29,14 +25,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.google.android.gms.maps.model.LatLng
-import dagger.Provides
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
-import pt.inesc.termite.wifidirect.SimWifiP2pDevice
-import pt.inesc.termite.wifidirect.SimWifiP2pManager
-import pt.inesc.termite.wifidirect.SimWifiP2pManager.Channel
-import pt.inesc.termite.wifidirect.service.SimWifiP2pService
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
 import store.pengu.mobile.api.PenguStoreApi
@@ -58,11 +49,10 @@ import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.BottomBar
 import store.pengu.mobile.views.partials.PenguSnackbar
-import store.pengu.mobile.views.partials.WifiP2pBroadcastReceiver
+import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), PeerListListener {
@@ -106,7 +96,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION)
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION)
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION)
-        mReceiver = WifiP2pBroadcastReceiver(this)
+        mReceiver = WifiP2pBroadcastReceiver(this, )
         registerReceiver(mReceiver, filter)
 
         runBlocking {
