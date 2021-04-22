@@ -28,13 +28,14 @@ fun PantryList(navController: NavController, productsService: ProductsService, s
     val storeState by remember { mutableStateOf(store) }
     val openDialogEdit = remember { mutableStateOf(false) }
     val openDialogDelete = remember { mutableStateOf(false) }
-    val selectedPantry = storeState.selectedList as PantryList
+    val selectedPantry = storeState.selectedList as PantryList?
     val selectedProductId = remember { mutableStateOf(-1L) }
     val products by remember { mutableStateOf(store.pantryProducts) }
     val amountAvailable = remember { mutableStateOf(0) }
     val amountNeeded = remember { mutableStateOf(0) }
 
-    productsService.getPantryProducts(selectedPantry.id)
+    if (selectedPantry == null) return
+    //productsService.getPantryProducts(selectedPantry.id)
 
     Column(
         modifier = Modifier

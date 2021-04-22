@@ -50,8 +50,8 @@ class PenguStoreApi(
     }
 
     suspend fun findList(
-        latitude: Float,
-        longitude: Float
+        latitude: Double,
+        longitude: Double
     ): UserListResponse {
         return get(Routes.FIND_LIST, mapOf("latitude" to latitude, "longitude" to longitude))
     }

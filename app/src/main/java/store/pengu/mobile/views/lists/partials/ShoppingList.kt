@@ -28,12 +28,13 @@ import store.pengu.mobile.states.StoreState
 fun ShoppingList(navController: NavController, productsService: ProductsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
-    val selectedShoppingList = storeState.selectedList as ShoppingList
+    val selectedShoppingList = storeState.selectedList as ShoppingList?
     val products by remember { mutableStateOf(store.shoppingListProducts) }
     val cartProducts by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
     val currentProduct = remember { mutableStateOf(Product(0L, 0L, "", "", 0.0, -1, -1, -1)) }
 
+    if (selectedShoppingList == null) return
     //productsService.getShoppingListProducts(selectedShoppingList.userId)
 
     Column(

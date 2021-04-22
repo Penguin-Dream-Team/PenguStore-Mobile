@@ -1,14 +1,13 @@
 package store.pengu.mobile.services
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.data.UserList
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.lists.AvailableListColor
@@ -23,7 +22,7 @@ class ListsService(
     val newListColor = mutableStateOf(AvailableListColor.BLUE)
     val newListLocation: MutableState<LatLng?> = mutableStateOf(null)
 
-    val pantryLists = mutableStateListOf<PantryList>()
+    var pantryLists = mutableStateListOf<PantryList>()
     val shoppingLists = mutableStateListOf<ShoppingList>()
 
     private var isCreating = mutableStateOf(false)
@@ -44,8 +43,8 @@ class ListsService(
 
     suspend fun getPantryLists() {
         try {
-            pantryLists.clear()
-            pantryLists.addAll(api.getPantryLists().data)
+            val received = api.getPantryLists().data
+            updateList(received, pantryLists)
         } catch (e: Exception) {
             // fetch from cache
             e.printStackTrace()
@@ -54,12 +53,28 @@ class ListsService(
 
     suspend fun getShoppingLists() {
         try {
-            shoppingLists.clear()
-            shoppingLists.addAll(api.getShoppingLists().data)
+            val received = api.getShoppingLists().data
+            updateList(received, shoppingLists)
         } catch (e: Exception) {
             // fetch from cache
             e.printStackTrace()
         }
+    }
+
+    private fun <T : UserList> updateList(received: List<T>, listToUpdate: SnapshotStateList<T>) {
+        listToUpdate.removeIf { old ->
+            received.find { new ->
+                old.id == new.id
+            } == null
+        }
+        listToUpdate.replaceAll { old ->
+            received.find { new ->
+                old.id == new.id
+            }!!
+        }
+        listToUpdate.addAll(received.filterNot { new ->
+            listToUpdate.contains(new)
+        })
     }
 
     /**
@@ -102,7 +117,7 @@ class ListsService(
         isCreating.value = false
     }
 
-    suspend fun findListInLocation(latitude: Float, longitude: Float): UserListType? {
+    suspend fun findListInLocation(latitude: Double, longitude: Double): UserListType? {
         return try {
             with(api.findList(latitude, longitude)) {
                 store.selectedList = when (type) {

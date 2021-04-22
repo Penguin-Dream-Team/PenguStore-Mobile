@@ -1,7 +1,6 @@
 package store.pengu.mobile.views
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -21,7 +20,6 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import store.pengu.mobile.api.PenguStoreApi
@@ -183,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                                 }
 
                                 composable("loading") {
-                                    LoadingScreen(navController, listsService)
+                                    LoadingScreen(navController, listsService, snackbarController)
                                 }
 
                                 composable("lists") {
