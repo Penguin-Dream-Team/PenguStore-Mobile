@@ -53,6 +53,7 @@ object Routes {
     const val GET_PRODUCT = "/products/id"
     const val ADD_PRODUCT = "/products/add"
     const val UPDATE_PRODUCT = "/products/update"
+    const val ADD_BARCODE_PRODUCT = "/products/addBarcode"
 
     const val SHOPS = "/shops"
     const val GET_SHOP = "/shops/id"

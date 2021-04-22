@@ -45,6 +45,10 @@ class ProductsService(
         getProducts()
     }
 
+    fun addBarcodeProduct(barcode: String) = GlobalScope.launch(Dispatchers.Main) {
+        api.addBarcodeProduct(barcode)
+    }
+
     fun deleteProduct(
         pantryId: Long,
         productId: Long

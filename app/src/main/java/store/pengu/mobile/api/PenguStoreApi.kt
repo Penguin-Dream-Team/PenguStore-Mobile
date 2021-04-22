@@ -51,7 +51,6 @@ class PenguStoreApi(
         return get(Routes.FIND_LIST, mapOf("latitude" to latitude, "longitude" to longitude))
     }
 
-
     suspend fun guestLogin(username: String): Response.SuccessResponse<User> =
         post(Routes.REGISTER_GUEST, username)
 
@@ -219,6 +218,8 @@ class PenguStoreApi(
             UpdateProductRequest(productId, productName, productBarCode, reviewScore, reviewNumber)
         return put(Routes.UPDATE_PRODUCT, updateProductRequest)
     }
+
+    suspend fun addBarcodeProduct(barcode: String): Response.SuccessResponse<String> = put(Routes.ADD_BARCODE_PRODUCT, barcode)
 
     suspend fun shops(): Response.SuccessResponse<List<ShoppingList>> = get(Routes.SHOPS)
 

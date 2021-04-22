@@ -46,7 +46,6 @@ class ListsService(
         }
     }
 
-
     fun createList(listName: String) = GlobalScope.launch(Dispatchers.Main) {
         if (store.listType == 0) {
             //val pantry = api.addPantry(listName, store.listLocation).data
