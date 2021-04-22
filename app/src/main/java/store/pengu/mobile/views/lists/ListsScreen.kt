@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import store.pengu.mobile.services.ListsService
@@ -78,7 +79,8 @@ fun ListsScreen(
                 isShared = item.shared,
                 enabled = enabled
             ) {
-                snackbarController.showDismissibleSnackbar("Clicked ${item.name}")
+                store.selectedList = item
+                navController.navigate("pantry_list")
             }
         }
 
@@ -94,7 +96,8 @@ fun ListsScreen(
                 isShared = item.shared,
                 enabled = enabled
             ) {
-                snackbarController.showDismissibleSnackbar("Clicked ${item.name}")
+                store.selectedList = item
+                navController.navigate("shopping_list")
             }
         }
     }

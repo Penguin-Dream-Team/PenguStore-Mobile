@@ -1,5 +1,8 @@
 package store.pengu.mobile.views.lists.partials
 
+import android.widget.Toast
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,16 +16,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import com.google.accompanist.coil.CoilImage
+import store.pengu.mobile.R
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.utils.QRCodeUtils
+import store.pengu.mobile.views.partials.AnimatedShimmerLoading
 
+@ExperimentalAnimationApi
 @Composable
 fun PantryList(navController: NavController, productsService: ProductsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
@@ -54,7 +65,7 @@ fun PantryList(navController: NavController, productsService: ProductsService, s
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            "If you want to share this Pantry use this code",
+            "If you want to share this Pantry use this code or scan the QR Code",
             textAlign = TextAlign.Center
         )
 
@@ -115,19 +126,27 @@ fun PantryList(navController: NavController, productsService: ProductsService, s
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
         Box(
             modifier = Modifier
-                //.height(400.dp)
-                .height(100.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(color = MaterialTheme.colors.onSurface)
+                .padding(top = 10.dp)
+                .height(150.dp)
+                .width(150.dp)
         ) {
-            Text(
-                text = "Should be a QRCode to scan the pantry",
-                color = MaterialTheme.colors.primary
+            CoilImage(
+                data = QRCodeUtils.generateQRCodeUrl(selectedPantry.code),
+                contentDescription = selectedPantry.code,
+                fadeIn = true,
+                contentScale = ContentScale.FillBounds,
+                error = {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_image),
+                        contentDescription = selectedPantry.code,
+                        contentScale = ContentScale.Crop
+                    )
+                },
+                loading = {
+                    AnimatedShimmerLoading()
+                }
             )
         }
 

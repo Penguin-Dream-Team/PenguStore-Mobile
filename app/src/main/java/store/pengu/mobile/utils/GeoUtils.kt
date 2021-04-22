@@ -24,7 +24,11 @@ object GeoUtils {
             if (countryName != null) {
                 sb.append(countryName)
             }
-            sb.toString()
-        } ?: ""
+            if (sb.isBlank()) {
+                "Unknown"
+            } else {
+                sb.toString()
+            }
+        } ?: "Unknown"
     }
 }

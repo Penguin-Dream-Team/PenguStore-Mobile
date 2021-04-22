@@ -35,7 +35,6 @@ import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.lists.ListsScreen
-import store.pengu.mobile.views.lists.partials.NewList
 import store.pengu.mobile.views.lists.partials.PantryList
 import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.login.LoginScreen
@@ -192,15 +191,6 @@ class MainActivity : AppCompatActivity() {
                                         listsService,
                                         storeState,
                                         snackbarController,
-                                    )
-                                }
-
-                                composable("new_list") {
-                                    NewList(
-                                        navController,
-                                        listsService,
-                                        this@MainActivity,
-                                        storeState
                                     )
                                 }
 
