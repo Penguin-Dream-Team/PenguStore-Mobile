@@ -1,6 +1,7 @@
 package store.pengu.mobile.api
 
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.google.android.gms.maps.model.LatLng
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
@@ -55,6 +56,14 @@ abstract class ApiHandler(open val store: StoreState) {
             handleApiException(e) as T
         }
 
+    protected suspend inline fun <reified T> get(path: String, location: LatLng): T =
+        try {
+            val route = "${location.latitude}/${location.longitude}"
+            api.get(path = path + route) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
     protected suspend inline fun <reified T> get(path: String, parameters: Map<String, Any>): T =
         try {
             api.get(path = path) {
@@ -96,6 +105,21 @@ abstract class ApiHandler(open val store: StoreState) {
     protected suspend inline fun <reified T> post(path: String, id: String, data: Any): T =
         try {
             api.post(path = path.replace("id", id), body = data) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> post(path: String, location: LatLng, numItems: Int): T =
+        try {
+            val route = "${location.latitude}/${location.longitude}/${numItems}"
+            api.post(path = path + route) { addJWTTokenToRequest(headers) }
+        } catch (e: Exception) {
+            handleApiException(e) as T
+        }
+
+    protected suspend inline fun <reified T> put(path: String): T =
+        try {
+            api.put(path = path) { addJWTTokenToRequest(headers) }
         } catch (e: Exception) {
             handleApiException(e) as T
         }

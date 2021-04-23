@@ -14,7 +14,6 @@ import store.pengu.mobile.views.lists.AvailableListColor
 
 class ListsService(
     private val api: PenguStoreApi,
-    private val productsService: ProductsService,
     private val store: StoreState
 ) {
 

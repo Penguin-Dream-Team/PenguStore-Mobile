@@ -3,7 +3,6 @@ package store.pengu.mobile.utils.camera
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
-import android.net.Uri.encode
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,13 +11,20 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Label
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -78,6 +84,7 @@ class Camera {
         return AspectRatio.RATIO_16_9
     }
 
+    @ExperimentalComposeUiApi
     @SuppressLint("InflateParams")
     @Composable
     fun CameraPreview(
@@ -86,38 +93,86 @@ class Camera {
         productsService: ProductsService
     ) {
         val lifecycleOwner = LocalLifecycleOwner.current
+        val keyboardController = LocalSoftwareKeyboardController.current
         val context = LocalContext.current
         val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+        var pantryCode by remember { mutableStateOf("") }
+        var scan by remember { mutableStateOf(false) }
+
+        val changeScan: () -> Unit = {
+            scan = false
+        }
 
         Column(
-            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-
             Text(
-                text = "Scan the barcode to share this pantry",
+                text = "Insert the code or scan it to add pantry",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(vertical = 32.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Divider(modifier = Modifier.padding(top = 2.dp))
 
-            AndroidView(factory = {
-                LayoutInflater.from(it).inflate(R.layout.camera_layout, null)
-            }) { inflatedLayout ->
-                cameraProviderFuture.addListener({
-                    val cameraProvider = cameraProviderFuture.get()
-                    bindAnalysis(
-                        lifecycleOwner,
-                        inflatedLayout as PreviewView,
-                        cameraProvider,
-                        navController,
-                        storeState,
-                        productsService,
-                        context
-                    )
-                }, ContextCompat.getMainExecutor(context))
+            OutlinedTextField(
+                value = pantryCode,
+                onValueChange = {
+                    pantryCode = it
+                },
+                placeholder = { Text("Pantry code") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(onNext = {
+                    keyboardController?.hide()
+                }),
+                leadingIcon = {
+                    Icon(imageVector = Icons.Filled.Label, contentDescription = "list name")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp),
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Button(
+                onClick = { scan = true },
+                modifier = Modifier
+                    .padding(bottom = 25.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Scan QR Code")
+            }
+
+            Button(
+                onClick = { scan = false },
+                modifier = Modifier
+                    .padding(bottom = 25.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Add Pantry")
+            }
+
+            if (scan) {
+                AndroidView(factory = {
+                    LayoutInflater.from(it).inflate(R.layout.camera_layout, null)
+                }) { inflatedLayout ->
+                    cameraProviderFuture.addListener({
+                        val cameraProvider = cameraProviderFuture.get()
+                        bindAnalysis(
+                            lifecycleOwner,
+                            inflatedLayout as PreviewView,
+                            cameraProvider,
+                            changeScan,
+                            storeState,
+                            productsService,
+                            context
+                        )
+                    }, ContextCompat.getMainExecutor(context))
+                }
             }
         }
     }
@@ -127,7 +182,7 @@ class Camera {
         lifecycleOwner: LifecycleOwner,
         previewView: PreviewView,
         cameraProvider: ProcessCameraProvider,
-        navController: NavHostController,
+        changeScan: () -> Unit,
         storeState: StoreState,
         productsService: ProductsService,
         context: Context
@@ -157,7 +212,7 @@ class Camera {
             processImageProxy(
                 barcodeScanner,
                 imageProxy,
-                navController,
+                changeScan,
                 storeState,
                 productsService,
                 context
@@ -178,7 +233,7 @@ class Camera {
     private fun processImageProxy(
         barcodeScanner: BarcodeScanner,
         imageProxy: ImageProxy,
-        navController: NavHostController,
+        changeScan: () -> Unit,
         store: StoreState,
         productsService: ProductsService,
         context: Context
@@ -196,8 +251,10 @@ class Camera {
                         Toast.makeText(context, "Added Barcode to Product ${store.selectedProduct}", Toast.LENGTH_SHORT).show()
 
                         imageProxy.close()
+
                         barcodeScanner.close()
-                        navController.popBackStack()
+                        changeScan()
+                        // navController.popBackStack()
 
                         if (toastTimeout >= 0)
                             toastTimeout -= 1

@@ -1,12 +1,17 @@
 package store.pengu.mobile.views
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Messenger
+import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -21,20 +26,23 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.app.ActivityCompat
+import androidx.core.content.PermissionChecker
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import dagger.hilt.android.AndroidEntryPoint
+import io.ktor.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.runBlocking
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
+import pt.inesc.termite.wifidirect.SimWifiP2pManager
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService
 import store.pengu.mobile.api.PenguStoreApi
-import store.pengu.mobile.services.AccountService
-import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.services.ProductsService
-import store.pengu.mobile.services.TermiteService
+import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
@@ -50,6 +58,7 @@ import store.pengu.mobile.views.partials.BottomSheetMenus
 import store.pengu.mobile.views.partials.FloatingActionButtons
 import store.pengu.mobile.views.partials.PenguSnackbar
 import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
+import store.pengu.mobile.utils.camera.Camera
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import javax.inject.Inject
@@ -67,6 +76,9 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     lateinit var accountService: AccountService
 
     @Inject
+    lateinit var beaconsService: BeaconsService
+
+    @Inject
     lateinit var storeState: StoreState
 
     @Inject
@@ -74,6 +86,9 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     private val termiteService = TermiteService(this)
     private var navController: NavHostController? = null
+    private var mManager: SimWifiP2pManager? = null
+    private var mChannel: SimWifiP2pManager.Channel? = null
+    private var mBound = false
     private var mReceiver: WifiP2pBroadcastReceiver? = null
 
     @ExperimentalMaterialApi
@@ -82,6 +97,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     private var isBottomSheetMenuOpen: Boolean = false
     private lateinit var coroutineScope: CoroutineScope
 
+    @KtorExperimentalAPI
     @ExperimentalMaterialApi
     @ExperimentalComposeUiApi
     @ExperimentalFoundationApi
@@ -101,8 +117,10 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION)
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION)
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION)
-        mReceiver = WifiP2pBroadcastReceiver(this, )
+        mReceiver = WifiP2pBroadcastReceiver(this, termiteService)
         registerReceiver(mReceiver, filter)
+
+        requestPermission(Manifest.permission.CAMERA)
 
         runBlocking {
             accountService.loadData()
@@ -139,6 +157,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         collapseBottomSheetMenu()
                     }
                 }
+                termiteService.wifiDirectON()
                 executedOnce = true
             }
 
@@ -151,6 +170,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                     sheetContent = {
                         Box {
                             BottomSheetMenus(
+                                navController,
                                 listsService,
                                 storeState,
                                 productsService,
@@ -241,6 +261,14 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         storeState
                                     )
                                 }
+
+                                composable("camera") {
+                                    Camera().CameraPreview(
+                                        navController,
+                                        storeState,
+                                        productsService
+                                    )
+                                }
                             }
 
                             Column(
@@ -270,7 +298,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     }
 
     @ExperimentalMaterialApi
-    fun expandBottomSheetMenu() {
+    private fun expandBottomSheetMenu() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(true)
         } else {
@@ -283,7 +311,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     }
 
     @ExperimentalMaterialApi
-    fun collapseBottomSheetMenu() {
+    private fun collapseBottomSheetMenu() {
         // uncomment to clear when popup is closed
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
@@ -302,12 +330,26 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         unregisterReceiver(mReceiver)
     }
 
+    private fun requestPermission(permission: String) {
+        if (PermissionChecker.checkSelfPermission(
+                applicationContext,
+                permission
+            ) != PermissionChecker.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, arrayOf(permission), 100)
+        }
+    }
+
     /*
      * Termite listeners
      */
     override fun onPeersAvailable(peers: SimWifiP2pDeviceList) {
-        val peersStr = StringBuilder()
+        if (peers.deviceList.isEmpty())
+            beaconsService.leaveQueue()
+        else
+            beaconsService.joinQueue()
 
+        /*val peersStr = StringBuilder()
         // compile list of devices in range
         for (device in peers.deviceList) {
             val dev = "${device.deviceName} (${device.virtIp})\n"
@@ -319,6 +361,6 @@ class MainActivity : AppCompatActivity(), PeerListListener {
             .setTitle("Devices in WiFi Range")
             .setMessage(peersStr.toString())
             .setNeutralButton("Dismiss") { _, _ -> }
-            .show()
+            .show()*/
     }
 }

@@ -71,4 +71,8 @@ object Routes {
     const val UPDATE_SHOP_PRODUCT = "/shops/updateProduct"
     const val DELETE_SHOP_PRODUCT = "/shops/deleteProduct"
     const val GET_SHOP_PRODUCTS = "/shops/id/products"
+
+    const val JOIN_QUEUE = "/queue/join/"
+    const val LEAVE_QUEUE = "/queue/leave"
+    const val TIME_QUEUE = "/queue/time/"
 }

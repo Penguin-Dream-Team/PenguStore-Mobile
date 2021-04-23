@@ -29,7 +29,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.navigate
 import com.google.android.gms.maps.model.LatLng
+import io.ktor.util.*
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.Border
@@ -39,11 +42,13 @@ import store.pengu.mobile.views.lists.AvailableListColor
 import store.pengu.mobile.views.maps.MapScreen
 import store.pengu.mobile.views.partials.IconButton
 
+@KtorExperimentalAPI
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
 fun CreateListBottomMenu(
+    navController: NavHostController,
     listsService: ListsService,
     store: StoreState,
     snackbarController: SnackbarController,
@@ -54,7 +59,7 @@ fun CreateListBottomMenu(
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
 
-    var shoppingListName by remember { listsService.newListName }
+    var listName by remember { listsService.newListName }
     var location by remember { listsService.newListLocation }
     var selectedColor by remember { listsService.newListColor }
 
@@ -102,9 +107,9 @@ fun CreateListBottomMenu(
         Divider(modifier = Modifier.padding(top = 2.dp))
 
         OutlinedTextField(
-            value = shoppingListName,
+            value = listName,
             onValueChange = {
-                shoppingListName = it
+                listName = it
             },
             placeholder = { Text("${title.toLowerCase(Locale.current).capitalize(Locale.current)} name") },
             keyboardOptions = KeyboardOptions(
@@ -201,7 +206,7 @@ fun CreateListBottomMenu(
         Button(
             onClick = {
                 launcher.launch(Intent(context, MapScreen::class.java).apply {
-                    putExtra("NAME", shoppingListName)
+                    putExtra("NAME", listName)
                     putExtra("HAS_LOCATION", location != null)
                     putExtra("LATITUDE", location?.latitude ?: 0.0)
                     putExtra("LONGITUDE", location?.longitude ?: 0.0)
@@ -214,13 +219,28 @@ fun CreateListBottomMenu(
             Text(text = "Pick Location")
         }
 
-        Button(
-            onClick = onCreate, enabled = listsService.newCanCreate(),
+        Row(
             modifier = Modifier
-                .padding(bottom = 25.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Create $title")
+            Button(
+                onClick = onCreate, enabled = listsService.newCanCreate(),
+                modifier = Modifier
+                    .padding(bottom = 25.dp)
+            ) {
+                Text(text = "Create $title")
+            }
+
+            Button(
+                onClick = { navController.navigate("camera") },
+                modifier = Modifier
+                    .padding(bottom = 25.dp)
+            ) {
+                Text(text = "Scan $title")
+            }
         }
     }
 }
+
+

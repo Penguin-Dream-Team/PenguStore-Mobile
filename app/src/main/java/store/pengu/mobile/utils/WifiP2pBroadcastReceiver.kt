@@ -6,9 +6,10 @@ import android.content.Intent
 import android.widget.Toast
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo
+import store.pengu.mobile.services.TermiteService
 import store.pengu.mobile.views.MainActivity
 
-class WifiP2pBroadcastReceiver(activity: MainActivity) : BroadcastReceiver() {
+class WifiP2pBroadcastReceiver(activity: MainActivity, private val termiteService: TermiteService) : BroadcastReceiver() {
     private val mActivity: MainActivity = activity
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -37,7 +38,7 @@ class WifiP2pBroadcastReceiver(activity: MainActivity) : BroadcastReceiver() {
             // asynchronous call and the calling activity is notified with a
             // callback on PeerListListener.onPeersAvailable()
 
-
+            termiteService.wifiDirectPeersAvailable()
             Toast.makeText(
                 mActivity, "Peer list changed",
                 Toast.LENGTH_SHORT

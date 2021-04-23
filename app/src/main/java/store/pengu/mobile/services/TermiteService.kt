@@ -17,22 +17,22 @@ class TermiteService(private val mainActivity: MainActivity) {
     private var mBound = false
 
     /*
-     * Listeners associated to buttons
+     * Termite Actions
      */
-    fun turnWifiDirectOn() {
+    fun wifiDirectON() = run {
         val intent = Intent(mainActivity.applicationContext, SimWifiP2pService::class.java)
         mainActivity.bindService(intent, mConnection, AppCompatActivity.BIND_AUTO_CREATE)
         mBound = true
     }
 
-    fun turnWifiDirectOff() {
+    fun wifiDirectOFF() = run {
         if (mBound) {
             mainActivity.unbindService(mConnection)
             mBound = false
         }
     }
 
-    fun getWifiDirectInRange() {
+    fun wifiDirectPeersAvailable() = run {
         if (mBound) {
             mManager!!.requestPeers(mChannel, mainActivity)
         } else {

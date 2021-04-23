@@ -290,4 +290,17 @@ class PenguStoreApi(
 
     suspend fun getShopProducts(shopId: String): Response.SuccessResponse<List<Product>> =
         get(Routes.GET_SHOP_PRODUCTS, shopId)
+
+    suspend fun joinQueue(location: LatLng, numItems: Int): Response.SuccessResponse<String> =
+        post(Routes.JOIN_QUEUE, location, numItems)
+
+    suspend fun leaveQueue(location: LatLng, numItems: Int, time: Int): Response.SuccessResponse<String> {
+        return post(
+            Routes.LEAVE_QUEUE,
+            LeaveQueueRequest(location.latitude, location.longitude, numItems, time)
+        )
+    }
+
+    suspend fun timeQueue(location: LatLng): Response.SuccessResponse<String> =
+        get(Routes.TIME_QUEUE, location)
 }

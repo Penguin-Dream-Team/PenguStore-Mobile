@@ -5,6 +5,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.navigation.NavHostController
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
@@ -16,6 +17,7 @@ import store.pengu.mobile.views.lists.bottommenu.ListsBottomSheetMenu
 @ExperimentalAnimationApi
 @Composable
 fun BottomSheetMenus(
+    navController: NavHostController,
     listsService: ListsService,
     store: StoreState,
     productsService: ProductsService,
@@ -26,6 +28,7 @@ fun BottomSheetMenus(
     when (currentRoute) {
         "lists" ->
             ListsBottomSheetMenu(
+                navController,
                 listsService,
                 store,
                 snackbarController,

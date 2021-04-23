@@ -7,18 +7,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
-import store.pengu.mobile.views.lists.bottommenu.CreateListBottomMenu
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
 fun ListsBottomSheetMenu(
+    navController: NavHostController,
     listsService: ListsService,
     store: StoreState,
     snackbarController: SnackbarController,
@@ -30,6 +31,7 @@ fun ListsBottomSheetMenu(
     when (selectedListType) {
         0 -> {
             CreateListBottomMenu(
+                navController,
                 listsService,
                 store,
                 snackbarController,
@@ -50,6 +52,7 @@ fun ListsBottomSheetMenu(
         }
         1 -> {
             CreateListBottomMenu(
+                navController,
                 listsService,
                 store,
                 snackbarController,

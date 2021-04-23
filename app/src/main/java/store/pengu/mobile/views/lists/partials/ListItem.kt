@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import store.pengu.mobile.theme.PenguShopTheme
@@ -92,8 +93,11 @@ fun ListItem(
                 Text(
                     text = location,
                     modifier = Modifier
-                        .alpha(0.8f),
-                    fontSize = MaterialTheme.typography.caption.fontSize
+                        .alpha(0.8f)
+                        .padding(start = 15.dp),
+                    fontSize = MaterialTheme.typography.caption.fontSize,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
