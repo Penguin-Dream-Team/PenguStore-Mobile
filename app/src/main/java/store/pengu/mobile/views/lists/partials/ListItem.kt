@@ -16,9 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.Border
 import store.pengu.mobile.utils.border
 import store.pengu.mobile.utils.pluralize

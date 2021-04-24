@@ -18,9 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import store.pengu.mobile.data.Product
+import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
-import store.pengu.mobile.data.ShoppingList2
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 
@@ -32,10 +31,10 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
     val products by remember { mutableStateOf(store.shoppingListProducts) }
     val cartProducts by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
-    val currentProduct = remember { mutableStateOf(Product(0L, 0L, "", "", 0.0, -1, -1, -1)) }
+    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20)) }
 
     if (selectedShoppingList == null) return
-    //productsService.getShoppingListProducts(selectedShoppingList.userId)
+    productsService.getShoppingListProducts(selectedShoppingList.id)
 
     Column(
         modifier = Modifier
@@ -91,7 +90,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                     } else {
                         IconButton(
                             onClick = {
-                                if ((product.amountNeeded!! - product.amountAvailable!!) == 1) {
+                                if ((product.amountNeeded - product.amountAvailable) == 1) {
                                     storeState.cartProducts.add(Pair(product, 1))
                                 } else {
                                     currentProduct.value = product
@@ -144,7 +143,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
 
                     IconButton(
                         onClick = {
-                            if (desiredAmount.value < (currentProduct.value.amountNeeded!! - currentProduct.value.amountAvailable!!))
+                            if (desiredAmount.value < (currentProduct.value.amountNeeded - currentProduct.value.amountAvailable))
                             desiredAmount.value++
                         }
                     ) {

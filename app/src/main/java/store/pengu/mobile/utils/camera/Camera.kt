@@ -148,7 +148,7 @@ class Camera {
             }
 
             Button(
-                onClick = { scan = false },
+                onClick = { scan = false }, // TODO
                 modifier = Modifier
                     .padding(bottom = 25.dp)
                     .fillMaxWidth()

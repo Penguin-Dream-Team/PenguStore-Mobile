@@ -47,7 +47,7 @@ object Routes {
     const val ADD_SHOPPING_LIST = "/users/addShoppingList"
     const val UPDATE_SHOPPING_LIST = "/users/updateShoppingList"
     const val DELETE_SHOPPING_LIST = "/users/deleteShoppingList"
-    const val GET_USER_SHOPPING_LIST = "/users/id/ShoppingList/"
+    const val GET_USER_SHOPPING_LIST = "/shoppingList/id"
 
     const val GET_PANTRY_LIST = "/pantries/id"
     const val ADD_PANTRY_LIST = "/pantries/add"
@@ -57,7 +57,7 @@ object Routes {
     const val DELETE_PANTRY_PRODUCT = "/pantries/deleteProduct"
     const val GET_PANTRY_PRODUCTS = "/pantries/id/products"
 
-    const val PRODUCTS = "/products"
+    const val PRODUCTS = "user/products"
     const val GET_PRODUCT = "/products/id"
     const val ADD_PRODUCT = "/products/add"
     const val UPDATE_PRODUCT = "/products/update"
@@ -71,6 +71,8 @@ object Routes {
     const val UPDATE_SHOP_PRODUCT = "/shops/updateProduct"
     const val DELETE_SHOP_PRODUCT = "/shops/deleteProduct"
     const val GET_SHOP_PRODUCTS = "/shops/id/products"
+
+    const val BUY_CART = "/cart"
 
     const val JOIN_QUEUE = "/queue/join/"
     const val LEAVE_QUEUE = "/queue/leave"

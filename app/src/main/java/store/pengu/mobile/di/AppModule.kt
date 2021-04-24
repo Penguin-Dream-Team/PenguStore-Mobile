@@ -11,27 +11,11 @@ import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.storage.UserDataService
 import store.pengu.mobile.storage.userDataStore
-import store.pengu.mobile.views.MainActivity
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Singleton
-    @Provides
-    fun getListsService(
-        api: PenguStoreApi,
-        store: StoreState
-    ): ListsService = ListsService(api, store)
-
-    @Singleton
-    @Provides
-    fun getProductsService(
-        api: PenguStoreApi,
-        store: StoreState
-    ): ProductsService =
-        ProductsService(api, store)
 
     @Singleton
     @Provides
@@ -49,6 +33,30 @@ object AppModule {
         store: StoreState
     ): BeaconsService =
         BeaconsService(api, store)
+
+    @Singleton
+    @Provides
+    fun getCartService(
+        api: PenguStoreApi,
+        listsService: ListsService,
+        store: StoreState
+    ): CartService =
+        CartService(api,listsService, store)
+
+    @Singleton
+    @Provides
+    fun getListsService(
+        api: PenguStoreApi,
+        store: StoreState
+    ): ListsService = ListsService(api, store)
+
+    @Singleton
+    @Provides
+    fun getProductsService(
+        api: PenguStoreApi,
+        store: StoreState
+    ): ProductsService =
+        ProductsService(api, store)
 
     @Singleton
     @Provides

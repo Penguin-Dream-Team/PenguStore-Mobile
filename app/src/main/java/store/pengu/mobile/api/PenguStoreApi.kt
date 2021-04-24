@@ -5,6 +5,7 @@ import store.pengu.mobile.api.requests.*
 import store.pengu.mobile.api.requests.account.LoginRequest
 import store.pengu.mobile.api.requests.account.RefreshTokenRequest
 import store.pengu.mobile.api.requests.account.RegisterRequest
+import store.pengu.mobile.api.requests.lists.CartRequest
 import store.pengu.mobile.api.requests.lists.CreateListRequest
 import store.pengu.mobile.api.responses.account.LoginResponse
 import store.pengu.mobile.api.responses.account.ProfileResponse
@@ -119,7 +120,7 @@ class PenguStoreApi(
     suspend fun getUserPantries(userId: Long): Response.SuccessResponse<List<PantryList>> =
         get(Routes.GET_USER_PANTRIES, userId.toString())
 
-    suspend fun getUserShoppingListProducts(shopId: Long): Response.SuccessResponse<List<Product>> =
+    suspend fun getUserShoppingListProducts(shopId: Long): Response.SuccessResponse<List<ProductInPantry>> =
         get(Routes.GET_USER_SHOPPING_LIST_PRODUCTS, shopId.toString())
 
     suspend fun addShoppingList(
@@ -149,11 +150,8 @@ class PenguStoreApi(
         return post(Routes.DELETE_SHOPPING_LIST, deleteShoppingListRequest)
     }
 
-    suspend fun getUserShoppingList(
-        userId: Long,
-        shopId: String
-    ): Response.SuccessResponse<ShoppingList2> =
-        get(Routes.GET_USER_SHOPPING_LIST + shopId, userId.toString())
+    suspend fun getUserShoppingList(shopId: Long): Response.SuccessResponse<List<ProductInShoppingList>> =
+        get(Routes.GET_USER_SHOPPING_LIST, shopId.toString())
 
     suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_PANTRIES)
 
@@ -214,7 +212,7 @@ class PenguStoreApi(
         return delete(Routes.DELETE_PANTRY_PRODUCT, deletePantryProductRequest)
     }
 
-    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<Product>> =
+    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<ProductInPantry>> =
         get(Routes.GET_PANTRY_PRODUCTS, pantryId.toString())
 
     suspend fun products(): Response.SuccessResponse<List<Product>> = get(Routes.PRODUCTS)
@@ -290,6 +288,10 @@ class PenguStoreApi(
 
     suspend fun getShopProducts(shopId: String): Response.SuccessResponse<List<Product>> =
         get(Routes.GET_SHOP_PRODUCTS, shopId)
+
+    suspend fun buyCart(cartRequest: CartRequest): Response.SuccessResponse<String> {
+        return post(Routes.BUY_CART, cartRequest)
+    }
 
     suspend fun joinQueue(location: LatLng, numItems: Int): Response.SuccessResponse<String> =
         post(Routes.JOIN_QUEUE, location, numItems)

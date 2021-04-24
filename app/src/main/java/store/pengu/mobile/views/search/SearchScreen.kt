@@ -38,12 +38,16 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
     val amountAvailable = remember { mutableStateOf(0) }
     val amountNeeded = remember { mutableStateOf(0) }
 
+    productsService.getProducts()
+
     Column(
         modifier = Modifier
             .padding(horizontal = 24.dp)
             .padding(vertical = 32.dp)
     ) {
         SearchTopBar()
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         LazyVerticalGrid(
             cells = GridCells.Fixed(3),
@@ -58,7 +62,7 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                         .padding(horizontal = 5.dp, vertical = 7.dp)
                         .clickable(onClickLabel = "Add to pantry"
                 ) {
-                    selectedProductId.value = product.productId
+                    selectedProductId.value = product.id
                     alertDialogView.value = 0
                     amountAvailable.value = 0
                     amountNeeded.value = 0
@@ -76,7 +80,7 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                     openDialog.value = false
                 },
                 title = {
-                    Text(text = "Select the amount available and desired")
+                    Text(text = "Add to Pantry")
                 },
                 text = {
                     Column(

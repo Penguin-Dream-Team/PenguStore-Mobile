@@ -9,7 +9,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +17,6 @@ import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
-
 
 @SuppressLint("RestrictedApi")
 @ExperimentalAnimationApi

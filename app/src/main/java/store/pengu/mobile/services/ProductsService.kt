@@ -21,9 +21,9 @@ class ProductsService(
         store.pantryProducts.addAll(api.getPantryProducts(pantryId).data)
     }
 
-    fun getShoppingListProducts(userId: Long) = GlobalScope.launch(Dispatchers.Main) {
+    fun getShoppingListProducts(shoppingListId: Long) = GlobalScope.launch(Dispatchers.Main) {
         store.shoppingListProducts.clear()
-        store.shoppingListProducts.addAll(api.getUserShoppingListProducts(userId).data)
+        store.shoppingListProducts.addAll(api.getUserShoppingList(shoppingListId).data)
     }
 
     fun addProduct(

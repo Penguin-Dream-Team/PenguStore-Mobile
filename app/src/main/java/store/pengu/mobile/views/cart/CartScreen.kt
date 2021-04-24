@@ -3,8 +3,6 @@ package store.pengu.mobile.views.cart
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -18,7 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.data.Product
+import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.states.StoreState
 
 @Composable
@@ -27,13 +25,12 @@ fun CartScreen(navController: NavController, store: StoreState) {
     val openDialog = remember { mutableStateOf(false) }
     val products by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
-    val currentProduct = remember { mutableStateOf(Product(0L, 0L, "", "", 0.0, -1, -1, -1)) }
+    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20)) }
 
     Column(verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Cart", fontWeight = FontWeight.Bold)
@@ -60,7 +57,7 @@ fun CartScreen(navController: NavController, store: StoreState) {
                             fontWeight = FontWeight.SemiBold
                         )
 
-                        if ((product.first.amountNeeded!! - product.first.amountAvailable!!) != 1) {
+                        if ((product.first.amountNeeded - product.first.amountAvailable) != 1) {
                             IconButton(
                                 onClick = {
                                     currentProduct.value = product.first
@@ -140,7 +137,7 @@ fun CartScreen(navController: NavController, store: StoreState) {
 
                     IconButton(
                         onClick = {
-                            if (desiredAmount.value < (currentProduct.value.amountNeeded!! - currentProduct.value.amountAvailable!!))
+                            if (desiredAmount.value < (currentProduct.value.amountNeeded - currentProduct.value.amountAvailable))
                                 desiredAmount.value++
                         }
                     ) {

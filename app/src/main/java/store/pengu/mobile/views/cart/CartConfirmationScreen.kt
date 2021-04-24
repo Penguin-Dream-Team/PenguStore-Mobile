@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -23,11 +21,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.services.CartService
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.partials.CartProductRow
 
 @Composable
-fun CartConfirmationScreen(navController: NavController, store: StoreState) {
+fun CartConfirmationScreen(navController: NavController, cartService: CartService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val cartProducts by remember { mutableStateOf(store.cartProducts) }
 
@@ -56,11 +56,11 @@ fun CartConfirmationScreen(navController: NavController, store: StoreState) {
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Box(
             modifier = Modifier
-                .height(300.dp)
+                .height(250.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .background(color = MaterialTheme.colors.onSurface)
@@ -108,7 +108,8 @@ fun CartConfirmationScreen(navController: NavController, store: StoreState) {
 
         Button(
             onClick = {
-                navController.navigate("new_pantry")
+                cartService.buyCart()
+                navController.navigate("lists")
             },
             modifier = Modifier
                 .fillMaxWidth()

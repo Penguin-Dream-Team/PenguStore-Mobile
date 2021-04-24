@@ -2,16 +2,11 @@ package store.pengu.mobile.views
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
-import android.os.Messenger
-import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -36,11 +31,8 @@ import io.ktor.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.runBlocking
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
-import pt.inesc.termite.wifidirect.SimWifiP2pDevice
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
-import pt.inesc.termite.wifidirect.SimWifiP2pManager
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
-import pt.inesc.termite.wifidirect.service.SimWifiP2pService
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
@@ -67,16 +59,19 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), PeerListListener {
 
     @Inject
-    lateinit var listsService: ListsService
-
-    @Inject
-    lateinit var productsService: ProductsService
-
-    @Inject
     lateinit var accountService: AccountService
 
     @Inject
     lateinit var beaconsService: BeaconsService
+
+    @Inject
+    lateinit var cartService: CartService
+
+    @Inject
+    lateinit var listsService: ListsService
+
+    @Inject
+    lateinit var productsService: ProductsService
 
     @Inject
     lateinit var storeState: StoreState
@@ -86,9 +81,6 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     private val termiteService = TermiteService(this)
     private var navController: NavHostController? = null
-    private var mManager: SimWifiP2pManager? = null
-    private var mChannel: SimWifiP2pManager.Channel? = null
-    private var mBound = false
     private var mReceiver: WifiP2pBroadcastReceiver? = null
 
     @ExperimentalMaterialApi
@@ -250,7 +242,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 composable("cart_confirmation") {
-                                    CartConfirmationScreen(navController, storeState)
+                                    CartConfirmationScreen(navController, cartService, storeState)
                                 }
 
                                 composable("profile") {
