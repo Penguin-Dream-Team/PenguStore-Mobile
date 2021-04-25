@@ -74,6 +74,7 @@ fun PantryList(navController: NavController, productsService: ProductsService, s
                 )
             }
         }
+
         Spacer(modifier = Modifier.height(32.dp))
 
         if (sharePantry.value) {

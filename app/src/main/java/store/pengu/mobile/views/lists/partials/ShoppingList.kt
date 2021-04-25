@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.lists.partials
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,11 +19,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ShoppingList(navController: NavController, productsService: ProductsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
@@ -32,9 +39,15 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
     val cartProducts by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
     val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20)) }
+    val queueTime = remember { mutableStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
+    val refreshQueueTime = coroutineScope.launch {
+        queueTime.value = productsService.timeQueue()
+    }
 
     if (selectedShoppingList == null) return
     productsService.getShoppingListProducts(selectedShoppingList.id)
+    refreshQueueTime.start()
 
     Column(
         modifier = Modifier
@@ -43,21 +56,33 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                selectedShoppingList.name,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+
+            Button(
+                onClick = { refreshQueueTime.start() }
+            ) {
+                Text("Refresh Queue Time")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Text(
-            selectedShoppingList.name,
+            "Queue Time: ${queueTime.value}",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            "Shopping List View",
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -172,5 +197,11 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                 }
             }
         )
+    }
+
+    fun refreshQueueTime() {
+        coroutineScope.launch {
+            queueTime.value = productsService.timeQueue()
+        }
     }
 }

@@ -303,6 +303,6 @@ class PenguStoreApi(
         )
     }
 
-    suspend fun timeQueue(location: LatLng): Response.SuccessResponse<String> =
+    suspend fun timeQueue(location: LatLng): Response.SuccessResponse<Int> =
         get(Routes.TIME_QUEUE, location)
 }

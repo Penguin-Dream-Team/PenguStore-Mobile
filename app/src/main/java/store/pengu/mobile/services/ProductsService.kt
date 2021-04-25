@@ -1,7 +1,9 @@
 package store.pengu.mobile.services
 
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.states.StoreState
@@ -55,5 +57,10 @@ class ProductsService(
     ) = GlobalScope.launch(Dispatchers.Main) {
         api.deletePantryProduct(pantryId, productId)
         getProducts()
+    }
+
+    suspend fun timeQueue(): Int {
+        store.location = LatLng(50.11, 50.11)
+        return api.timeQueue(store.location!!).data
     }
 }

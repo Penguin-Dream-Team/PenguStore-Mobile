@@ -35,8 +35,6 @@ object Routes {
 
     const val DASHBOARD = "/dashboard"
 
-    const val SETUP = "/setup"
-
     const val USERS = "/users"
     const val GET_USER = "/users/id"
     const val ADD_USER = "/users/add"

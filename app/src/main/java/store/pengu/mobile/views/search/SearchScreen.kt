@@ -18,7 +18,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
@@ -29,7 +29,7 @@ import store.pengu.mobile.views.partials.SearchTopBar
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @Composable
-fun SearchScreen(navController: NavController, productsService: ProductsService, store: StoreState) {
+fun SearchScreen(navController: NavHostController, productsService: ProductsService, store: StoreState) {
     val storeState by remember { mutableStateOf(store) }
     val openDialog = remember { mutableStateOf(false) }
     val selectedProductId = remember { mutableStateOf(-2L) }
@@ -62,12 +62,14 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                         .padding(horizontal = 5.dp, vertical = 7.dp)
                         .clickable(onClickLabel = "Add to pantry"
                 ) {
+                    storeState.selectedProduct = product
                     selectedProductId.value = product.id
                     alertDialogView.value = 0
                     amountAvailable.value = 0
                     amountNeeded.value = 0
                     selectedPantryId.value = -2L
-                    openDialog.value = true
+                    //openDialog.value = true
+                    navController.navigate("product")
                 })
             }
         }
@@ -201,8 +203,8 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                                 )
                             }
                         }
-
-                        item {
+                        // TODO add to new pantry
+                        /*item {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
@@ -218,7 +220,7 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                                     onClick = { selectedPantryId.value = -1L }
                                 )
                             }
-                        }
+                        }*/
                     }
                 },
                 dismissButton = {
@@ -233,14 +235,11 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                     Button(
                         enabled = selectedPantryId.value != -2L,
                         onClick = {
-                            if (selectedPantryId.value == -1L) {
+                            /*if (selectedPantryId.value == -1L) {
                                 alertDialogView.value = 0
                                 openDialog.value = false
-                                storeState.selectedProduct = selectedProductId.value
-                                storeState.amountAvailable = amountAvailable.value
-                                storeState.amountNeeded = amountNeeded.value
-                                navController.navigate("new_pantry")
-                            } else {
+
+                            } else {*/
                                 productsService.addProduct(
                                     selectedPantryId.value,
                                     selectedProductId.value,
@@ -249,7 +248,7 @@ fun SearchScreen(navController: NavController, productsService: ProductsService,
                                 )
                                 alertDialogView.value = 0
                                 openDialog.value = false
-                            }
+                            //}
                         }) {
                         Text("Add Product")
                     }

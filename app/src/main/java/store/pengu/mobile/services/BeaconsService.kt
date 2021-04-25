@@ -23,9 +23,4 @@ class BeaconsService(
         store.timeInQueue = 2
         api.leaveQueue(store.location!!, store.numItems!!, store.timeInQueue!!)
     }
-
-    fun timeQueue() = GlobalScope.launch(Dispatchers.Main) {
-        store.location = LatLng(50.11, 50.11)
-        api.timeQueue(store.location!!)
-    }
 }

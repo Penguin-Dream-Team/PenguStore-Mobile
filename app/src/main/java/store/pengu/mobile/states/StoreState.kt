@@ -26,7 +26,7 @@ class StoreState {
     //var shoppingLists = mutableStateListOf<ShoppingList2>()
     var lists = Array(2) { emptyList<UserList>() }
     var listType = -1
-    var selectedProduct: Long = -1L
+    var selectedProduct: Product? = null
     var amountAvailable: Int = 0
     var amountNeeded: Int = 0
     var pantryProducts = mutableStateListOf<ProductInPantry>()

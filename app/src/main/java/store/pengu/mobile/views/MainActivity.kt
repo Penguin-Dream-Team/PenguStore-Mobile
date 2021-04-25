@@ -53,6 +53,7 @@ import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
 import store.pengu.mobile.utils.camera.Camera
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
+import store.pengu.mobile.views.search.partials.ProductScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -235,6 +236,10 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
                                 composable("search") {
                                     SearchScreen(navController, productsService, storeState)
+                                }
+
+                                composable("product") {
+                                    ProductScreen(navController, storeState)
                                 }
 
                                 composable("cart") {
