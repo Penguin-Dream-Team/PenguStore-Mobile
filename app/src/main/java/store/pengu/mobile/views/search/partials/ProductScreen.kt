@@ -1,6 +1,8 @@
 package store.pengu.mobile.views.search.partials
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -11,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +35,11 @@ import store.pengu.mobile.R
 
 import kotlin.math.max
 import kotlin.math.min
+import android.content.Intent
+
+import androidx.core.content.ContextCompat.startActivity
+import store.pengu.mobile.views.MainActivity
+
 
 private val BottomBarHeight = 56.dp
 private val TitleHeight = 128.dp
@@ -47,6 +55,7 @@ private val HzPadding = Modifier.padding(horizontal = 24.dp)
 @Composable
 fun ProductScreen(
     navController: NavHostController,
+    mainActivity: MainActivity,
     store: StoreState
 ) {
     val storeState by remember { mutableStateOf(store) }
@@ -59,6 +68,7 @@ fun ProductScreen(
         Title(selectedProduct!!, scroll.value)
         Image(""/*selectedProduct.imageUrl*/, scroll.value)
         Back(navController)
+        Share(mainActivity)
         CartBottomBar(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -295,6 +305,34 @@ private fun Back(navController: NavHostController) {
         Icon(
             imageVector = Icons.Outlined.ArrowBack,
             contentDescription = "Back"
+        )
+    }
+}
+
+@Composable
+private fun Share(mainActivity: MainActivity) {
+    IconButton(
+        onClick = {
+            val myIntent = Intent(Intent.ACTION_SEND)
+            myIntent.type = "text/plain"
+            val shareBody = "Share your Product"
+            val shareSub = "Share it on social Media"
+            myIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+            myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub)
+            mainActivity.startActivity(Intent.createChooser(myIntent, "Share"))
+        },
+        modifier = Modifier
+            .statusBarsPadding()
+            .padding(horizontal = 116.dp, vertical = 10.dp)
+            .size(36.dp)
+            .background(
+                color = MaterialTheme.colors.primaryVariant,
+                shape = CircleShape
+            )
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Share,
+            contentDescription = "Share"
         )
     }
 }

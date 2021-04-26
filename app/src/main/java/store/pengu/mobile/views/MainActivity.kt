@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -239,7 +240,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 composable("product") {
-                                    ProductScreen(navController, storeState)
+                                    ProductScreen(navController, this@MainActivity, storeState)
                                 }
 
                                 composable("cart") {
