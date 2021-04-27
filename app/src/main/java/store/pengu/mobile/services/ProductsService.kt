@@ -63,4 +63,24 @@ class ProductsService(
         store.location = LatLng(50.11, 50.11)
         return api.timeQueue(store.location!!).data
     }
+
+    suspend fun addProduct(imageId: Int, imageUrl: String): String {
+        val product = store.selectedProduct!!
+
+        return api.addProductImage(imageId, product.barcode, product.id, imageUrl).data
+    }
+
+    suspend fun deleteProduct(imageId: Int, imageUrl: String): String {
+        val product = store.selectedProduct!!
+
+        return api.deleteProductImage(imageId, product.barcode, product.id, imageUrl).data
+    }
+
+    suspend fun getProductImages() : List<String> {
+        return if (store.selectedProduct!!.barcode != null)
+            api.getProductImageBarcode(store.selectedProduct!!.barcode!!).data
+        else
+            api.getProductImageProductId(store.selectedProduct!!.id).data
+    }
+
 }

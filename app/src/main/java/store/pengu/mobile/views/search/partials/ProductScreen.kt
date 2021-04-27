@@ -1,8 +1,6 @@
 package store.pengu.mobile.views.search.partials
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -36,10 +34,13 @@ import store.pengu.mobile.R
 import kotlin.math.max
 import kotlin.math.min
 import android.content.Intent
+import androidx.compose.animation.ExperimentalAnimationApi
+import com.google.accompanist.coil.CoilImage
+import kotlinx.coroutines.launch
+import store.pengu.mobile.services.ProductsService
 
-import androidx.core.content.ContextCompat.startActivity
 import store.pengu.mobile.views.MainActivity
-
+import store.pengu.mobile.views.partials.AnimatedShimmerLoading
 
 private val BottomBarHeight = 56.dp
 private val TitleHeight = 128.dp
@@ -52,21 +53,37 @@ private val ExpandedImageSize = 300.dp
 private val CollapsedImageSize = 150.dp
 private val HzPadding = Modifier.padding(horizontal = 24.dp)
 
+@ExperimentalAnimationApi
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ProductScreen(
     navController: NavHostController,
+    productsService: ProductsService,
     mainActivity: MainActivity,
     store: StoreState
 ) {
     val storeState by remember { mutableStateOf(store) }
     val selectedProduct = storeState.selectedProduct
+    val coroutineScope = rememberCoroutineScope()
+    val productImages = remember { mutableStateListOf<String>() }
+    var loaded by remember { mutableStateOf(false) }
+    if (!loaded) {
+        coroutineScope.launch {
+            productImages.addAll(productsService.getProductImages())
+        }
+        loaded = true
+    }
 
     Box(Modifier.fillMaxSize()) {
         val scroll = rememberScrollState(0)
         Header()
         Body(scroll)
         Title(selectedProduct!!, scroll.value)
-        Image(""/*selectedProduct.imageUrl*/, scroll.value)
+        if (productImages.isEmpty()) {
+            Image("", selectedProduct.name, scroll.value)
+        } else {
+            Image(productImages[0], selectedProduct.name, scroll.value)
+        }
         Back(navController)
         Share(mainActivity)
         CartBottomBar(modifier = Modifier.align(Alignment.BottomCenter))
@@ -259,10 +276,12 @@ private fun Title(
     }
 }
 
+@ExperimentalAnimationApi
 @SuppressLint("ResourceType")
 @Composable
 private fun Image(
     imageUrl: String,
+    productName: String,
     scroll: Int
 ) {
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
@@ -278,12 +297,20 @@ private fun Image(
             shape = CircleShape,
             modifier = Modifier.fillMaxSize()
         ) {
-            Image(
-                painter = if(imageUrl == "") painterResource(id = R.drawable.default_image)
-                            else rememberCoilPainter(imageUrl),
-                contentDescription = "image",
-                modifier = Modifier.fillMaxSize(),
+            CoilImage(
+                data = imageUrl ?: "",
+                contentDescription = productName,
+                fadeIn = true,
                 contentScale = ContentScale.Crop,
+                error = {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_image), productName,
+                        contentScale = ContentScale.Crop
+                    )
+                },
+                loading = {
+                    AnimatedShimmerLoading()
+                }
             )
         }
     }

@@ -305,4 +305,24 @@ class PenguStoreApi(
 
     suspend fun timeQueue(location: LatLng): Response.SuccessResponse<Int> =
         get(Routes.TIME_QUEUE, location)
+
+    suspend fun addProductImage(id: Int, barcode: String?, productId: Long?, imageUrl: String): Response.SuccessResponse<String> {
+        return post(
+            Routes.ADD_IMAGE,
+            ImageRequest(id.toULong(), barcode, productId, imageUrl)
+        )
+    }
+
+    suspend fun deleteProductImage(id: Int, barcode: String?, productId: Long?, imageUrl: String): Response.SuccessResponse<String> {
+        return delete(
+            Routes.DELETE_IMAGE,
+            ImageRequest(id.toULong(), barcode, productId, imageUrl)
+        )
+    }
+
+    suspend fun getProductImageBarcode(barcode: String): Response.SuccessResponse<List<String>> =
+        get(Routes.PRODUCT_IMAGE_BARCODE, barcode)
+
+    suspend fun getProductImageProductId(productId: Long): Response.SuccessResponse<List<String>> =
+        get(Routes.PRODUCT_IMAGE_PRODUCT_ID, productId.toString())
 }

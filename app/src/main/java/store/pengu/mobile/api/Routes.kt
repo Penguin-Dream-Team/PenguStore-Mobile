@@ -75,4 +75,9 @@ object Routes {
     const val JOIN_QUEUE = "/queue/join/"
     const val LEAVE_QUEUE = "/queue/leave"
     const val TIME_QUEUE = "/queue/time/"
+
+    const val ADD_IMAGE = "/images/addImage"
+    const val DELETE_IMAGE = "/images/deleteImage"
+    const val PRODUCT_IMAGE_BARCODE = "/images/barcode/id"
+    const val PRODUCT_IMAGE_PRODUCT_ID = "/images/productId/id"
 }
