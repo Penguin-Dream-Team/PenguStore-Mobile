@@ -1,15 +1,19 @@
 package store.pengu.mobile.views.lists.partials
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material.icons.filled.RemoveShoppingCart
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,11 +23,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.utils.Math
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -52,31 +58,49 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Text(
+            selectedShoppingList.name,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                selectedShoppingList.name,
+                "Queue Time:",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
 
-            Button(
-                onClick = { refreshQueueTime.start() }
+            IconButton(
+                onClick = { refreshQueueTime.start() },
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .size(36.dp)
+                    .background(
+                        color = MaterialTheme.colors.primaryVariant,
+                        shape = CircleShape
+                    )
             ) {
-                Text("Refresh Queue Time")
+                Icon(
+                    imageVector = Icons.Outlined.Refresh,
+                    contentDescription = "Refresh Queue Time"
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
         Text(
-            "Queue Time: ${queueTime.value}",
+            Math.secondsToMinutes(queueTime.value),
             fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
 
@@ -193,11 +217,5 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                 }
             }
         )
-    }
-
-    fun refreshQueueTime() {
-        coroutineScope.launch {
-            queueTime.value = productsService.timeQueue()
-        }
     }
 }

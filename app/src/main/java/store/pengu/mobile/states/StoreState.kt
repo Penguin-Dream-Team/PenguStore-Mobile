@@ -18,7 +18,7 @@ class StoreState {
     var shouldFindListInLocation: Boolean by mutableStateOf(true)
     var location: LatLng? = null
     var numItems: Int? = null
-    var timeInQueue: Int? = null
+    var joinQueueTime: Int? = null
 
     var userId: Long by mutableStateOf(1)
     var products = mutableStateListOf<Product>()

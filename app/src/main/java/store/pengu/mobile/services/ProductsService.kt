@@ -6,6 +6,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.states.StoreState
 
 class ProductsService(
@@ -60,7 +61,7 @@ class ProductsService(
     }
 
     suspend fun timeQueue(): Int {
-        store.location = LatLng(50.11, 50.11)
+        store.location = LatLng(50.25, 150.25)
         return api.timeQueue(store.location!!).data
     }
 
@@ -76,11 +77,10 @@ class ProductsService(
         return api.deleteProductImage(imageId, product.barcode, product.id, imageUrl).data
     }
 
-    suspend fun getProductImages() : List<String> {
+    suspend fun getProductImages(): List<String> {
         return if (store.selectedProduct!!.barcode != null)
             api.getProductImageBarcode(store.selectedProduct!!.barcode!!).data
         else
             api.getProductImageProductId(store.selectedProduct!!.id).data
     }
-
 }
