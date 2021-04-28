@@ -9,8 +9,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -34,6 +33,7 @@ import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
@@ -42,15 +42,13 @@ import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.lists.ListsScreen
-import store.pengu.mobile.views.lists.partials.PantryList
+import store.pengu.mobile.views.lists.pantry.PantryList
 import store.pengu.mobile.views.lists.partials.ShoppingList
 import store.pengu.mobile.views.login.LoginScreen
-import store.pengu.mobile.views.partials.BottomBar
-import store.pengu.mobile.views.partials.BottomSheetMenus
-import store.pengu.mobile.views.partials.FloatingActionButtons
-import store.pengu.mobile.views.partials.PenguSnackbar
 import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
 import store.pengu.mobile.utils.camera.Camera
+import store.pengu.mobile.views.lists.pantry.SharePantryListView
+import store.pengu.mobile.views.partials.*
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.search.partials.ProductScreen
@@ -209,15 +207,15 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                             ) {
                                 loaded = true
 
-                                composable("login") {
+                                animatedComposable("login") {
                                     LoginScreen(navController, accountService, snackbarController)
                                 }
 
-                                composable("loading") {
+                                animatedComposable("loading") {
                                     LoadingScreen(navController, listsService, snackbarController)
                                 }
 
-                                composable("lists") {
+                                animatedComposable("lists") {
                                     ListsScreen(
                                         navController,
                                         listsService,
@@ -226,31 +224,48 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 }
 
-                                composable("pantry_list") {
-                                    PantryList(navController, productsService, storeState)
+                                animatedComposable("pantry_list") {
+                                    PantryList(
+                                        navController,
+                                        productsService,
+                                        storeState
+                                    )
                                 }
 
-                                composable("shopping_list") {
+                                animatedComposable("share_pantry_list") {
+                                    SharePantryListView(
+                                        navController,
+                                        storeState,
+                                        snackbarController
+                                    )
+                                }
+
+                                animatedComposable("shopping_list") {
                                     ShoppingList(navController, productsService, storeState)
                                 }
 
-                                composable("search") {
+                                animatedComposable("search") {
                                     SearchScreen(navController, productsService, storeState)
                                 }
 
-                                composable("product") {
-                                    ProductScreen(navController, productsService, this@MainActivity, storeState)
+                                animatedComposable("product") {
+                                    ProductScreen(
+                                        navController,
+                                        productsService,
+                                        this@MainActivity,
+                                        storeState
+                                    )
                                 }
 
-                                composable("cart") {
+                                animatedComposable("cart") {
                                     CartScreen(navController, storeState)
                                 }
 
-                                composable("cart_confirmation") {
+                                animatedComposable("cart_confirmation") {
                                     CartConfirmationScreen(navController, cartService, storeState)
                                 }
 
-                                composable("profile") {
+                                animatedComposable("profile") {
                                     ProfileScreen(
                                         navController,
                                         accountService,
@@ -259,7 +274,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 }
 
-                                composable("camera") {
+                                animatedComposable("camera") {
                                     Camera().CameraPreview(
                                         navController,
                                         storeState,

@@ -52,7 +52,6 @@ fun LoginScreen(
     /**
      * Uncomment to enable automatic login for testing
      */
-/*
     Box {
         val ok = remember {
             mutableStateOf(coroutineScope.launch {
@@ -61,6 +60,7 @@ fun LoginScreen(
             })
         }
     }
+/*
     Box {
         val ok = remember {
             mutableStateOf(coroutineScope.launch {
