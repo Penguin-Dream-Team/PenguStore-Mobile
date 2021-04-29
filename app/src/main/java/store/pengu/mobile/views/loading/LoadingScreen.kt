@@ -9,12 +9,14 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.utils.SnackbarController
@@ -84,7 +86,7 @@ fun LoadingScreen(
                 }
             }
         }
-        Text("Loading...")
+        Text(stringResource(R.string.loading))
     }
 
     if (!loading) {
@@ -97,6 +99,6 @@ fun LoadingScreen(
             null -> navController.navigate("lists")
         }
     } else {
-        Text("Loaded")
+        Text(stringResource(R.string.loaded))
     }
 }

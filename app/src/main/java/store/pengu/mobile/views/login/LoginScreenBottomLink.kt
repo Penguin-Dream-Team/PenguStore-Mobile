@@ -11,8 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import store.pengu.mobile.R
 import store.pengu.mobile.services.AccountService
 
 @SuppressLint("RestrictedApi")
@@ -36,7 +38,7 @@ fun LoginScreenBottomLink(
         enabled = canRegister.value
     ) {
         Text(
-            text = "Continue without account",
+            text = stringResource(R.string.login_guest),
             textDecoration = TextDecoration.Underline
         )
     }

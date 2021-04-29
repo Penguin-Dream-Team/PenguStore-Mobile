@@ -52,14 +52,14 @@ fun LoginScreen(
     /**
      * Uncomment to enable automatic login for testing
      */
-    Box {
+    /*Box {
         val ok = remember {
             mutableStateOf(coroutineScope.launch {
                 accountService.login("Tux", "tux")
                 navController.navigate("loading")
             })
         }
-    }
+    }*/
 /*
     Box {
         val ok = remember {

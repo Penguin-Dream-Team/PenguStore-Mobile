@@ -6,9 +6,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.R
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.lists.partials.ListItem
@@ -43,14 +45,14 @@ fun ListsScreen(
             Tab(
                 modifier = Modifier.padding(top = 15.dp, bottom = 13.dp),
                 selected = selectedList == 0,
-                content = { Text("Pantries") },
+                content = { Text(stringResource(R.string.pantries)) },
                 onClick = { selectedList = 0 },
                 unselectedContentColor = MaterialTheme.colors.onSurface
             )
             Tab(
                 modifier = Modifier.padding(top = 15.dp, bottom = 13.dp),
                 selected = selectedList == 1,
-                content = { Text("Shopping") },
+                content = { Text(stringResource(R.string.shopping)) },
                 onClick = { selectedList = 1 },
                 unselectedContentColor = MaterialTheme.colors.onSurface
             )

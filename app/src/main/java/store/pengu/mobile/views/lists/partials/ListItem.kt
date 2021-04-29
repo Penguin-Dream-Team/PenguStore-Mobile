@@ -15,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import store.pengu.mobile.R
 import store.pengu.mobile.utils.Border
 import store.pengu.mobile.utils.border
 import store.pengu.mobile.utils.pluralize
@@ -81,7 +83,7 @@ fun ListItem(
                         fontSize = MaterialTheme.typography.h6.fontSize,
                     )
                     Text(
-                        text = "product".pluralize(productAmount),
+                        text = stringResource(R.string.product).pluralize(productAmount),
                         modifier = Modifier
                             .alpha(0.8f),
                         fontSize = MaterialTheme.typography.caption.fontSize,
