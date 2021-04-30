@@ -1,13 +1,10 @@
-package store.pengu.mobile.views.lists.pantry
+package store.pengu.mobile.views.lists.partials
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,19 +13,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import store.pengu.mobile.data.PantryList
+import androidx.navigation.compose.navigate
+import store.pengu.mobile.data.UserList
 import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.partials.IconButton
 
 @ExperimentalAnimationApi
 @Composable
-fun SharePantryListView(
+fun ListView(
     navController: NavController,
     store: StoreState,
-    snackbarController: SnackbarController
+    shareRoute: String,
+    content: @Composable() (UserList) -> Unit
 ) {
-    val pantryList = store.selectedList as PantryList? ?: return
+    val list = store.selectedList ?: return
 
     Column(
         modifier = Modifier
@@ -41,21 +39,22 @@ fun SharePantryListView(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(
-                onClick = { navController.popBackStack() },
-                icon = Icons.Filled.ArrowBack,
-                description = "Go back"
-            )
 
             Text(
-                pantryList.name,
-                fontSize = 24.sp,
+                list.name,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
 
+            Spacer(modifier = Modifier.weight(1.0f, true))
+            IconButton(
+                onClick = { navController.navigate(shareRoute) },
+                icon = Icons.Filled.Share,
+                description = "Share list"
+            )
         }
 
-        SharePantryList(pantryList, snackbarController)
+        content(list)
     }
 }

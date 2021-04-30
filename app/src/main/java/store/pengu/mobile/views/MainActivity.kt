@@ -31,6 +31,8 @@ import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
@@ -41,8 +43,11 @@ import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.lists.ListsScreen
 import store.pengu.mobile.views.lists.pantry.PantryList
-import store.pengu.mobile.views.lists.pantry.SharePantryListView
-import store.pengu.mobile.views.lists.partials.ShoppingList
+import store.pengu.mobile.views.lists.pantry.ViewPantryList
+import store.pengu.mobile.views.lists.partials.ListView
+import store.pengu.mobile.views.lists.partials.ShareListView
+import store.pengu.mobile.views.lists.shops.ShoppingList
+import store.pengu.mobile.views.lists.shops.ViewShoppingList
 import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.*
@@ -233,23 +238,50 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("pantry_list") {
-                                    PantryList(
+                                    ListView(
                                         navController,
-                                        productsService,
-                                        storeState
-                                    )
+                                        storeState,
+                                        "share_pantry_list"
+                                    ) {
+                                        ViewPantryList(
+                                            navController,
+                                            productsService,
+                                            storeState,
+                                            it as PantryList
+                                        )
+                                    }
                                 }
 
                                 animatedComposable("share_pantry_list") {
-                                    SharePantryListView(
+                                    ShareListView(
                                         navController,
                                         storeState,
-                                        snackbarController
+                                        snackbarController,
+                                        "Pantry List"
+                                    )
+                                }
+
+                                animatedComposable("share_shopping_list") {
+                                    ShareListView(
+                                        navController,
+                                        storeState,
+                                        snackbarController,
+                                        "Shopping List"
                                     )
                                 }
 
                                 animatedComposable("shopping_list") {
-                                    ShoppingList(navController, productsService, storeState)
+                                    ListView(
+                                        navController,
+                                        storeState,
+                                        "share_shopping_list"
+                                    ) {
+                                        ViewShoppingList(
+                                            productsService,
+                                            storeState,
+                                            it as ShoppingList
+                                        )
+                                    }
                                 }
 
                                 animatedComposable("search") {

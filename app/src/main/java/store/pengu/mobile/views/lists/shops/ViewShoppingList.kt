@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.lists.partials
+package store.pengu.mobile.views.lists.shops
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material.icons.filled.RemoveShoppingCart
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
@@ -35,10 +33,8 @@ import store.pengu.mobile.utils.Math
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun ShoppingList(navController: NavController, productsService: ProductsService, store: StoreState) {
-    val storeState by remember { mutableStateOf(store) }
+fun ViewShoppingList(productsService: ProductsService, store: StoreState, shoppingList: ShoppingList) {
     val openDialog = remember { mutableStateOf(false) }
-    val selectedShoppingList = storeState.selectedList as ShoppingList?
     val products by remember { mutableStateOf(store.shoppingListProducts) }
     val cartProducts by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
@@ -49,27 +45,14 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
         queueTime.value = productsService.timeQueue()
     }
 
-    if (selectedShoppingList == null) return
-    productsService.getShoppingListProducts(selectedShoppingList.id)
+    productsService.getShoppingListProducts(shoppingList.id)
     refreshQueueTime.start()
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .padding(vertical = 32.dp)
+            .padding(vertical = 18.dp)
             .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Text(
-            selectedShoppingList.name,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -125,7 +108,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                     if (cartProducts.map { it.first }.contains(product)) {
                         IconButton(
                             onClick = {
-                                storeState.cartProducts.removeAt(cartProducts.map { it.first }.indexOf(product))
+                                store.cartProducts.removeAt(cartProducts.map { it.first }.indexOf(product))
                             },
                         ) {
                             Icon(
@@ -138,7 +121,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                         IconButton(
                             onClick = {
                                 if ((product.amountNeeded - product.amountAvailable) == 1) {
-                                    storeState.cartProducts.add(Pair(product, 1))
+                                    store.cartProducts.add(Pair(product, 1))
                                 } else {
                                     currentProduct.value = product
                                     desiredAmount.value = 0
@@ -205,7 +188,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                 Button(
                     onClick = {
                         openDialog.value = false
-                        storeState.cartProducts.add(Pair(currentProduct.value, desiredAmount.value))
+                        store.cartProducts.add(Pair(currentProduct.value, desiredAmount.value))
                     }) {
                     Text("Add to Cart")
                 }
