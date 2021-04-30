@@ -6,12 +6,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavHostController
+import io.ktor.util.*
+import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.lists.bottommenu.ListsBottomSheetMenu
 
+@KtorExperimentalAPI
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -23,16 +26,15 @@ fun BottomSheetMenus(
     productsService: ProductsService,
     snackbarController: SnackbarController,
     currentRoute: String?,
-    closeMenu: () -> Unit
+    closeMenu: () -> Unit,
 ) {
     when (currentRoute) {
         "lists" ->
             ListsBottomSheetMenu(
-                navController,
                 listsService,
                 store,
                 snackbarController,
-                closeMenu
+                closeMenu,
             )
         else -> Text("")
     }

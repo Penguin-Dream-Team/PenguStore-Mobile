@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
@@ -28,26 +27,24 @@ import androidx.navigation.compose.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.ktor.util.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.runBlocking
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
 import store.pengu.mobile.api.PenguStoreApi
-import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
-import store.pengu.mobile.views.cart.CartConfirmationScreen
-import store.pengu.mobile.views.cart.CartScreen
-import store.pengu.mobile.views.loading.LoadingScreen
-import store.pengu.mobile.views.lists.ListsScreen
-import store.pengu.mobile.views.lists.pantry.PantryList
-import store.pengu.mobile.views.lists.partials.ShoppingList
-import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
 import store.pengu.mobile.utils.camera.Camera
+import store.pengu.mobile.views.cart.CartConfirmationScreen
+import store.pengu.mobile.views.cart.CartScreen
+import store.pengu.mobile.views.lists.ListsScreen
+import store.pengu.mobile.views.lists.pantry.PantryList
 import store.pengu.mobile.views.lists.pantry.SharePantryListView
+import store.pengu.mobile.views.lists.partials.ShoppingList
+import store.pengu.mobile.views.loading.LoadingScreen
+import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.*
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
@@ -79,7 +76,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     lateinit var api: PenguStoreApi
 
     private val termiteService = TermiteService(this)
-    private var navController: NavHostController? = null
+    lateinit var navController: NavHostController
     private var mReceiver: WifiP2pBroadcastReceiver? = null
 
     @ExperimentalMaterialApi
@@ -93,7 +90,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     @ExperimentalComposeUiApi
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
-    @SuppressLint("SourceLockedOrientationActivity")
+    @SuppressLint("SourceLockedOrientationActivity", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -123,8 +120,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         }
 
         setContent {
-            val navController = rememberNavController()
-            this.navController = navController
+            navController = rememberNavController()
 
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
@@ -148,8 +144,19 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         collapseBottomSheetMenu()
                     }
                 }
+
+                accountService.navController = navController
+
                 termiteService.wifiDirectON()
                 executedOnce = true
+            }
+
+            coroutineScope.launch {
+                delay(200L)
+                if (!storeState.isLoggedIn() && currentRoute != "login") {
+                    navController.navigate("login")
+                    navController.backStack.clear()
+                }
             }
 
             PenguShopTheme {
@@ -166,8 +173,9 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 storeState,
                                 productsService,
                                 snackbarController,
-                                currentRoute
-                            ) { collapseBottomSheetMenu() }
+                                currentRoute,
+                                closeMenu = { collapseBottomSheetMenu() },
+                            )
                         }
                     },
                     sheetPeekHeight = 0.dp,
@@ -300,6 +308,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         }
     }
 
+
     @ExperimentalMaterialApi
     override fun onBackPressed() {
         if (isBottomSheetMenuOpen) {
@@ -311,11 +320,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     @ExperimentalMaterialApi
     private fun expandBottomSheetMenu() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(true)
-        } else {
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        }
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         coroutineScope.launch {
             bottomSheetState.expand()
             isBottomSheetMenuOpen = true
@@ -324,12 +329,8 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     @ExperimentalMaterialApi
     private fun collapseBottomSheetMenu() {
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
         // uncomment to clear when popup is closed
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-        } else {
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-        }
         //listsService.resetNewListData()
         coroutineScope.launch {
             bottomSheetState.collapse()

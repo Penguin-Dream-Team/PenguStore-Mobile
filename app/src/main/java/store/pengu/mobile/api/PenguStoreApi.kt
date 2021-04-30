@@ -31,11 +31,6 @@ class PenguStoreApi(
         return post(Routes.LOGIN, loginRequest)
     }
 
-    suspend fun refreshToken(refreshToken: String): LoginResponse {
-        val refreshRequest = RefreshTokenRequest(refreshToken)
-        return post(Routes.REFRESH_TOKEN, refreshRequest)
-    }
-
     suspend fun getProfile(): ProfileResponse {
         return get(Routes.USER_PROFILE)
     }

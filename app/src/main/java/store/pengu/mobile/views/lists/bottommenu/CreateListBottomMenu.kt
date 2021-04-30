@@ -27,16 +27,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.navigate
 import com.google.android.gms.maps.model.LatLng
 import io.ktor.util.*
 import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.Border
-import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.border
 import store.pengu.mobile.views.lists.AvailableListColor
 import store.pengu.mobile.views.maps.MapScreen
@@ -48,13 +45,11 @@ import store.pengu.mobile.views.partials.IconButton
 @ExperimentalAnimationApi
 @Composable
 fun CreateListBottomMenu(
-    navController: NavHostController,
     listsService: ListsService,
-    store: StoreState,
-    snackbarController: SnackbarController,
     closeMenu: () -> Unit,
     title: String,
-    onCreate: () -> Unit
+    onCreate: () -> Unit,
+    onImport: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
@@ -99,8 +94,9 @@ fun CreateListBottomMenu(
             Spacer(modifier = Modifier.weight(1.0f, true))
             IconButton(
                 onClick = { listsService.resetNewListData() },
-                icon = Icons.Filled.Clear,
-                description = "clear create data"
+                icon = Icons.Filled.Delete,
+                description = "clear create data",
+                enabled = listsService.newCanPickLocation()
             )
         }
 
@@ -111,7 +107,13 @@ fun CreateListBottomMenu(
             onValueChange = {
                 listName = it
             },
-            placeholder = { Text("${title.toLowerCase(Locale.current).capitalize(Locale.current)} name") },
+            placeholder = {
+                Text(
+                    "${
+                        title.toLowerCase(Locale.current).capitalize(Locale.current)
+                    } name"
+                )
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -213,32 +215,50 @@ fun CreateListBottomMenu(
                 })
             }, enabled = listsService.newCanPickLocation(),
             modifier = Modifier
-                .padding(vertical = 25.dp)
+                .padding(top = 25.dp, bottom = 15.dp)
                 .fillMaxWidth()
         ) {
             Text(text = "Pick Location")
         }
 
-        Row(
+        Button(
+            onClick = onCreate, enabled = listsService.newCanCreate(),
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(
-                onClick = onCreate, enabled = listsService.newCanCreate(),
-                modifier = Modifier
-                    .padding(bottom = 25.dp)
-            ) {
-                Text(text = "Create $title")
-            }
+            Text(text = "Create $title")
+        }
 
-            Button(
-                onClick = { navController.navigate("camera") },
+        Row(
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Divider(
                 modifier = Modifier
-                    .padding(bottom = 25.dp)
-            ) {
-                Text(text = "Scan $title")
-            }
+                    .weight(0.5f, true)
+            )
+            Text(
+                text = "or",
+                modifier = Modifier
+                    .weight(0.2f, true),
+                textAlign = TextAlign.Center
+            )
+            Divider(
+                modifier = Modifier
+                    .weight(0.5f, true)
+            )
+        }
+
+        Button(
+            onClick = onImport,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+        ) {
+            Text(text = "Import $title")
         }
     }
 }

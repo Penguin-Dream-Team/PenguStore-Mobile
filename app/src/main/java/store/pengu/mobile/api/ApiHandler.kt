@@ -1,5 +1,6 @@
 package store.pengu.mobile.api
 
+import android.util.Log
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.google.android.gms.maps.model.LatLng
 import io.ktor.client.*
@@ -109,7 +110,11 @@ abstract class ApiHandler(open val store: StoreState) {
             handleApiException(e) as T
         }
 
-    protected suspend inline fun <reified T> post(path: String, location: LatLng, numItems: Int): T =
+    protected suspend inline fun <reified T> post(
+        path: String,
+        location: LatLng,
+        numItems: Int
+    ): T =
         try {
             val route = "${location.latitude}/${location.longitude}/${numItems}"
             api.post(path = path + route) { addJWTTokenToRequest(headers) }
@@ -159,9 +164,8 @@ abstract class ApiHandler(open val store: StoreState) {
             is java.net.SocketTimeoutException,
             is TimeoutException,
             is ConnectTimeoutException -> Response.ErrorResponse("Can't reach the server")
-            is ClientRequestException -> Response.ErrorResponse(e.response.receive())
-            is ServerResponseException -> {
-                if (e.response.status == HttpStatusCode.Forbidden || e.response.status == HttpStatusCode.Unauthorized) {
+            is ResponseException -> {
+                if (e.response.status == HttpStatusCode.Unauthorized) {
                     throw PenguStoreApiAuthorizationException("You need to login")
                 }
                 Response.ErrorResponse(e.response.receive())
@@ -176,6 +180,9 @@ abstract class ApiHandler(open val store: StoreState) {
     }
 
     protected fun addJWTTokenToRequest(headers: HeadersBuilder) {
-        if (store.token.isNotBlank()) headers["Authorization"] = "Bearer ${store.token}"
+        if (store.token.isNotBlank()) {
+            Log.d("HELP", "ADDED TOKEN")
+            headers["Authorization"] = "Bearer ${store.token}"
+        }
     }
 }

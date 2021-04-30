@@ -40,11 +40,6 @@ class UserDataService(
         return userData.token
     }
 
-    suspend fun getRefreshToken(): String {
-        val userData = getUserData()
-        return userData.refreshToken
-    }
-
     suspend fun isLoggedIn(): Boolean {
         val userData = getUserData()
         return userData.token.isNotBlank()
@@ -59,7 +54,6 @@ class UserDataService(
         username: String? = null,
         password: String? = null,
         token: String? = null,
-        refreshToken: String? = null,
         guest: Boolean? = null,
         email: String? = null,
     ) {
@@ -76,10 +70,6 @@ class UserDataService(
 
             if (token != null) {
                 userDataBuilder.token = token
-            }
-
-            if (refreshToken != null) {
-                userDataBuilder.refreshToken = refreshToken
             }
 
             if (guest != null) {

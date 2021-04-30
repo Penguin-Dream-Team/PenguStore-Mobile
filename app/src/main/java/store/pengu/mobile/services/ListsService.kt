@@ -21,6 +21,8 @@ class ListsService(
     val newListColor = mutableStateOf(AvailableListColor.BLUE)
     val newListLocation: MutableState<LatLng?> = mutableStateOf(null)
 
+    val newListCode = mutableStateOf("")
+
     var pantryLists = mutableStateListOf<PantryList>()
     val shoppingLists = mutableStateListOf<ShoppingList>()
 
@@ -38,6 +40,14 @@ class ListsService(
         newListName.value = ""
         newListColor.value = AvailableListColor.BLUE
         newListLocation.value = null
+    }
+
+    fun resetImportListData() {
+        newListCode.value = ""
+    }
+
+    fun newCanImportList(): Boolean {
+        return newListCode.value.isNotBlank()
     }
 
     suspend fun getPantryLists() {
@@ -80,6 +90,50 @@ class ListsService(
      * @throws PenguStoreApiException
      */
     suspend fun createNewPantryList() {
+        if (isCreating.value) {
+            return
+        }
+
+        isCreating.value = true
+        pantryLists.add(
+            api.createPantryList(
+                newListName.value,
+                newListLocation.value!!,
+                newListColor.value
+            ).data
+        )
+        resetNewListData()
+        isCreating.value = false
+    }
+
+    /**
+     * @throws PenguStoreApiException
+     */
+    suspend fun importNewShoppingList() {
+        // TODO
+        if (true) return
+        if (isCreating.value) {
+            return
+        }
+
+        isCreating.value = true
+        pantryLists.add(
+            api.createPantryList(
+                newListName.value,
+                newListLocation.value!!,
+                newListColor.value
+            ).data
+        )
+        resetNewListData()
+        isCreating.value = false
+    }
+
+    /**
+     * @throws PenguStoreApiException
+     */
+    suspend fun importNewPantryList() {
+        // TODO
+        if (true) return
         if (isCreating.value) {
             return
         }

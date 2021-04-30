@@ -8,5 +8,4 @@ import store.pengu.mobile.api.Response
 data class LoginResponse(
     @SerializedName("id") val id: Int,
     @SerializedName("token") val token: String,
-    @SerializedName("refreshToken") val refreshToken: String,
 )

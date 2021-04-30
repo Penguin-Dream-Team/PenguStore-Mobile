@@ -26,6 +26,7 @@ object AppModule {
     ): AccountService =
         AccountService(userDataService, api, store)
 
+
     @Singleton
     @Provides
     fun getBeaconsService(
