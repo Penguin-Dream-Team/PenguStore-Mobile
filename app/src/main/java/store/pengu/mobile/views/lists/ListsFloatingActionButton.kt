@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.res.stringResource
+import store.pengu.mobile.R
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
@@ -29,6 +31,6 @@ fun ListsFloatingActionButton(
         shape = buttonShape,
         contentColor = MaterialTheme.colors.onBackground
     ) {
-        Icon(imageVector = Icons.Filled.Add, "create list")
+        Icon(imageVector = Icons.Filled.Add, stringResource(R.string.create_list_button))
     }
 }
