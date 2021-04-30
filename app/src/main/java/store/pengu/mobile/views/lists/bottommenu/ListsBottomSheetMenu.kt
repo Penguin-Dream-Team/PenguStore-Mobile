@@ -37,6 +37,18 @@ fun ListsBottomSheetMenu(
         closeMenu()
     }
 
+    val actionWrapper: (String, suspend () -> Unit) -> Unit = { successMessage, callable ->
+        coroutineScope.launch {
+            try {
+                callable()
+                snackbarController.showDismissibleSnackbar(successMessage)
+            } catch (e: PenguStoreApiException) {
+                snackbarController.showDismissibleSnackbar(e.message)
+            }
+            closeMenuWrapper()
+        }
+    }
+
     when (selectedListType) {
         0 -> {
             ListBottomMenu(
@@ -46,25 +58,13 @@ fun ListsBottomSheetMenu(
                 formType,
                 setFormType,
                 onCreate = {
-                    coroutineScope.launch {
-                        try {
-                            listsService.createNewPantryList()
-                            closeMenuWrapper()
-                            snackbarController.showDismissibleSnackbar("Created new Pantry List")
-                        } catch (e: PenguStoreApiException) {
-                            snackbarController.showDismissibleSnackbar(e.message)
-                        }
+                    actionWrapper("Created new Pantry List") {
+                        listsService.createNewPantryList()
                     }
                 },
                 onImport = {
-                    coroutineScope.launch {
-                        try {
-                            listsService.importNewPantryList()
-                            closeMenuWrapper()
-                            snackbarController.showDismissibleSnackbar("Imported new Pantry List")
-                        } catch (e: PenguStoreApiException) {
-                            snackbarController.showDismissibleSnackbar(e.message)
-                        }
+                    actionWrapper("Imported new Pantry List") {
+                        listsService.importNewPantryList()
                     }
                 },
                 onScan = {
@@ -84,25 +84,13 @@ fun ListsBottomSheetMenu(
                 formType,
                 setFormType,
                 onCreate = {
-                    coroutineScope.launch {
-                        try {
-                            listsService.createNewShoppingList()
-                            closeMenuWrapper()
-                            snackbarController.showDismissibleSnackbar("Created new Shopping List")
-                        } catch (e: PenguStoreApiException) {
-                            snackbarController.showDismissibleSnackbar(e.message)
-                        }
+                    actionWrapper("Created new Shopping List") {
+                        listsService.createNewShoppingList()
                     }
                 },
                 onImport = {
-                    coroutineScope.launch {
-                        try {
-                            listsService.importNewShoppingList()
-                            closeMenuWrapper()
-                            snackbarController.showDismissibleSnackbar("Imported new Shopping List")
-                        } catch (e: PenguStoreApiException) {
-                            snackbarController.showDismissibleSnackbar(e.message)
-                        }
+                    actionWrapper("Imported new Shopping List") {
+                        listsService.importNewShoppingList()
                     }
                 },
                 onScan = {},

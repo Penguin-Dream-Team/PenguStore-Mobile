@@ -27,6 +27,7 @@ class ListsService(
     val shoppingLists = mutableStateListOf<ShoppingList>()
 
     private var isCreating = mutableStateOf(false)
+    private var isImporting = mutableStateOf(false)
 
     fun newCanPickLocation(): Boolean {
         return newListName.value.isNotBlank()
@@ -47,7 +48,7 @@ class ListsService(
     }
 
     fun newCanImportList(): Boolean {
-        return newListCode.value.isNotBlank()
+        return !isImporting.value && newListCode.value.isNotBlank()
     }
 
     suspend fun getPantryLists() {
@@ -109,45 +110,24 @@ class ListsService(
     /**
      * @throws PenguStoreApiException
      */
-    suspend fun importNewShoppingList() {
-        // TODO
-        if (true) return
-        if (isCreating.value) {
-            return
-        }
-
-        isCreating.value = true
-        pantryLists.add(
-            api.createPantryList(
-                newListName.value,
-                newListLocation.value!!,
-                newListColor.value
-            ).data
-        )
-        resetNewListData()
-        isCreating.value = false
-    }
-
-    /**
-     * @throws PenguStoreApiException
-     */
     suspend fun importNewPantryList() {
-        // TODO
-        if (true) return
-        if (isCreating.value) {
+        if (isImporting.value) {
             return
         }
 
-        isCreating.value = true
-        pantryLists.add(
-            api.createPantryList(
-                newListName.value,
-                newListLocation.value!!,
-                newListColor.value
-            ).data
-        )
-        resetNewListData()
-        isCreating.value = false
+        isImporting.value = true
+        try {
+            pantryLists.add(
+                api.importPantry(
+                    newListCode.value,
+                ).data
+            )
+            resetImportListData()
+            isImporting.value = false
+        } catch (e: PenguStoreApiException) {
+            isImporting.value = false
+            throw e
+        }
     }
 
     /**
@@ -170,6 +150,30 @@ class ListsService(
         isCreating.value = false
     }
 
+    /**
+     * @throws PenguStoreApiException
+     */
+    suspend fun importNewShoppingList() {
+        if (isImporting.value) {
+            return
+        }
+
+        isImporting.value = true
+        try {
+            shoppingLists.add(
+                api.importShoppingList(
+                    newListCode.value,
+                ).data
+            )
+            resetImportListData()
+            isImporting.value = false
+        } catch (e: PenguStoreApiException) {
+            isImporting.value = false
+            throw e
+        }
+    }
+
+
     suspend fun findListInLocation(latitude: Double, longitude: Double): UserListType? {
         return try {
             with(api.findList(latitude, longitude)) {
@@ -177,8 +181,8 @@ class ListsService(
                     UserListType.PANTRY ->
                         PantryList(
                             (list["id"] as Int).toLong(),
-                            list["code"] as String,
                             list["name"] as String,
+                            list["code"] as String,
                             list["latitude"] as Double,
                             list["longitude"] as Double,
                             list["productCount"] as Int,
@@ -189,6 +193,7 @@ class ListsService(
                         ShoppingList(
                             (list["id"] as Int).toLong(),
                             list["name"] as String,
+                            list["code"] as String,
                             list["latitude"] as Double,
                             list["longitude"] as Double,
                             list["color"] as String,

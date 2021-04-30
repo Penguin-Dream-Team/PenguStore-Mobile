@@ -1,10 +1,11 @@
+@file:Suppress("FunctionName")
+
 package store.pengu.mobile.api
 
 import store.pengu.mobile.errors.PenguStoreApiException
 
 object Routes {
     const val LOGIN = "/login"
-    const val REFRESH_TOKEN = "/login/refresh"
     const val REGISTER_GUEST = "/register/guest"
     const val USER_PROFILE = "/profile"
 
@@ -28,6 +29,9 @@ object Routes {
     const val CREATE_PANTRY_LIST = "/lists/pantries"
     const val CREATE_SHOPPING_LIST = "/lists/shops"
 
+    fun IMPORT_PANTRY_LIST(code: String) = "/lists/pantries/import/$code"
+    fun IMPORT_SHOPPING_LIST(code: String) = "/lists/shops/import/$code"
+
 
     /**
      * NEED REWRITE
@@ -38,11 +42,9 @@ object Routes {
     const val USERS = "/users"
     const val GET_USER = "/users/id"
     const val ADD_USER = "/users/add"
-    const val ADD_USER_PANTRY = "/users/addPantry"
     const val DELETE_USER_PANTRY = "/users/deletePantry"
     const val GET_USER_PANTRIES = "/users/id/pantries"
     const val GET_USER_SHOPPING_LIST_PRODUCTS = "/users/id/shoppingList"
-    const val ADD_SHOPPING_LIST = "/users/addShoppingList"
     const val UPDATE_SHOPPING_LIST = "/users/updateShoppingList"
     const val DELETE_SHOPPING_LIST = "/users/deleteShoppingList"
     const val GET_USER_SHOPPING_LIST = "/shoppingList/id"
