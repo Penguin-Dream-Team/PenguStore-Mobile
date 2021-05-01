@@ -28,6 +28,7 @@ import io.ktor.util.*
 import store.pengu.mobile.R
 import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.utils.SnackbarController
+import store.pengu.mobile.views.loading.RequestCameraPermission
 import store.pengu.mobile.views.partials.IconButton
 
 @KtorExperimentalAPI
@@ -65,20 +66,27 @@ fun ScanListBottomMenu(
             )
         }
 
-        AndroidView(factory = {
-            LayoutInflater.from(it).inflate(R.layout.camera_layout, null)
-        }) { inflatedLayout ->
-            cameraService.initCamera(
-                context,
-                lifecycleOwner,
-                inflatedLayout as PreviewView,
-                onSuccess = onScan,
-                onFail = {
-                    Toast.makeText(context, "No correct code found", Toast.LENGTH_SHORT).show()
-                    //snackbarController.showDismissibleSnackbar("No correct code found")
-                },
-                CameraService.ScanType.LIST_CODE
-            )
+        RequestCameraPermission(
+            snackbarController,
+            onFail = {
+                goBack()
+            }
+        ) {
+            AndroidView(factory = {
+                LayoutInflater.from(it).inflate(R.layout.camera_layout, null)
+            }) { inflatedLayout ->
+                cameraService.initCamera(
+                    context,
+                    lifecycleOwner,
+                    inflatedLayout as PreviewView,
+                    onSuccess = onScan,
+                    onFail = {
+                        Toast.makeText(context, "No correct code found", Toast.LENGTH_SHORT).show()
+                        //snackbarController.showDismissibleSnackbar("No correct code found")
+                    },
+                    CameraService.ScanType.LIST_CODE
+                )
+            }
         }
     }
 }

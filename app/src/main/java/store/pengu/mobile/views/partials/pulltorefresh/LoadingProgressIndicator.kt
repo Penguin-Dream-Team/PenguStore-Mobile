@@ -26,7 +26,7 @@ private const val strokeWidthPx = 2.5f
 
 
 @Composable
-internal fun PullToRefreshProgressIndicator(
+internal fun LoadingProgressIndicator(
     modifier: Modifier = Modifier,
     progressColor: Color,
     backgroundColor: Color,

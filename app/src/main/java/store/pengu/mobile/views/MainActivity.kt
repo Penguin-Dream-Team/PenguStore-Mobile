@@ -42,11 +42,9 @@ import store.pengu.mobile.utils.camera.Camera
 import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.lists.ListsScreen
-import store.pengu.mobile.views.lists.pantry.PantryList
 import store.pengu.mobile.views.lists.pantry.ViewPantryList
 import store.pengu.mobile.views.lists.partials.ListView
 import store.pengu.mobile.views.lists.partials.ShareListView
-import store.pengu.mobile.views.lists.shops.ShoppingList
 import store.pengu.mobile.views.lists.shops.ViewShoppingList
 import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.login.LoginScreen
@@ -105,15 +103,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         val startDestination: String
 
         // register broadcast receiver
-        val filter = IntentFilter()
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION)
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION)
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION)
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION)
-        mReceiver = WifiP2pBroadcastReceiver(this, termiteService)
-        registerReceiver(mReceiver, filter)
-
-        requestPermission(Manifest.permission.CAMERA)
+        registerTermiteReceiver()
 
         runBlocking {
             accountService.loadData()
@@ -313,14 +303,6 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         storeState
                                     )
                                 }
-
-                                animatedComposable("camera") {
-                                    Camera().CameraPreview(
-                                        navController,
-                                        storeState,
-                                        productsService
-                                    )
-                                }
                             }
 
                             Column(
@@ -375,14 +357,19 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         unregisterReceiver(mReceiver)
     }
 
-    private fun requestPermission(permission: String) {
-        if (PermissionChecker.checkSelfPermission(
-                applicationContext,
-                permission
-            ) != PermissionChecker.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(this, arrayOf(permission), 100)
-        }
+    override fun onResume() {
+        super.onResume()
+        registerTermiteReceiver()
+    }
+
+    private fun registerTermiteReceiver() {
+        val filter = IntentFilter()
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION)
+        mReceiver = WifiP2pBroadcastReceiver(this, termiteService)
+        registerReceiver(mReceiver, filter)
     }
 
     /*

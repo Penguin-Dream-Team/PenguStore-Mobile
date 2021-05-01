@@ -6,10 +6,15 @@ import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
@@ -21,6 +26,7 @@ import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.launcherForActivityResult
+import store.pengu.mobile.views.partials.pulltorefresh.LoadingProgressIndicator
 
 @SuppressLint("RestrictedApi")
 @ExperimentalAnimationApi
@@ -53,7 +59,7 @@ fun LoadingScreen(
         }
 
 
-    AnimatedVisibility(visible = loading) {
+    AnimatedVisibility(visible = loading, modifier = Modifier.fillMaxSize()) {
         if (needsLocationPermission) {
             when (PackageManager.PERMISSION_GRANTED) {
                 ContextCompat.checkSelfPermission(
@@ -86,7 +92,21 @@ fun LoadingScreen(
                 }
             }
         }
-        Text(stringResource(R.string.loading))
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            LoadingProgressIndicator(
+                progressColor = MaterialTheme.colors.primary,
+                backgroundColor = MaterialTheme.colors.surface
+            )
+            Text(
+                modifier = Modifier.padding(top = 10.dp),
+                text = stringResource(R.string.loading)
+            )
+        }
     }
 
     if (!loading) {
@@ -98,7 +118,5 @@ fun LoadingScreen(
                 navController.navigate("shopping_list")
             null -> navController.navigate("lists")
         }
-    } else {
-        Text(stringResource(R.string.loaded))
     }
 }

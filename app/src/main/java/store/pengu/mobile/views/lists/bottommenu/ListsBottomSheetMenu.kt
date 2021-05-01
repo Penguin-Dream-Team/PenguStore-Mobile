@@ -11,6 +11,7 @@ import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
+import store.pengu.mobile.views.loading.RequestCameraPermission
 
 @KtorExperimentalAPI
 @ExperimentalComposeUiApi

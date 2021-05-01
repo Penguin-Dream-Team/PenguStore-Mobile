@@ -52,6 +52,7 @@ fun ProfileScreen(
         )
 
         ProfileScreenLocationButton(snackbarController)
+        ProfileScreenCameraButton(snackbarController)
 
         ProfileScreenFooter(
             navController,
