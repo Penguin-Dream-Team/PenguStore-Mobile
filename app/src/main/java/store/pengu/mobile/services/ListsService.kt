@@ -1,8 +1,13 @@
 package store.pengu.mobile.services
 
+import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.PantryList
@@ -10,6 +15,8 @@ import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.data.UserList
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.utils.geo.GeoTimeTask
+import store.pengu.mobile.utils.geo.GeoUtils
 import store.pengu.mobile.views.lists.AvailableListColor
 
 class ListsService(
@@ -28,6 +35,25 @@ class ListsService(
 
     private var isCreating = mutableStateOf(false)
     private var isImporting = mutableStateOf(false)
+
+    private var geoTimeTask = GeoTimeTask()
+
+    fun initGeoTimeTask(context: Context) {
+        geoTimeTask.init(context)
+    }
+
+    fun getGeoTime(context: Context, source: LatLng, destiny: LatLng): String {
+        try {
+            val result = geoTimeTask.getTime(
+                GeoUtils.getLocationName(context, source), GeoUtils.getLocationName(context, destiny)
+            )
+            if (result != null) return result
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return "Unknown"
+    }
 
     fun newCanPickLocation(): Boolean {
         return newListName.value.isNotBlank()

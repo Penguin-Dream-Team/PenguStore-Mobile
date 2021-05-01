@@ -1,6 +1,5 @@
 package store.pengu.mobile.views
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.ActivityInfo
@@ -19,8 +18,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.core.app.ActivityCompat
-import androidx.core.content.PermissionChecker
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
@@ -38,7 +35,6 @@ import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
-import store.pengu.mobile.utils.camera.Camera
 import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.lists.ListsScreen
@@ -142,7 +138,10 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
                 accountService.navController = navController
 
+                listsService.initGeoTimeTask(applicationContext)
+
                 termiteService.wifiDirectON()
+
                 executedOnce = true
             }
 
@@ -235,6 +234,8 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     ) {
                                         ViewPantryList(
                                             navController,
+                                            applicationContext,
+                                            listsService,
                                             productsService,
                                             storeState,
                                             it as PantryList
@@ -267,6 +268,8 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         "share_shopping_list"
                                     ) {
                                         ViewShoppingList(
+                                            applicationContext,
+                                            listsService,
                                             productsService,
                                             storeState,
                                             it as ShoppingList

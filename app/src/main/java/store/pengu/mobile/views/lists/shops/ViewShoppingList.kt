@@ -1,6 +1,7 @@
 package store.pengu.mobile.views.lists.shops
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,13 +28,20 @@ import kotlinx.coroutines.launch
 import store.pengu.mobile.R
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.Math
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun ViewShoppingList(productsService: ProductsService, store: StoreState, shoppingList: ShoppingList) {
+fun ViewShoppingList(
+    applicationContext: Context,
+    listsService: ListsService,
+    productsService: ProductsService,
+    store: StoreState,
+    shoppingList: ShoppingList
+) {
     val openDialog = remember { mutableStateOf(false) }
     val products by remember { mutableStateOf(store.shoppingListProducts) }
     val cartProducts by remember { mutableStateOf(store.cartProducts) }

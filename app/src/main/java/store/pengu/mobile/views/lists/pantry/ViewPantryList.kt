@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.lists.pantry
 
+import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +23,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 
@@ -30,6 +33,8 @@ import store.pengu.mobile.states.StoreState
 @Composable
 fun ViewPantryList(
     navController: NavController,
+    context: Context,
+    listsService: ListsService,
     productsService: ProductsService,
     store: StoreState,
     pantryList: PantryList
@@ -44,6 +49,12 @@ fun ViewPantryList(
     productsService.getPantryProducts(pantryList.id)
 
     Spacer(modifier = Modifier.height(32.dp))
+
+    Text(
+        text = "Time to get to location: ${listsService.getGeoTime(context, LatLng(50.25, 50.25), LatLng(60.25, 60.25))}",
+                //"${listsService.getGeoTime(context, store.location!!, store.listLocation!!)}",
+        fontWeight = FontWeight.SemiBold
+    )
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
