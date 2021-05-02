@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
 import store.pengu.mobile.api.responses.lists.UserListType
+import store.pengu.mobile.data.UserList
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.launcherForActivityResult
@@ -40,6 +41,7 @@ fun LoadingScreen(
     val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var type: UserListType? by remember { mutableStateOf(null) }
+    var list: UserList? by remember { mutableStateOf(null) }
     var canGetLocation by remember { mutableStateOf(false) }
     var needsLocationPermission by remember { mutableStateOf(true) }
 
@@ -85,8 +87,10 @@ fun LoadingScreen(
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 coroutineScope.launch {
                     if (location != null) {
-                        type =
+                        val pair =
                             listsService.findListInLocation(location.latitude, location.longitude)
+                        type = pair?.first
+                        list = pair?.second
                     }
                     loading = false
                 }
@@ -113,9 +117,9 @@ fun LoadingScreen(
         navController.backStack.clear()
         when (type) {
             UserListType.PANTRY ->
-                navController.navigate("pantry_list")
+                navController.navigate("pantry_list/${list?.id}")
             UserListType.SHOPPING_LIST ->
-                navController.navigate("shopping_list")
+                navController.navigate("shopping_list/${list?.id}")
             null -> navController.navigate("lists")
         }
     }

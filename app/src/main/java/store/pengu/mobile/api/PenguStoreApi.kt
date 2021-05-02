@@ -98,6 +98,13 @@ class PenguStoreApi(
         return post(Routes.IMPORT_SHOPPING_LIST(shoppingListCode))
     }
 
+    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<ProductInPantry>> {
+        return get(Routes.GET_PANTRY(pantryId))
+    }
+
+    suspend fun getShoppingListProducts(shoppingListId: Long): Response.SuccessResponse<List<ProductInShoppingList>> {
+        return get(Routes.GET_SHOPPING_LIST(shoppingListId))
+    }
 
     /**
      * NEEDS REWRITE
@@ -128,9 +135,6 @@ class PenguStoreApi(
     suspend fun getUserPantries(userId: Long): Response.SuccessResponse<List<PantryList>> =
         get(Routes.GET_USER_PANTRIES, userId.toString())
 
-    suspend fun getUserShoppingListProducts(shopId: Long): Response.SuccessResponse<List<ProductInPantry>> =
-        get(Routes.GET_USER_SHOPPING_LIST_PRODUCTS, shopId.toString())
-
     suspend fun updateShoppingList(
         shopId: Long,
         userId: Long,
@@ -148,9 +152,6 @@ class PenguStoreApi(
         val deleteShoppingListRequest = DeleteShoppingListRequest(shopId, userId, name)
         return post(Routes.DELETE_SHOPPING_LIST, deleteShoppingListRequest)
     }
-
-    suspend fun getUserShoppingList(shopId: Long): Response.SuccessResponse<List<ProductInShoppingList>> =
-        get(Routes.GET_USER_SHOPPING_LIST, shopId.toString())
 
     suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_PANTRIES)
 
@@ -210,9 +211,6 @@ class PenguStoreApi(
         val deletePantryProductRequest = DeletePantryProductRequest(pantryId, productId, -1, -1)
         return delete(Routes.DELETE_PANTRY_PRODUCT, deletePantryProductRequest)
     }
-
-    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<ProductInPantry>> =
-        get(Routes.GET_PANTRY_PRODUCTS, pantryId.toString())
 
     suspend fun products(): Response.SuccessResponse<List<Product>> = get(Routes.PRODUCTS)
 

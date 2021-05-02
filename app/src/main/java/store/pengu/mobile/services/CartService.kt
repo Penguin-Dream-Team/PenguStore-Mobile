@@ -18,7 +18,7 @@ class CartService(
     fun buyCart() = GlobalScope.launch(Dispatchers.Main) {
         val requests = mutableStateListOf<CartProduct>()
         store.cartProducts.forEach { product ->
-            val cartProduct = CartProduct(product.first.product_id, product.first.pantry_id, product.second)
+            val cartProduct = CartProduct(product.first.id, product.first.listId, product.second)
             requests.add(cartProduct)
         }
         api.buyCart(CartRequest(requests))

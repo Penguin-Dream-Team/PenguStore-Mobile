@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -14,7 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.UserList
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.partials.IconButton
 
@@ -24,9 +26,18 @@ fun ListView(
     navController: NavController,
     store: StoreState,
     shareRoute: String,
-    content: @Composable() (UserList) -> Unit
+    listsService: ListsService,
+    listId: Long,
+    type: UserListType,
+    content: @Composable (UserList) -> Unit,
 ) {
-    val list = store.selectedList ?: return
+    val list by remember { mutableStateOf(listsService.getList(type, listId)) }
+    if (list == null) {
+        navController.popBackStack()
+        return
+    }
+
+    store.selectedList = list
 
     Column(
         modifier = Modifier
@@ -41,7 +52,7 @@ fun ListView(
         ) {
 
             Text(
-                list.name,
+                list!!.name,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -55,6 +66,6 @@ fun ListView(
             )
         }
 
-        content(list)
+        content(list!!)
     }
 }

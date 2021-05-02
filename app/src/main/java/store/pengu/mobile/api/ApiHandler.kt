@@ -1,6 +1,5 @@
 package store.pengu.mobile.api
 
-import android.util.Log
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.google.android.gms.maps.model.LatLng
 import io.ktor.client.*
@@ -181,7 +180,6 @@ abstract class ApiHandler(open val store: StoreState) {
 
     protected fun addJWTTokenToRequest(headers: HeadersBuilder) {
         if (store.token.isNotBlank()) {
-            Log.d("HELP", "ADDED TOKEN")
             headers["Authorization"] = "Bearer ${store.token}"
         }
     }

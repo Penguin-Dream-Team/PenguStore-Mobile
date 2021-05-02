@@ -1,6 +1,5 @@
 package store.pengu.mobile.views
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.ActivityInfo
@@ -19,10 +18,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.core.app.ActivityCompat
-import androidx.core.content.PermissionChecker
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.ktor.util.*
@@ -31,6 +29,7 @@ import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.*
@@ -38,7 +37,6 @@ import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
-import store.pengu.mobile.utils.camera.Camera
 import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.lists.ListsScreen
@@ -142,7 +140,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
                 accountService.navController = navController
 
-                termiteService.wifiDirectON()
+                //termiteService.wifiDirectON()
                 executedOnce = true
             }
 
@@ -227,11 +225,16 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 }
 
-                                animatedComposable("pantry_list") {
+                                animatedComposable("pantry_list/{pantryId}", listOf(
+                                    navArgument("pantryId") { type = NavType.LongType}
+                                )) { args ->
                                     ListView(
                                         navController,
                                         storeState,
-                                        "share_pantry_list"
+                                        shareRoute = "share_pantry_list",
+                                        listsService = listsService,
+                                        listId = args!!["pantryId"] as Long,
+                                        type = UserListType.PANTRY,
                                     ) {
                                         ViewPantryList(
                                             navController,
@@ -260,13 +263,19 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 }
 
-                                animatedComposable("shopping_list") {
+                                animatedComposable("shopping_list/{shopId}", listOf(
+                                    navArgument("shopId") { type = NavType.LongType}
+                                )) { args ->
                                     ListView(
                                         navController,
                                         storeState,
-                                        "share_shopping_list"
+                                        shareRoute = "share_shopping_list",
+                                        listId = args!!["shopId"] as Long,
+                                        type = UserListType.SHOPPING_LIST,
+                                        listsService = listsService
                                     ) {
                                         ViewShoppingList(
+                                            navController,
                                             productsService,
                                             storeState,
                                             it as ShoppingList
@@ -354,7 +363,10 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(mReceiver)
+        mReceiver?.let {
+            unregisterReceiver(it)
+        }
+        mReceiver = null
     }
 
     override fun onResume() {

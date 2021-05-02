@@ -31,6 +31,8 @@ object Routes {
 
     fun IMPORT_PANTRY_LIST(code: String) = "/lists/pantries/import/$code"
     fun IMPORT_SHOPPING_LIST(code: String) = "/lists/shops/import/$code"
+    fun GET_PANTRY(pantryId: Long) = "/lists/pantries/$pantryId"
+    fun GET_SHOPPING_LIST(shoppingListId: Long) = "/lists/shops/$shoppingListId"
 
 
     /**
@@ -44,7 +46,6 @@ object Routes {
     const val ADD_USER = "/users/add"
     const val DELETE_USER_PANTRY = "/users/deletePantry"
     const val GET_USER_PANTRIES = "/users/id/pantries"
-    const val GET_USER_SHOPPING_LIST_PRODUCTS = "/users/id/shoppingList"
     const val UPDATE_SHOPPING_LIST = "/users/updateShoppingList"
     const val DELETE_SHOPPING_LIST = "/users/deleteShoppingList"
     const val GET_USER_SHOPPING_LIST = "/shoppingList/id"
@@ -55,7 +56,6 @@ object Routes {
     const val ADD_PANTRY_PRODUCT = "/pantries/addProduct"
     const val UPDATE_PANTRY_PRODUCT = "/pantries/updateProduct"
     const val DELETE_PANTRY_PRODUCT = "/pantries/deleteProduct"
-    const val GET_PANTRY_PRODUCTS = "/pantries/id/products"
 
     const val PRODUCTS = "user/products"
     const val GET_PRODUCT = "/products/id"

@@ -1,206 +1,116 @@
 package store.pengu.mobile.views.lists.shops
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material.icons.filled.RemoveShoppingCart
-import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.google.accompanist.insets.statusBarsPadding
+import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
+import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.utils.Math
+import store.pengu.mobile.views.lists.partials.ProductItem
+import store.pengu.mobile.views.lists.partials.ProductItemDialog
+import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@Suppress("UNUSED_VALUE")
+@ExperimentalAnimationApi
 @Composable
-fun ViewShoppingList(productsService: ProductsService, store: StoreState, shoppingList: ShoppingList) {
-    val openDialog = remember { mutableStateOf(false) }
-    val products by remember { mutableStateOf(store.shoppingListProducts) }
-    val cartProducts by remember { mutableStateOf(store.cartProducts) }
-    val desiredAmount = remember { mutableStateOf(1) }
-    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20)) }
-    val queueTime = remember { mutableStateOf(0) }
+fun ViewShoppingList(
+    navController: NavController,
+    productsService: ProductsService,
+    store: StoreState,
+    shoppingList: ShoppingList
+) {
     val coroutineScope = rememberCoroutineScope()
-    val refreshQueueTime = coroutineScope.launch {
-        queueTime.value = productsService.timeQueue()
+    var isRefreshing: Boolean by remember { mutableStateOf(false) }
+    var needsRefresh: Boolean by remember { mutableStateOf(true) }
+    val refresh = {
+        isRefreshing = true
+        coroutineScope.launch(Dispatchers.IO) {
+            delay(50L)
+            productsService.fetchShoppingListProducts(shoppingList.id)
+            isRefreshing = false
+        }
     }
 
-    productsService.getShoppingListProducts(shoppingList.id)
-    refreshQueueTime.start()
+    if (needsRefresh && !isRefreshing) {
+        refresh()
+        needsRefresh = false
+    }
 
-    Column(
+    val products = remember { productsService.getShoppingListProducts(shoppingList.id) }
+    var selectedProduct: ProductInShoppingList? by remember { mutableStateOf(null) }
+    val (haveAmount, setHaveAmount) = remember { mutableStateOf(0) }
+    val (needAmount, setNeedAmount) = remember { mutableStateOf(0) }
+
+    PullToRefresh(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            refresh()
+        },
         modifier = Modifier
-            .padding(vertical = 18.dp)
-            .fillMaxWidth(),
+            .fillMaxSize()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(vertical = 15.dp)
+                .fillMaxSize()
         ) {
-            Text(
-                stringResource(R.string.queue_time),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
+            if (products.isEmpty() && !isRefreshing) {
+                item {
+                    Text(stringResource(R.string.empty_list_info))
+                }
+            }
+            items(items = products) { product ->
+                ProductItem(
+                    title = product.name,
+                    haveAmount = product.amountAvailable,
+                    needAmount = product.amountNeeded,
+                    color = shoppingList.color,
+                    image = product.image
+                ) {
+                    selectedProduct = product
+                    setHaveAmount(product.amountAvailable)
+                    setNeedAmount(product.amountNeeded)
+                }
+            }
+        }
+    }
 
-            IconButton(
-                onClick = { refreshQueueTime.start() },
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .size(36.dp)
-                    .background(
-                        color = MaterialTheme.colors.primaryVariant,
-                        shape = CircleShape
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Refresh,
-                    contentDescription = "Refresh Queue Time"
+    ProductItemDialog(
+        product = selectedProduct,
+        haveAmount = haveAmount,
+        needAmount = needAmount,
+        setHaveAmount = setHaveAmount,
+        setNeedAmount = setNeedAmount,
+        onClose = { selectedProduct = null },
+        onViewInfo = {
+            selectedProduct?.let {
+                store.selectedProduct = Product(
+                    it.id,
+                    it.name,
+                    it.barcode
                 )
             }
+            selectedProduct = null
+            navController.navigate("product")
         }
-
-        Text(
-            Math.secondsToMinutes(queueTime.value),
-            fontSize = 24.sp,
-            textAlign = TextAlign.Center
-        )
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            items(products) { product ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "${product.name}: ${product.amountAvailable} out of ${product.amountNeeded}",
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    if (cartProducts.map { it.first }.contains(product)) {
-                        IconButton(
-                            onClick = {
-                                store.cartProducts.removeAt(cartProducts.map { it.first }.indexOf(product))
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.RemoveShoppingCart,
-                                tint = Color(52, 247, 133),
-                                contentDescription = "Remove from Cart"
-                            )
-                        }
-                    } else {
-                        IconButton(
-                            onClick = {
-                                if ((product.amountNeeded - product.amountAvailable) == 1) {
-                                    store.cartProducts.add(Pair(product, 1))
-                                } else {
-                                    currentProduct.value = product
-                                    desiredAmount.value = 0
-                                    openDialog.value = true
-                                }
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.AddShoppingCart,
-                                tint = Color(52, 247, 133),
-                                contentDescription = "Add to Cart"
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (openDialog.value) {
-        AlertDialog(
-            onDismissRequest = {
-                openDialog.value = false
-            },
-            title = {
-                Text(text = "Select the desired amount")
-            },
-            text = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(
-                        onClick = {
-                            if (desiredAmount.value > 1)
-                                desiredAmount.value--
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.RemoveCircle,
-                            contentDescription = "Remove"
-                        )
-                    }
-
-                    Text(text = "Amount: ${desiredAmount.value}")
-
-                    IconButton(
-                        onClick = {
-                            if (desiredAmount.value < (currentProduct.value.amountNeeded - currentProduct.value.amountAvailable))
-                            desiredAmount.value++
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "Add"
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        openDialog.value = false
-                        store.cartProducts.add(Pair(currentProduct.value, desiredAmount.value))
-                    }) {
-                    Text("Add to Cart")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        openDialog.value = false
-                    }) {
-                    Text("Close")
-                }
-            }
-        )
-    }
+    )
 }

@@ -23,11 +23,18 @@ class ListsService(
 
     val newListCode = mutableStateOf("")
 
-    var pantryLists = mutableStateListOf<PantryList>()
+    val pantryLists = mutableStateListOf<PantryList>()
     val shoppingLists = mutableStateListOf<ShoppingList>()
 
     private var isCreating = mutableStateOf(false)
     private var isImporting = mutableStateOf(false)
+
+    fun getList(type: UserListType, id: Long): UserList? {
+        return when (type) {
+            UserListType.PANTRY -> pantryLists.find { it.id == id }
+            UserListType.SHOPPING_LIST -> shoppingLists.find { it.id == id }
+        }
+    }
 
     fun newCanPickLocation(): Boolean {
         return newListName.value.isNotBlank()
@@ -173,11 +180,10 @@ class ListsService(
         }
     }
 
-
-    suspend fun findListInLocation(latitude: Double, longitude: Double): UserListType? {
+    suspend fun findListInLocation(latitude: Double, longitude: Double): Pair<UserListType, UserList>? {
         return try {
             with(api.findList(latitude, longitude)) {
-                store.selectedList = when (type) {
+                val list = when (type) {
                     UserListType.PANTRY ->
                         PantryList(
                             (list["id"] as Int).toLong(),
@@ -201,7 +207,7 @@ class ListsService(
                         )
                     }
                 }
-                type
+                type to list
             }
         } catch (e: PenguStoreApiException) {
             // No list found in location, so just load default view

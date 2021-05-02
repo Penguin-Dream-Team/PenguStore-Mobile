@@ -69,7 +69,7 @@ fun ListsScreen(
                 enabled = enabled
             ) {
                 store.selectedList = item
-                navController.navigate("pantry_list")
+                navController.navigate("pantry_list/${item.id}")
             }
         }
 
@@ -86,7 +86,7 @@ fun ListsScreen(
                 enabled = enabled
             ) {
                 store.selectedList = item
-                navController.navigate("shopping_list")
+                navController.navigate("shopping_list/${item.id}")
             }
         }
     }
