@@ -82,4 +82,6 @@ object Routes {
     const val DELETE_IMAGE = "/images/deleteImage"
     const val PRODUCT_IMAGE_BARCODE = "/images/barcode/id"
     const val PRODUCT_IMAGE_PRODUCT_ID = "/images/productId/id"
+
+    const val TRANSLATION = "/translation/id"
 }

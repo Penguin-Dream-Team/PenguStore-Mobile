@@ -339,4 +339,7 @@ class PenguStoreApi(
 
     suspend fun getProductImageProductId(productId: Long): Response.SuccessResponse<List<String>> =
         get(Routes.PRODUCT_IMAGE_PRODUCT_ID, productId.toString())
+
+    suspend fun translation(string: String): Response.SuccessResponse<String> =
+        get(Routes.TRANSLATION, string)
 }
