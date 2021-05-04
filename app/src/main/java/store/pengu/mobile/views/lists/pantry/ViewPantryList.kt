@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.lists.pantry
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 
+@SuppressLint("InflateParams")
 @ExperimentalAnimationApi
 @Composable
 fun ViewPantryList(
