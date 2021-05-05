@@ -342,4 +342,9 @@ class PenguStoreApi(
 
     suspend fun translation(string: String): Response.SuccessResponse<String> =
         get(Routes.TRANSLATION, string)
+
+    suspend fun rateProduct(barcode: String, rating: Int): Response.SuccessResponse<String> {
+        val route = Routes.RATE_PRODUCT.replace("rating", rating.toString())
+        return post(route, barcode)
+    }
 }

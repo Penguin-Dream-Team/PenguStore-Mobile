@@ -84,4 +84,6 @@ object Routes {
     const val PRODUCT_IMAGE_PRODUCT_ID = "/images/productId/id"
 
     const val TRANSLATION = "/translation/id"
+
+    const val RATE_PRODUCT = "/ratings/id/rating"
 }
