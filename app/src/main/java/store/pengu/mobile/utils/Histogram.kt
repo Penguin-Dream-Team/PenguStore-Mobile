@@ -21,11 +21,11 @@ fun histogram() {
         description.text = "Test"
 
         val barEntries = arrayListOf<BarEntry>()
-        barEntries.add(BarEntry(100f, 1f))
-        barEntries.add(BarEntry(200f, 2f))
-        barEntries.add(BarEntry(300f, 3f))
-        barEntries.add(BarEntry(400f, 4f))
-        barEntries.add(BarEntry(500f, 5f))
+        barEntries.add(BarEntry(0f, 10f))
+        barEntries.add(BarEntry(1f, 20f))
+        barEntries.add(BarEntry(2f, 30f))
+        barEntries.add(BarEntry(3f, 40f))
+        barEntries.add(BarEntry(4f, 50f))
 
         val barDataSet = BarDataSet(barEntries, "Dates")
         barDataSet.color = ContextCompat.getColor(inflatedLayout.context, android.R.color.holo_orange_dark)
