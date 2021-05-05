@@ -12,22 +12,20 @@ import com.github.mikephil.charting.data.BarEntry
 import store.pengu.mobile.R
 
 @Composable
-fun histogram() {
+fun Histogram(ratings: List<Int>) {
     AndroidView(factory = {
         LayoutInflater.from(it).inflate(R.layout.histogram_layout, null)
     }) { inflatedLayout ->
         val barChart = inflatedLayout.findViewById<BarChart>(R.id.barChart)
         val description = Description()
-        description.text = "Test"
+        description.text = "Product Rating"
 
         val barEntries = arrayListOf<BarEntry>()
-        barEntries.add(BarEntry(0f, 10f))
-        barEntries.add(BarEntry(1f, 20f))
-        barEntries.add(BarEntry(2f, 30f))
-        barEntries.add(BarEntry(3f, 40f))
-        barEntries.add(BarEntry(4f, 50f))
+        ratings.groupingBy { it }.eachCount().forEach { rating ->
+            barEntries.add(BarEntry(rating.key.toFloat(), rating.value.toFloat()))
+        }
 
-        val barDataSet = BarDataSet(barEntries, "Dates")
+        val barDataSet = BarDataSet(barEntries, "Stars")
         barDataSet.color = ContextCompat.getColor(inflatedLayout.context, android.R.color.holo_orange_dark)
 
         val barData = BarData(barDataSet)
