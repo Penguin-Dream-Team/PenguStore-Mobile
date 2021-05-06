@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
@@ -93,6 +94,25 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
             interval = 120000 // two minute interval
             fastestInterval = 120000
             priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient?.requestLocationUpdates(
+                locationRequest,
+                object : LocationCallback() {
+                    override fun onLocationResult(locationResult: LocationResult) {
+                        fusedLocationClient?.removeLocationUpdates(this)
+                    }
+                },
+                Looper.getMainLooper()
+            )
+        } else {
+            //Request Location Permission
+            checkLocationPermission()
         }
 
         if (ContextCompat.checkSelfPermission(

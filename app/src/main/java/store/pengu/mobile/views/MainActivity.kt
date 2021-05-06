@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -75,6 +76,9 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     @Inject
     lateinit var api: PenguStoreApi
+
+    @Inject
+    lateinit var mapsService: MapsService
 
     private val termiteService = TermiteService(this)
     lateinit var navController: NavHostController
@@ -213,7 +217,12 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("loading") {
-                                    LoadingScreen(navController, listsService, snackbarController)
+                                    LoadingScreen(
+                                        navController,
+                                        listsService,
+                                        snackbarController,
+                                        mapsService
+                                    )
                                 }
 
                                 animatedComposable("lists") {
@@ -226,18 +235,22 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("pantry_list/{pantryId}", listOf(
-                                    navArgument("pantryId") { type = NavType.LongType}
+                                    navArgument("pantryId") { type = NavType.LongType }
                                 )) { args ->
                                     ListView(
                                         navController,
+                                        snackbarController,
                                         storeState,
                                         shareRoute = "share_pantry_list",
                                         listsService = listsService,
                                         listId = args!!["pantryId"] as Long,
                                         type = UserListType.PANTRY,
+                                        mapsService = mapsService
                                     ) {
                                         ViewPantryList(
                                             navController,
+                                            applicationContext,
+                                            listsService,
                                             productsService,
                                             storeState,
                                             it as PantryList
@@ -264,15 +277,17 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("shopping_list/{shopId}", listOf(
-                                    navArgument("shopId") { type = NavType.LongType}
+                                    navArgument("shopId") { type = NavType.LongType }
                                 )) { args ->
                                     ListView(
                                         navController,
+                                        snackbarController,
                                         storeState,
                                         shareRoute = "share_shopping_list",
                                         listId = args!!["shopId"] as Long,
                                         type = UserListType.SHOPPING_LIST,
-                                        listsService = listsService
+                                        listsService = listsService,
+                                        mapsService = mapsService
                                     ) {
                                         ViewShoppingList(
                                             navController,

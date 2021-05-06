@@ -180,7 +180,10 @@ class ListsService(
         }
     }
 
-    suspend fun findListInLocation(latitude: Double, longitude: Double): Pair<UserListType, UserList>? {
+    suspend fun findListInLocation(
+        latitude: Double,
+        longitude: Double
+    ): Pair<UserListType, UserList>? {
         return try {
             with(api.findList(latitude, longitude)) {
                 val list = when (type) {

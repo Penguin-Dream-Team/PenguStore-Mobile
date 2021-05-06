@@ -26,6 +26,10 @@ object AppModule {
     ): AccountService =
         AccountService(userDataService, api, store)
 
+    @Singleton
+    @Provides
+    fun getMapsService(@ApplicationContext context: Context): MapsService =
+        MapsService(context)
 
     @Singleton
     @Provides

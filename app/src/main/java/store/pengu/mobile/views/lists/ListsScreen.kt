@@ -14,7 +14,7 @@ import store.pengu.mobile.R
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.lists.partials.ListItem
-import store.pengu.mobile.utils.GeoUtils
+import store.pengu.mobile.utils.geo.GeoUtils
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.toColor
 

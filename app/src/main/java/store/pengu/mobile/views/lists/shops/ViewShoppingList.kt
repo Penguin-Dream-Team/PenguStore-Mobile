@@ -21,6 +21,7 @@ import store.pengu.mobile.R
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.lists.partials.ProductItem

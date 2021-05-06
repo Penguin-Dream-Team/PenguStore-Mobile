@@ -29,7 +29,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDGFuuxJryL0zdGgBJrTVpiVF_qFhfRSoc"/>
+            android:value="AIzaSyAhZqinq23zBlvJ17tlm-YX9dP_E2QQDII"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

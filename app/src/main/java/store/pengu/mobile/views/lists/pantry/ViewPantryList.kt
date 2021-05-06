@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.lists.pantry
 
+import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import store.pengu.mobile.R
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ProductInPantry
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.lists.partials.ProductItem
@@ -32,6 +34,8 @@ import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 @Composable
 fun ViewPantryList(
     navController: NavController,
+    context: Context,
+    listsService: ListsService,
     productsService: ProductsService,
     store: StoreState,
     pantryList: PantryList
