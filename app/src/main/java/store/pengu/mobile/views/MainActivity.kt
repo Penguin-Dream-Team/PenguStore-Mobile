@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
@@ -33,6 +34,7 @@ import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.ShoppingList
+import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
@@ -52,6 +54,7 @@ import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.search.partials.ProductScreen
 import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), PeerListListener {
@@ -102,19 +105,9 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         var loaded = false
-        val startDestination: String
 
         // register broadcast receiver
         registerTermiteReceiver()
-
-        runBlocking {
-            accountService.loadData()
-            startDestination = if (storeState.isLoggedIn()) {
-                "loading"
-            } else {
-                "login"
-            }
-        }
 
         setContent {
             navController = rememberNavController()
@@ -148,13 +141,11 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                 executedOnce = true
             }
 
-            coroutineScope.launch {
-                delay(200L)
-                if (!storeState.isLoggedIn() && currentRoute != "login") {
-                    navController.navigate("login")
-                    navController.backStack.clear()
-                }
+            if (loaded && !storeState.isLoggedIn() && currentRoute != "loading" && currentRoute != "login") {
+                navController.navigate("login")
+                navController.backStack.clear()
             }
+
 
             PenguShopTheme {
                 BottomSheetScaffold(
@@ -208,7 +199,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         ) {
                             NavHost(
                                 navController = navController,
-                                startDestination = startDestination
+                                startDestination = "loading"
                             ) {
                                 loaded = true
 
@@ -221,7 +212,9 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         navController,
                                         listsService,
                                         snackbarController,
-                                        mapsService
+                                        mapsService,
+                                        accountService,
+                                        storeState
                                     )
                                 }
 

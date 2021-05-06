@@ -150,7 +150,7 @@ class AccountService(
                     loginWithSavedCredentials()
                     return request(getProfile)
                 } catch (e: PenguStoreApiException) {
-                    userDataService.storeUserData(null, null, null, null, null)
+                    //userDataService.storeUserData(null, null, null, null, null)
                 } catch (e: PenguStoreApiAuthorizationException) {
                     userDataService.storeUserData(null, null, null, null, null)
                 }

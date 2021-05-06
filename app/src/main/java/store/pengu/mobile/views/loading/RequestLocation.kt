@@ -52,7 +52,8 @@ fun RequestLocation(
     loading: Boolean,
     setLoading: (Boolean) -> Unit,
     setLocation: (LatLng?) -> Unit,
-    mapsService: MapsService
+    mapsService: MapsService,
+    showLoading: Boolean = true
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -108,19 +109,21 @@ fun RequestLocation(
             )
         }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            LoadingProgressIndicator(
-                progressColor = MaterialTheme.colors.primary,
-                backgroundColor = MaterialTheme.colors.surface
-            )
-            Text(
-                modifier = Modifier.padding(top = 10.dp),
-                text = stringResource(R.string.loading)
-            )
+        if (showLoading) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                LoadingProgressIndicator(
+                    progressColor = MaterialTheme.colors.primary,
+                    backgroundColor = MaterialTheme.colors.surface
+                )
+                Text(
+                    modifier = Modifier.padding(top = 10.dp),
+                    text = stringResource(R.string.loading)
+                )
+            }
         }
     }
 }
