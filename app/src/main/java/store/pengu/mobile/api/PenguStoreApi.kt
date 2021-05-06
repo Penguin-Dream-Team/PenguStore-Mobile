@@ -152,6 +152,9 @@ class PenguStoreApi(
     suspend fun getUserShoppingList(shopId: Long): Response.SuccessResponse<List<ProductInShoppingList>> =
         get(Routes.GET_USER_SHOPPING_LIST, shopId.toString())
 
+    suspend fun updateSmartSortingEntries(productId: Long, remainingItems: List<Long>): Response.SuccessResponse<Boolean> =
+        put(Routes.UPDATE_SMART_SORTING_ENTRIES.replace("id", productId.toString()), remainingItems)
+
     suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_PANTRIES)
 
     suspend fun getPantry(pantryId: String): Response.SuccessResponse<PantryList> =
