@@ -287,9 +287,11 @@ class PenguStoreApi(
     suspend fun getShopProducts(shopId: String): Response.SuccessResponse<List<Product>> =
         get(Routes.GET_SHOP_PRODUCTS, shopId)
 
-    suspend fun buyCart(cartRequest: CartRequest): Response.SuccessResponse<String> {
-        return post(Routes.BUY_CART, cartRequest)
-    }
+    suspend fun buyCart(cartRequest: CartRequest): Response.SuccessResponse<String> =
+        post(Routes.BUY_CART, cartRequest)
+
+    suspend fun getProductSuggestion(productId: Long): Response.SuccessResponse<Long> =
+        get(Routes.GET_PRODUCT_SUGGESTION, productId.toString())
 
     suspend fun joinQueue(location: LatLng, numItems: Int): Response.SuccessResponse<String> =
         post(Routes.JOIN_QUEUE, location, numItems)
@@ -337,4 +339,12 @@ class PenguStoreApi(
 
     suspend fun getProductImageProductId(productId: Long): Response.SuccessResponse<List<String>> =
         get(Routes.PRODUCT_IMAGE_PRODUCT_ID, productId.toString())
+
+    suspend fun translation(string: String): Response.SuccessResponse<String> =
+        get(Routes.TRANSLATION, string)
+
+    suspend fun rateProduct(barcode: String, rating: Int): Response.SuccessResponse<String> {
+        val route = Routes.RATE_PRODUCT.replace("rating", rating.toString())
+        return post(route, barcode)
+    }
 }

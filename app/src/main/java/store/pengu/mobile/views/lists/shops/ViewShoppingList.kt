@@ -107,7 +107,8 @@ fun ViewShoppingList(
                 store.selectedProduct = Product(
                     it.id,
                     it.name,
-                    it.barcode
+                    it.barcode,
+                    0f, 0, listOf()
                 )
             }
             selectedProduct = null

@@ -9,7 +9,8 @@ abstract class UserList(
     open val latitude: Double,
     open val longitude: Double,
     open val color: String,
-    open val shared: Boolean
+    open val shared: Boolean,
+    open val productCount: Int
 ) {
     val location: LatLng get() = LatLng(latitude, longitude)
 }

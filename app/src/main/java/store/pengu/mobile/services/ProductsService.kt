@@ -1,5 +1,6 @@
 package store.pengu.mobile.services
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.android.gms.maps.model.LatLng
@@ -66,7 +67,10 @@ class ProductsService(
         }
     }
 
-    private fun <T : ListProduct> updateList(received: List<T>, listToUpdate: SnapshotStateList<T>) {
+    private fun <T : ListProduct> updateList(
+        received: List<T>,
+        listToUpdate: SnapshotStateList<T>
+    ) {
         listToUpdate.removeIf { old ->
             received.find { new ->
                 old.id == new.id

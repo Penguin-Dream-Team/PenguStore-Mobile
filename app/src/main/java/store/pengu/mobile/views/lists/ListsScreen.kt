@@ -78,8 +78,8 @@ fun ListsScreen(
         }) { item, enabled ->
             ListItem(
                 title = item.name,
-                //productAmount = it.productCount,
-                productAmount = 0,
+                productAmount = item.productCount,
+                //productAmount = 0,
                 location = GeoUtils.getLocationName(context, item.latitude, item.longitude),
                 color = item.color.toColor(),
                 isShared = item.shared,

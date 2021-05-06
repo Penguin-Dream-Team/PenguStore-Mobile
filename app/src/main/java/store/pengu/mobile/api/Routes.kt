@@ -73,6 +73,7 @@ object Routes {
     const val GET_SHOP_PRODUCTS = "/shops/id/products"
 
     const val BUY_CART = "/cart"
+    const val GET_PRODUCT_SUGGESTION = "/cart/suggestion/id"
 
     const val JOIN_QUEUE = "/queue/join/"
     const val LEAVE_QUEUE = "/queue/leave"
@@ -82,4 +83,8 @@ object Routes {
     const val DELETE_IMAGE = "/images/deleteImage"
     const val PRODUCT_IMAGE_BARCODE = "/images/barcode/id"
     const val PRODUCT_IMAGE_PRODUCT_ID = "/images/productId/id"
+
+    const val TRANSLATION = "/translation/id"
+
+    const val RATE_PRODUCT = "/ratings/id/rating"
 }

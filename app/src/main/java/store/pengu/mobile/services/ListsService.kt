@@ -206,7 +206,8 @@ class ListsService(
                             list["latitude"] as Double,
                             list["longitude"] as Double,
                             list["color"] as String,
-                            list["shared"] as Boolean
+                            list["shared"] as Boolean,
+                            list["productCount"] as Int
                         )
                     }
                 }

@@ -11,5 +11,6 @@ data class ProductInShoppingList (
     override val amountAvailable: Int,
     override val amountNeeded: Int,
     val price: Double,
-    override val image: String?
+    override val image: String?,
+    val pantries: List<PantryList>
 ) : ListProduct(id, listId, name, barcode, amountAvailable, amountNeeded, image)

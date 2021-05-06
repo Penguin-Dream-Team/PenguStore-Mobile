@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.lists.pantry
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +31,7 @@ import store.pengu.mobile.views.lists.partials.ProductItemDialog
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
 @Suppress("UNUSED_VALUE")
+@SuppressLint("InflateParams")
 @ExperimentalAnimationApi
 @Composable
 fun ViewPantryList(
@@ -110,7 +112,8 @@ fun ViewPantryList(
                 store.selectedProduct = Product(
                     it.id,
                     it.name,
-                    it.barcode
+                    it.barcode,
+                    0f,0, listOf()
                 )
             }
             selectedProduct = null

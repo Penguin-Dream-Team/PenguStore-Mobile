@@ -38,7 +38,7 @@ fun ViewShoppingListOld(productsService: ProductsService, store: StoreState, sho
     val products by remember { mutableStateOf(store.shoppingListProducts) }
     val cartProducts by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
-    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20, "")) }
+    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20, "", listOf())) }
     val queueTime = remember { mutableStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
     val refreshQueueTime = coroutineScope.launch {
