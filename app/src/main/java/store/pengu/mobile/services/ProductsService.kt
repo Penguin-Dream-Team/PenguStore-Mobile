@@ -1,6 +1,5 @@
 package store.pengu.mobile.services
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.android.gms.maps.model.LatLng
@@ -9,6 +8,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.data.ListProduct
+import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ProductInPantry
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.states.StoreState
@@ -17,12 +17,12 @@ class ProductsService(
     private val api: PenguStoreApi,
     private val store: StoreState
 ) {
-    val pantryProducts = mutableMapOf<Long, SnapshotStateList<ProductInPantry>>()
-    val shoppingProducts = mutableMapOf<Long, SnapshotStateList<ProductInShoppingList>>()
+    private val pantryProducts = mutableMapOf<Long, SnapshotStateList<ProductInPantry>>()
+    private val shoppingProducts = mutableMapOf<Long, SnapshotStateList<ProductInShoppingList>>()
+    private val allProducts = mutableStateListOf<Product>()
 
-    fun getProducts() = GlobalScope.launch(Dispatchers.Main) {
-        store.products.clear()
-        store.products.addAll(api.products().data)
+    fun getAllProducts(): SnapshotStateList<Product> {
+        return allProducts
     }
 
     fun getPantryProducts(pantryId: Long): SnapshotStateList<ProductInPantry> {
@@ -39,6 +39,27 @@ class ProductsService(
         return shoppingProducts[shoppingListId]!!
     }
 
+    suspend fun fetchAllProducts() {
+        try {
+            val received = api.getAllProducts().data
+            allProducts.removeIf { old ->
+                received.find { new ->
+                    old.id == new.id
+                } == null
+            }
+            allProducts.replaceAll { old ->
+                received.find { new ->
+                    old.id == new.id
+                }!!
+            }
+            allProducts.addAll(received.filterNot { new ->
+                allProducts.contains(new)
+            })
+        } catch (e: Exception) {
+            // fetch from cache
+            e.printStackTrace()
+        }
+    }
 
     suspend fun fetchPantryProducts(pantryId: Long) {
         try {
@@ -52,7 +73,6 @@ class ProductsService(
             e.printStackTrace()
         }
     }
-
 
     suspend fun fetchShoppingListProducts(shoppingListId: Long) {
         try {
@@ -86,52 +106,17 @@ class ProductsService(
         })
     }
 
-    fun addProduct(
-        pantryId: Long,
-        productId: Long,
-        amountAvailable: Int,
-        amountNeeded: Int
-    ) = GlobalScope.launch(Dispatchers.Main) {
-        api.addPantryProduct(pantryId, productId, amountAvailable, amountNeeded)
-    }
-
-    fun updateProduct(
-        pantryId: Long,
-        productId: Long,
-        amountAvailable: Int,
-        amountNeeded: Int
-    ) = GlobalScope.launch(Dispatchers.Main) {
-        api.updatePantryProduct(pantryId, productId, amountAvailable, amountNeeded)
-        getProducts()
-    }
+    /**
+     * NO
+     */
 
     fun addBarcodeProduct(barcode: String) = GlobalScope.launch(Dispatchers.Main) {
         api.addBarcodeProduct(barcode)
     }
 
-    fun deleteProduct(
-        pantryId: Long,
-        productId: Long
-    ) = GlobalScope.launch(Dispatchers.Main) {
-        api.deletePantryProduct(pantryId, productId)
-        getProducts()
-    }
-
     suspend fun timeQueue(): Int {
         store.location = LatLng(50.25, 150.25)
         return api.timeQueue(store.location!!).data
-    }
-
-    suspend fun addProduct(imageId: Int, imageUrl: String): String {
-        val product = store.selectedProduct!!
-
-        return api.addProductImage(imageId, product.barcode, product.id, imageUrl).data
-    }
-
-    suspend fun deleteProduct(imageId: Int, imageUrl: String): String {
-        val product = store.selectedProduct!!
-
-        return api.deleteProductImage(imageId, product.barcode, product.id, imageUrl).data
     }
 
     suspend fun getProductImages(): List<String> {

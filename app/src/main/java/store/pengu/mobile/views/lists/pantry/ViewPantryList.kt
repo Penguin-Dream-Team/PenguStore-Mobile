@@ -112,12 +112,7 @@ fun ViewPantryList(
         onClose = { selectedProduct = null },
         onViewInfo = {
             selectedProduct?.let {
-                store.selectedProduct = Product(
-                    it.id,
-                    it.name,
-                    it.barcode,
-                    0f, 0, listOf()
-                )
+                store.selectedProduct = it.toProduct()
             }
             selectedProduct = null
             navController.navigate("product")

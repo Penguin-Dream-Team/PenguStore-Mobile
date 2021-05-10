@@ -11,4 +11,16 @@ abstract class ListProduct(
     open val amountAvailable: Int,
     open val amountNeeded: Int,
     open val image: String?
-)
+) {
+    fun toProduct(): Product {
+        return Product(
+            id = id,
+            name = name,
+            barcode = barcode,
+            productRating = 0f,
+            userRating = 0,
+            ratings = emptyList(),
+            image = image
+        )
+    }
+}

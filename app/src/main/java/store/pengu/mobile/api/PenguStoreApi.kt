@@ -106,6 +106,9 @@ class PenguStoreApi(
         return get(Routes.GET_SHOPPING_LIST(shoppingListId))
     }
 
+    suspend fun getAllProducts(): Response.SuccessResponse<List<Product>> = get(Routes.GET_PRODUCTS)
+
+
     /**
      * NEEDS REWRITE
      */
@@ -217,8 +220,6 @@ class PenguStoreApi(
         val deletePantryProductRequest = DeletePantryProductRequest(pantryId, productId, -1, -1)
         return delete(Routes.DELETE_PANTRY_PRODUCT, deletePantryProductRequest)
     }
-
-    suspend fun products(): Response.SuccessResponse<List<Product>> = get(Routes.PRODUCTS)
 
     suspend fun getProduct(productId: String): Response.SuccessResponse<Product> =
         get(Routes.GET_PRODUCT, productId)
