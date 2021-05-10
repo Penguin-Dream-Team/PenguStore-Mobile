@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.runtime.Composable
@@ -53,7 +51,14 @@ fun ProductItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .padding(horizontal = 10.dp)
-                .border(bottom = Border(3.dp, color.toColor().copy(alpha = 0.3f)))
+                .border(
+                    bottom = Border(
+                        3.dp,
+                        color
+                            .toColor()
+                            .copy(alpha = 0.3f)
+                    )
+                )
                 .padding(bottom = 3.dp)
         ) {
             Surface(

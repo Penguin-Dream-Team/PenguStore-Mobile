@@ -5,21 +5,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
-import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.services.ProductsService
-import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.lists.ListsFloatingActionButton
+import store.pengu.mobile.views.lists.AddProductToListFloatingActionButton
 
 @ExperimentalAnimationApi
 @Composable
 fun FloatingButton(
     currentRoute: String?,
-    expectedRoute: String,
+    expectedRoute: String? = null,
+    expectedRoutes: List<String> = listOf(expectedRoute ?: ""),
     content: @Composable () -> Unit
 ) {
     AnimatedVisibility(
-        visible = currentRoute == expectedRoute,
+        visible = expectedRoutes.contains(currentRoute),
         enter = fadeIn() + slideIn({ IntOffset(0, it.height / 2) }),
         exit = fadeOut() + slideOut({ IntOffset(0, it.height / 2) }),
         initiallyVisible = false
@@ -33,19 +31,24 @@ fun FloatingButton(
 @Composable
 fun FloatingActionButtons(
     buttonShape: RoundedCornerShape,
-    listsService: ListsService,
-    storeState: StoreState,
-    productsService: ProductsService,
-    snackbarController: SnackbarController,
     expandBottomSheetMenu: () -> Unit,
     currentRoute: String?
 ) {
-    FloatingButton(currentRoute, "lists") {
+    FloatingButton(currentRoute, expectedRoute = "lists") {
         ListsFloatingActionButton(
             buttonShape,
-            listsService,
-            storeState,
-            snackbarController,
+            expandBottomSheetMenu
+        )
+    }
+
+    FloatingButton(
+        currentRoute, expectedRoutes = listOf(
+            "pantry_list/{pantryId}",
+            "shopping_list/{shopId}",
+        )
+    ) {
+        AddProductToListFloatingActionButton(
+            buttonShape,
             expandBottomSheetMenu
         )
     }

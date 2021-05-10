@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.lists.partials.ProductItem
 import store.pengu.mobile.views.lists.partials.ProductItemDialog
+import store.pengu.mobile.views.partials.pulltodelete.SwipeableAction
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
 @Suppress("UNUSED_VALUE")
@@ -113,7 +116,7 @@ fun ViewPantryList(
                     it.id,
                     it.name,
                     it.barcode,
-                    0f,0, listOf()
+                    0f, 0, listOf()
                 )
             }
             selectedProduct = null

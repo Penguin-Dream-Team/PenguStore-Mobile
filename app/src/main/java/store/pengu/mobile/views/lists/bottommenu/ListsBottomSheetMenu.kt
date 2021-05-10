@@ -11,7 +11,6 @@ import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
-import store.pengu.mobile.views.loading.RequestCameraPermission
 
 @KtorExperimentalAPI
 @ExperimentalComposeUiApi
@@ -52,7 +51,7 @@ fun ListsBottomSheetMenu(
 
     when (selectedListType) {
         0 -> {
-            ListBottomMenu(
+           ListBottomMenu(
                 title = "Pantry List",
                 listsService,
                 closeMenuWrapper,

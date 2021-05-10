@@ -5,14 +5,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.navigation.NavHostController
 import io.ktor.util.*
-import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.lists.bottommenu.ListsBottomSheetMenu
+import store.pengu.mobile.views.lists.pantry.AddProductToPantryBottomMenu
+import store.pengu.mobile.views.lists.shops.AddProductToShoppingListBottomMenu
 
 @KtorExperimentalAPI
 @ExperimentalComposeUiApi
@@ -20,13 +19,12 @@ import store.pengu.mobile.views.lists.bottommenu.ListsBottomSheetMenu
 @ExperimentalAnimationApi
 @Composable
 fun BottomSheetMenus(
-    navController: NavHostController,
     listsService: ListsService,
     store: StoreState,
-    productsService: ProductsService,
     snackbarController: SnackbarController,
     currentRoute: String?,
-    closeMenu: () -> Unit,
+    isBottomSheetOpen: Boolean,
+    closeMenu: (String?) -> Unit,
 ) {
     when (currentRoute) {
         "lists" ->
@@ -34,8 +32,22 @@ fun BottomSheetMenus(
                 listsService,
                 store,
                 snackbarController,
-                closeMenu,
+            ) { closeMenu(null) }
+        "pantry_list/{pantryId}" ->
+            AddProductToPantryBottomMenu(
+                store,
+                closeMenu
             )
-        else -> Text("")
+        "shopping_list/{shopId}" ->
+            AddProductToShoppingListBottomMenu(
+                store,
+                closeMenu
+            )
+        else -> {
+            if (isBottomSheetOpen) {
+                closeMenu(null)
+            }
+            Text("")
+        }
     }
 }

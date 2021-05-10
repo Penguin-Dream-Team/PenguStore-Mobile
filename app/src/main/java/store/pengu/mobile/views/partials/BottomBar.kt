@@ -27,20 +27,32 @@ import androidx.navigation.compose.navigate
 import java.util.*
 
 private val bottomBarItems = listOf(
-    BottomBarItem("Lists", Icons.Filled.List),
+    BottomBarItem(
+        "Lists", Icons.Filled.List,
+        listOf(
+            "pantry_list/{pantryId}",
+            "shopping_list/{shopId}",
+        )
+    ),
     BottomBarItem("Search", Icons.Filled.Search),
     BottomBarItem("Cart", Icons.Filled.ShoppingCart),
     BottomBarItem("Profile", Icons.Filled.AccountCircle),
 )
 
 private val bottomBarButtonItems = listOf(
-    "lists"
+    "lists",
+    "pantry_list/{pantryId}",
+    "shopping_list/{shopId}",
 )
 
 data class BottomBarItem(
     val name: String,
-    val icon: ImageVector
-)
+    val icon: ImageVector,
+    val active: List<String> = listOf()
+) {
+    val location = name.toLowerCase(Locale.ENGLISH)
+    val locations = listOf(location) + active
+}
 
 @ExperimentalAnimationApi
 @Composable
@@ -55,10 +67,10 @@ fun BottomBar(navController: NavHostController, buttonShape: RoundedCornerShape)
         )
         {
             bottomBarItems.forEachIndexed { index, item ->
-                val selected = currentRoute == item.name.toLowerCase(Locale.ENGLISH)
+                val selected = item.locations.contains(currentRoute)
                 BottomNavigationItem(
                     selected = selected,
-                    onClick = { navigate(navController, item.name.toLowerCase(Locale.ENGLISH)) },
+                    onClick = { navigate(navController, item.location) },
                     icon = { Icon(item.icon, item.name) },
                     label = { Text(item.name) },
                     selectedContentColor = MaterialTheme.colors.primary,

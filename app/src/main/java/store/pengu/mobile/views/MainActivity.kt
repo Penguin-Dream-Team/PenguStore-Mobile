@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
@@ -34,7 +33,6 @@ import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.ShoppingList
-import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
@@ -54,7 +52,6 @@ import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.search.partials.ProductScreen
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), PeerListListener {
@@ -114,6 +111,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+            Log.d("HELP", currentRoute ?: "")
             // put all routes that should not show bottom bar navigation
             val noBottomBarRoutes = listOf("login", "loading")
             val showBottomBar = !noBottomBarRoutes.contains(currentRoute)
@@ -156,14 +154,12 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                     sheetContent = {
                         Box {
                             BottomSheetMenus(
-                                navController,
                                 listsService,
                                 storeState,
-                                productsService,
                                 snackbarController,
                                 currentRoute,
-                                closeMenu = { collapseBottomSheetMenu() },
-                            )
+                                isBottomSheetMenuOpen
+                            ) { collapseBottomSheetMenu(it) }
                         }
                     },
                     sheetPeekHeight = 0.dp,
@@ -182,10 +178,6 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         floatingActionButton = {
                             FloatingActionButtons(
                                 buttonShape,
-                                listsService,
-                                storeState,
-                                productsService,
-                                snackbarController,
                                 { expandBottomSheetMenu() },
                                 currentRoute,
                             )
@@ -359,13 +351,14 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     }
 
     @ExperimentalMaterialApi
-    private fun collapseBottomSheetMenu() {
+    private fun collapseBottomSheetMenu(destination: String? = null) {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-        // uncomment to clear when popup is closed
-        //listsService.resetNewListData()
         coroutineScope.launch {
             bottomSheetState.collapse()
             isBottomSheetMenuOpen = false
+            destination?.let {
+                navController.navigate(it)
+            }
         }
     }
 

@@ -11,14 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
 import store.pengu.mobile.data.UserList
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
-import kotlin.coroutines.CoroutineContext
 
 @ExperimentalAnimationApi
 @Composable
