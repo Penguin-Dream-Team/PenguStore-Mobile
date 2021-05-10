@@ -284,7 +284,22 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("search") {
-                                    SearchScreen(navController, productsService, storeState)
+                                    SearchScreen(
+                                        navController,
+                                        productsService,
+                                        storeState,
+                                    )
+                                }
+
+                                animatedComposable("search/{shopId}", listOf(
+                                    navArgument("shopId") { type = NavType.LongType }
+                                )) { args ->
+                                    SearchScreen(
+                                        navController,
+                                        productsService,
+                                        storeState,
+                                        args!!["shopId"] as Long
+                                    )
                                 }
 
                                 animatedComposable("product") {

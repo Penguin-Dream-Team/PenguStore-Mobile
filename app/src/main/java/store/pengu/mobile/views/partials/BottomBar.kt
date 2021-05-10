@@ -34,7 +34,13 @@ private val bottomBarItems = listOf(
             "shopping_list/{shopId}",
         )
     ),
-    BottomBarItem("Search", Icons.Filled.Search),
+    BottomBarItem(
+        "Search",
+        Icons.Filled.Search,
+        listOf(
+            "search/{shopId}",
+        )
+    ),
     BottomBarItem("Cart", Icons.Filled.ShoppingCart),
     BottomBarItem("Profile", Icons.Filled.AccountCircle),
 )

@@ -29,11 +29,21 @@ import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 fun SearchScreen(
     navController: NavHostController,
     productsService: ProductsService,
-    store: StoreState
+    store: StoreState,
+    shopId: Long? = null
 ) {
     val storeState by remember { mutableStateOf(store) }
     val selectedProductId = remember { mutableStateOf(-2L) }
     val coroutineScope = rememberCoroutineScope()
+    val products = remember {
+        if (shopId == null) {
+            productsService.getAllProducts()
+        } else {
+            productsService.getShoppingListProducts(shopId).map {
+                it.toProduct()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -49,7 +59,11 @@ fun SearchScreen(
         val refresh = {
             isRefreshing = true
             coroutineScope.launch(Dispatchers.IO) {
-                productsService.fetchAllProducts()
+                if (shopId == null) {
+                    productsService.fetchAllProducts()
+                } else {
+                    productsService.fetchShoppingListProducts(shopId)
+                }
                 isRefreshing = false
             }
         }
@@ -73,7 +87,7 @@ fun SearchScreen(
                     .padding(horizontal = 7.dp),
                 state = rememberLazyListState()
             ) {
-                items(productsService.getAllProducts()) { product ->
+                items(products) { product ->
                     ItemCard(
                         name = product.name,
                         image = product.image,
