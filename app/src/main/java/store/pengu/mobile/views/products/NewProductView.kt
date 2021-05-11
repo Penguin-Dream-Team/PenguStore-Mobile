@@ -2,6 +2,8 @@ package store.pengu.mobile.views.products
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
@@ -39,14 +41,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
+import coil.Coil
+import coil.request.ImageRequest
+import coil.util.CoilUtils
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.ImageLoadState
+import com.google.accompanist.imageloading.isFinalState
 import io.ktor.util.*
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import store.pengu.mobile.R
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.CameraService
+import store.pengu.mobile.services.ProductsService
+import store.pengu.mobile.utils.ImageUtils
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.loading.RequestCameraPermission
 import store.pengu.mobile.views.partials.AnimatedShimmerLoading
@@ -61,11 +72,16 @@ import java.util.*
  *  barcode?
  *  image?
  */
+@InternalCoroutinesApi
 @KtorExperimentalAPI
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
-fun NewProductView(snackbarController: SnackbarController, cameraService: CameraService) {
+fun NewProductView(
+    snackbarController: SnackbarController,
+    cameraService: CameraService,
+    productsService: ProductsService
+) {
     Column(
         modifier = Modifier
             .padding(horizontal = 24.dp)
@@ -85,7 +101,7 @@ fun NewProductView(snackbarController: SnackbarController, cameraService: Camera
             )
         }
 
-        ProductForm(snackbarController, cameraService)
+        ProductForm(snackbarController, cameraService, productsService)
     }
 
     /**
@@ -104,11 +120,16 @@ fun NewProductView(snackbarController: SnackbarController, cameraService: Camera
  *  barcode?
  *  image?
  */
+@InternalCoroutinesApi
 @KtorExperimentalAPI
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
-private fun ProductForm(snackbarController: SnackbarController, cameraService: CameraService) {
+private fun ProductForm(
+    snackbarController: SnackbarController,
+    cameraService: CameraService,
+    productsService: ProductsService
+) {
     var name by remember { mutableStateOf("test") }
     var barcode by remember { mutableStateOf("") }
     var image by remember { mutableStateOf(null as Uri?) }
@@ -117,6 +138,7 @@ private fun ProductForm(snackbarController: SnackbarController, cameraService: C
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = rememberCoroutineScope()
 
     var scanBarcode by remember { mutableStateOf(false) }
     var canScanBarcode by remember { mutableStateOf(false) }
@@ -134,11 +156,22 @@ private fun ProductForm(snackbarController: SnackbarController, cameraService: C
     canCreate = name.isNotBlank()
 
     val createProduct = {
-        snackbarController.showDismissibleSnackbar("SIMULATION CREATING A PRODUCT BRUV")
+        coroutineScope.launch {
+            val imageData = ImageUtils.getEncodedImage(context, productImage)
+            try {
+                productsService.createProduct(
+                    name,
+                    if (barcode.isNotBlank()) barcode else null,
+                    if (productImage.isNotBlank()) imageData else null
+                )
+            } catch(e: PenguStoreApiException) {
+                snackbarController.showDismissibleSnackbar(e.message)
+            }
+        }
     }
 
     val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { it ->
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
             with(it) {
                 if (resultCode == RESULT_OK) {
                     productImage = if (data != null && data?.data != null) {

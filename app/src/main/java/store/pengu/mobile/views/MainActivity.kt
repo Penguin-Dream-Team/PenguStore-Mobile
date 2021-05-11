@@ -315,7 +315,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("new_item") {
-                                    NewProductView(snackbarController, cameraService)
+                                    NewProductView(snackbarController, cameraService, productsService)
                                 }
 
                                 animatedComposable("cart") {

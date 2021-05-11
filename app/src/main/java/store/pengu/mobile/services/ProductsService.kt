@@ -106,6 +106,10 @@ class ProductsService(
         })
     }
 
+    suspend fun createProduct(name: String, barcode: String?, image: String?) {
+        api.createProduct(name, barcode, image)
+    }
+
     /**
      * NO
      */

@@ -34,7 +34,8 @@ object Routes {
     fun GET_PANTRY(pantryId: Long) = "/lists/pantries/$pantryId"
     fun GET_SHOPPING_LIST(shoppingListId: Long) = "/lists/shops/$shoppingListId"
 
-    const val GET_PRODUCTS = "products"
+    const val GET_PRODUCTS = "/products"
+    const val CREATE_PRODUCT = "/products"
 
 
     /**
@@ -61,7 +62,6 @@ object Routes {
     const val DELETE_PANTRY_PRODUCT = "/pantries/deleteProduct"
 
     const val GET_PRODUCT = "/products/id"
-    const val ADD_PRODUCT = "/products/add"
     const val UPDATE_PRODUCT = "/products/update"
     const val ADD_BARCODE_PRODUCT = "/products/addBarcode"
 

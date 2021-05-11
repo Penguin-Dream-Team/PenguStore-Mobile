@@ -108,6 +108,15 @@ class PenguStoreApi(
 
     suspend fun getAllProducts(): Response.SuccessResponse<List<Product>> = get(Routes.GET_PRODUCTS)
 
+    suspend fun createProduct(
+        name: String,
+        barcode: String?,
+        image: String?,
+    ): Response.SuccessResponse<Product> {
+        val request = CreateProductRequest(name, barcode, image)
+        return post(Routes.CREATE_PRODUCT, request)
+    }
+
 
     /**
      * NEEDS REWRITE
@@ -223,18 +232,6 @@ class PenguStoreApi(
 
     suspend fun getProduct(productId: String): Response.SuccessResponse<Product> =
         get(Routes.GET_PRODUCT, productId)
-
-    suspend fun addProduct(
-        productId: Long,
-        productName: String,
-        productBarCode: String,
-        reviewScore: Double,
-        reviewNumber: Int
-    ): Response.SuccessResponse<String> {
-        val addProductRequest =
-            AddProductRequest(productId, productName, productBarCode, reviewScore, reviewNumber)
-        return post(Routes.ADD_PRODUCT, addProductRequest)
-    }
 
     suspend fun updateProduct(
         productId: Long,
