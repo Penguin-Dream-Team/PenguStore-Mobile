@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -35,9 +32,10 @@ private val bottomBarItems = listOf(
         )
     ),
     BottomBarItem(
-        "Search",
-        Icons.Filled.Search,
+        "New Item",
+        Icons.Filled.Add,
         listOf(
+            "search",
             "search/{shopId}",
         )
     ),
@@ -56,7 +54,7 @@ data class BottomBarItem(
     val icon: ImageVector,
     val active: List<String> = listOf()
 ) {
-    val location = name.toLowerCase(Locale.ENGLISH)
+    val location = name.toLowerCase(Locale.ENGLISH).replace(" ", "_")
     val locations = listOf(location) + active
 }
 
@@ -78,7 +76,7 @@ fun BottomBar(navController: NavHostController, buttonShape: RoundedCornerShape)
                     selected = selected,
                     onClick = { navigate(navController, item.location) },
                     icon = { Icon(item.icon, item.name) },
-                    label = { Text(item.name) },
+                    label = { Text(item.name, maxLines = 1, softWrap = false) },
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = MaterialTheme.colors.onBackground.copy(alpha = 0.8f),
                 )

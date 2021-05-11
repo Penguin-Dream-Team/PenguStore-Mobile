@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import io.ktor.util.*
+import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
@@ -24,6 +25,7 @@ fun BottomSheetMenus(
     snackbarController: SnackbarController,
     currentRoute: String?,
     isBottomSheetOpen: Boolean,
+    cameraService: CameraService,
     closeMenu: (String?) -> Unit,
 ) {
     when (currentRoute) {
@@ -32,6 +34,7 @@ fun BottomSheetMenus(
                 listsService,
                 store,
                 snackbarController,
+                cameraService
             ) { closeMenu(null) }
         "pantry_list/{pantryId}" ->
             AddProductToPantryBottomMenu(

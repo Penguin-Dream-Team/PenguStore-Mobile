@@ -21,12 +21,12 @@ fun ListsBottomSheetMenu(
     listsService: ListsService,
     store: StoreState,
     snackbarController: SnackbarController,
+    cameraService: CameraService,
     closeMenu: () -> Unit,
 ) {
     val selectedListType by remember { store.selectedListType }
     val coroutineScope = rememberCoroutineScope()
 
-    val cameraService = remember { CameraService() }
     val (formType, setFormType) = remember { mutableStateOf(0) }
 
     val closeMenuWrapper = {

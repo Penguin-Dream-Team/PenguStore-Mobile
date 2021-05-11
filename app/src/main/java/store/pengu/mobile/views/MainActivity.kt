@@ -48,6 +48,7 @@ import store.pengu.mobile.views.lists.shops.ViewShoppingList
 import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.*
+import store.pengu.mobile.views.products.NewProductView
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.search.partials.ProductScreen
@@ -102,6 +103,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         var loaded = false
+        val cameraService = CameraService()
 
         // register broadcast receiver
         registerTermiteReceiver()
@@ -158,7 +160,8 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 storeState,
                                 snackbarController,
                                 currentRoute,
-                                isBottomSheetMenuOpen
+                                isBottomSheetMenuOpen,
+                                cameraService
                             ) { collapseBottomSheetMenu(it) }
                         }
                     },
@@ -309,6 +312,10 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         this@MainActivity,
                                         storeState
                                     )
+                                }
+
+                                animatedComposable("new_item") {
+                                    NewProductView(snackbarController, cameraService)
                                 }
 
                                 animatedComposable("cart") {

@@ -176,9 +176,8 @@ class CameraService {
                             imageProxy.close()
                             barcodeScanner.close()
                             onSuccess(parameters["code"]!!)
-                        } else if (scanType == ScanType.PRODUCT_BARCODE && parameters.contains("barcode")) {
-                            // TODO I STILL DONT KNOW HOW BARCODE WORKS THAT WELL
-                            onSuccess(parameters["barcode"]!!)
+                        } else if (scanType == ScanType.PRODUCT_BARCODE) {
+                            onSuccess(it)
                             imageProxy.close()
                             barcodeScanner.close()
                         } else {
