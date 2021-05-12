@@ -183,7 +183,7 @@ fun PullToRefresh(
             val coeff = MAX_OFFSET / (MAX_OFFSET - BASE_OFFSET)
             (indicatorOffset - BASE_OFFSET) / maxOffset * coeff
         }
-        PullToRefreshProgressIndicator(
+        LoadingProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
                 .absoluteOffset(y = absoluteOffset)

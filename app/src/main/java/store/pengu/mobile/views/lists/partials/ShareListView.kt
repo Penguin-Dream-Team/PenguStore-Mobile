@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.lists.pantry
+package store.pengu.mobile.views.lists.partials
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
@@ -16,19 +16,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
+import store.pengu.mobile.views.lists.partials.ShareList
 import store.pengu.mobile.views.partials.IconButton
 
 @ExperimentalAnimationApi
 @Composable
-fun SharePantryListView(
+fun ShareListView(
     navController: NavController,
     store: StoreState,
-    snackbarController: SnackbarController
+    snackbarController: SnackbarController,
+    type: String
 ) {
-    val pantryList = store.selectedList as PantryList? ?: return
+    val list = store.selectedList ?: return
 
     Column(
         modifier = Modifier
@@ -48,14 +49,14 @@ fun SharePantryListView(
             )
 
             Text(
-                pantryList.name,
-                fontSize = 24.sp,
+                list.name,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
 
         }
 
-        SharePantryList(pantryList, snackbarController)
+        ShareList(list, snackbarController, type)
     }
 }

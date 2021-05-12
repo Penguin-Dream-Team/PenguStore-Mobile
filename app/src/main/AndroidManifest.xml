@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
 
     <uses-sdk tools:overrideLibrary="
       androidx.camera.camera2, androidx.camera.core,
@@ -13,7 +17,7 @@
 
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-permission android:name="android.permission.CAMERA" />
+
 
     <application
         tools:replace="android:icon, android:theme"
@@ -27,9 +31,20 @@
         android:usesCleartextTraffic="true"
         android:allowBackup="true">
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="store.pengu.mobile.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDGFuuxJryL0zdGgBJrTVpiVF_qFhfRSoc"/>
+            android:value="AIzaSyAhZqinq23zBlvJ17tlm-YX9dP_E2QQDII"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

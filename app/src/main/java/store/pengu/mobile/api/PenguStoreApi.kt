@@ -3,7 +3,6 @@ package store.pengu.mobile.api
 import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.api.requests.*
 import store.pengu.mobile.api.requests.account.LoginRequest
-import store.pengu.mobile.api.requests.account.RefreshTokenRequest
 import store.pengu.mobile.api.requests.account.RegisterRequest
 import store.pengu.mobile.api.requests.lists.CartRequest
 import store.pengu.mobile.api.requests.lists.CreateListRequest
@@ -29,11 +28,6 @@ class PenguStoreApi(
     suspend fun login(username: String, password: String): LoginResponse {
         val loginRequest = LoginRequest(username, password)
         return post(Routes.LOGIN, loginRequest)
-    }
-
-    suspend fun refreshToken(refreshToken: String): LoginResponse {
-        val refreshRequest = RefreshTokenRequest(refreshToken)
-        return post(Routes.REFRESH_TOKEN, refreshRequest)
     }
 
     suspend fun getProfile(): ProfileResponse {
@@ -71,7 +65,12 @@ class PenguStoreApi(
     ): Response.SuccessResponse<PantryList> {
         return post(
             Routes.CREATE_PANTRY_LIST,
-            CreateListRequest(newListName, newListLocation.latitude, newListLocation.longitude, newListColor.toString())
+            CreateListRequest(
+                newListName,
+                newListLocation.latitude,
+                newListLocation.longitude,
+                newListColor.toString()
+            )
         )
     }
 
@@ -82,9 +81,42 @@ class PenguStoreApi(
     ): Response.SuccessResponse<ShoppingList> {
         return post(
             Routes.CREATE_SHOPPING_LIST,
-            CreateListRequest(newListName, newListLocation.latitude, newListLocation.longitude, newListColor.toString())
+            CreateListRequest(
+                newListName,
+                newListLocation.latitude,
+                newListLocation.longitude,
+                newListColor.toString()
+            )
         )
     }
+
+    suspend fun importPantry(pantryCode: String): Response.SuccessResponse<PantryList> {
+        return post(Routes.IMPORT_PANTRY_LIST(pantryCode))
+    }
+
+    suspend fun importShoppingList(shoppingListCode: String): Response.SuccessResponse<ShoppingList> {
+        return post(Routes.IMPORT_SHOPPING_LIST(shoppingListCode))
+    }
+
+    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<ProductInPantry>> {
+        return get(Routes.GET_PANTRY(pantryId))
+    }
+
+    suspend fun getShoppingListProducts(shoppingListId: Long): Response.SuccessResponse<List<ProductInShoppingList>> {
+        return get(Routes.GET_SHOPPING_LIST(shoppingListId))
+    }
+
+    suspend fun getAllProducts(): Response.SuccessResponse<List<Product>> = get(Routes.GET_PRODUCTS)
+
+    suspend fun createProduct(
+        name: String,
+        barcode: String?,
+        image: String?,
+    ): Response.SuccessResponse<Product> {
+        val request = CreateProductRequest(name, barcode, image)
+        return post(Routes.CREATE_PRODUCT, request)
+    }
+
 
     /**
      * NEEDS REWRITE
@@ -104,11 +136,6 @@ class PenguStoreApi(
         return post(Routes.ADD_USER, addUserRequest)
     }
 
-    suspend fun addUserPantry(userId: Long, pantryCode: String): Response.SuccessResponse<String> {
-        val addUserPantryRequest = AddUserPantryRequest(userId, pantryCode)
-        return post(Routes.ADD_USER_PANTRY, addUserPantryRequest)
-    }
-
     suspend fun deleteUserPantry(
         userId: Long,
         pantryCode: String
@@ -119,18 +146,6 @@ class PenguStoreApi(
 
     suspend fun getUserPantries(userId: Long): Response.SuccessResponse<List<PantryList>> =
         get(Routes.GET_USER_PANTRIES, userId.toString())
-
-    suspend fun getUserShoppingListProducts(shopId: Long): Response.SuccessResponse<List<ProductInPantry>> =
-        get(Routes.GET_USER_SHOPPING_LIST_PRODUCTS, shopId.toString())
-
-    suspend fun addShoppingList(
-        shopId: Long,
-        userId: Long,
-        name: String
-    ): Response.SuccessResponse<String> {
-        val addShoppingListRequest = AddShoppingListRequest(shopId, userId, name)
-        return post(Routes.ADD_SHOPPING_LIST, addShoppingListRequest)
-    }
 
     suspend fun updateShoppingList(
         shopId: Long,
@@ -152,6 +167,9 @@ class PenguStoreApi(
 
     suspend fun getUserShoppingList(shopId: Long): Response.SuccessResponse<List<ProductInShoppingList>> =
         get(Routes.GET_USER_SHOPPING_LIST, shopId.toString())
+
+    suspend fun updateSmartSortingEntries(productId: Long, remainingItems: List<Long>): Response.SuccessResponse<Boolean> =
+        put(Routes.UPDATE_SMART_SORTING_ENTRIES.replace("id", productId.toString()), remainingItems)
 
     suspend fun pantries(): Response.SuccessResponse<List<PantryList>> = get(Routes.GET_PANTRIES)
 
@@ -212,25 +230,8 @@ class PenguStoreApi(
         return delete(Routes.DELETE_PANTRY_PRODUCT, deletePantryProductRequest)
     }
 
-    suspend fun getPantryProducts(pantryId: Long): Response.SuccessResponse<List<ProductInPantry>> =
-        get(Routes.GET_PANTRY_PRODUCTS, pantryId.toString())
-
-    suspend fun products(): Response.SuccessResponse<List<Product>> = get(Routes.PRODUCTS)
-
     suspend fun getProduct(productId: String): Response.SuccessResponse<Product> =
         get(Routes.GET_PRODUCT, productId)
-
-    suspend fun addProduct(
-        productId: Long,
-        productName: String,
-        productBarCode: String,
-        reviewScore: Double,
-        reviewNumber: Int
-    ): Response.SuccessResponse<String> {
-        val addProductRequest =
-            AddProductRequest(productId, productName, productBarCode, reviewScore, reviewNumber)
-        return post(Routes.ADD_PRODUCT, addProductRequest)
-    }
 
     suspend fun updateProduct(
         productId: Long,
@@ -244,7 +245,8 @@ class PenguStoreApi(
         return put(Routes.UPDATE_PRODUCT, updateProductRequest)
     }
 
-    suspend fun addBarcodeProduct(barcode: String): Response.SuccessResponse<String> = put(Routes.ADD_BARCODE_PRODUCT, barcode)
+    suspend fun addBarcodeProduct(barcode: String): Response.SuccessResponse<String> =
+        put(Routes.ADD_BARCODE_PRODUCT, barcode)
 
     suspend fun shops(): Response.SuccessResponse<List<ShoppingList>> = get(Routes.SHOPS)
 
@@ -289,14 +291,20 @@ class PenguStoreApi(
     suspend fun getShopProducts(shopId: String): Response.SuccessResponse<List<Product>> =
         get(Routes.GET_SHOP_PRODUCTS, shopId)
 
-    suspend fun buyCart(cartRequest: CartRequest): Response.SuccessResponse<String> {
-        return post(Routes.BUY_CART, cartRequest)
-    }
+    suspend fun buyCart(cartRequest: CartRequest): Response.SuccessResponse<String> =
+        post(Routes.BUY_CART, cartRequest)
+
+    suspend fun getProductSuggestion(productId: Long): Response.SuccessResponse<Long> =
+        get(Routes.GET_PRODUCT_SUGGESTION, productId.toString())
 
     suspend fun joinQueue(location: LatLng, numItems: Int): Response.SuccessResponse<String> =
         post(Routes.JOIN_QUEUE, location, numItems)
 
-    suspend fun leaveQueue(location: LatLng, numItems: Int, time: Int): Response.SuccessResponse<String> {
+    suspend fun leaveQueue(
+        location: LatLng,
+        numItems: Int,
+        time: Int
+    ): Response.SuccessResponse<String> {
         return post(
             Routes.LEAVE_QUEUE,
             LeaveQueueRequest(location.latitude, location.longitude, numItems, time)
@@ -306,14 +314,24 @@ class PenguStoreApi(
     suspend fun timeQueue(location: LatLng): Response.SuccessResponse<Int> =
         get(Routes.TIME_QUEUE, location)
 
-    suspend fun addProductImage(id: Int, barcode: String?, productId: Long?, imageUrl: String): Response.SuccessResponse<String> {
+    suspend fun addProductImage(
+        id: Int,
+        barcode: String?,
+        productId: Long?,
+        imageUrl: String
+    ): Response.SuccessResponse<String> {
         return post(
             Routes.ADD_IMAGE,
             ImageRequest(id.toULong(), barcode, productId, imageUrl)
         )
     }
 
-    suspend fun deleteProductImage(id: Int, barcode: String?, productId: Long?, imageUrl: String): Response.SuccessResponse<String> {
+    suspend fun deleteProductImage(
+        id: Int,
+        barcode: String?,
+        productId: Long?,
+        imageUrl: String
+    ): Response.SuccessResponse<String> {
         return delete(
             Routes.DELETE_IMAGE,
             ImageRequest(id.toULong(), barcode, productId, imageUrl)
@@ -325,4 +343,12 @@ class PenguStoreApi(
 
     suspend fun getProductImageProductId(productId: Long): Response.SuccessResponse<List<String>> =
         get(Routes.PRODUCT_IMAGE_PRODUCT_ID, productId.toString())
+
+    suspend fun translation(string: String): Response.SuccessResponse<String> =
+        get(Routes.TRANSLATION, string)
+
+    suspend fun rateProduct(barcode: String, rating: Int): Response.SuccessResponse<String> {
+        val route = Routes.RATE_PRODUCT.replace("rating", rating.toString())
+        return post(route, barcode)
+    }
 }

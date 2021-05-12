@@ -19,10 +19,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import store.pengu.mobile.R
 import store.pengu.mobile.services.AccountService
 
 @SuppressLint("RestrictedApi")
@@ -57,7 +59,7 @@ fun LoginScreenForm(
                 username = it
                 canLogin = username.isNotBlank() && password.isNotBlank()
             },
-            placeholder = { Text("Username") },
+            placeholder = { Text(stringResource(R.string.username_label)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -87,7 +89,7 @@ fun LoginScreenForm(
             keyboardActions = KeyboardActions(onGo = {
                 submit()
             }),
-            placeholder = { Text("Password") },
+            placeholder = { Text(stringResource(R.string.password_label)) },
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .fillMaxWidth()
@@ -103,7 +105,7 @@ fun LoginScreenForm(
                 .padding(top = 10.dp, bottom = 75.dp)
                 .fillMaxWidth()
         ) {
-            Text(text = "Login")
+            Text(text = stringResource(R.string.login_button))
         }
     }
 }

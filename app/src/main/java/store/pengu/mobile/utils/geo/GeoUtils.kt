@@ -1,4 +1,4 @@
-package store.pengu.mobile.utils
+package store.pengu.mobile.utils.geo
 
 import android.content.Context
 import android.location.Geocoder

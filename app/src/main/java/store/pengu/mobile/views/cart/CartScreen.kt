@@ -25,7 +25,8 @@ fun CartScreen(navController: NavController, store: StoreState) {
     val openDialog = remember { mutableStateOf(false) }
     val products by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
-    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20)) }
+    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20, "", listOf())) }
+    store.numItems = 0
 
     Column(verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
@@ -93,6 +94,9 @@ fun CartScreen(navController: NavController, store: StoreState) {
 
         Button(
             onClick = {
+                products.forEach { product ->
+                    storeState.numItems = storeState.numItems!!.plus(product.second)
+                }
                 navController.navigate("cart_confirmation")
             },
             modifier = Modifier

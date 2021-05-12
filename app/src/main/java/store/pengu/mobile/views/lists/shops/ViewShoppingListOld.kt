@@ -1,56 +1,57 @@
-package store.pengu.mobile.views.lists.partials
+package store.pengu.mobile.views.lists.shops
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material.icons.filled.RemoveShoppingCart
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.utils.Math
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun ShoppingList(navController: NavController, productsService: ProductsService, store: StoreState) {
-    val storeState by remember { mutableStateOf(store) }
+fun ViewShoppingListOld(productsService: ProductsService, store: StoreState, shoppingList: ShoppingList) {
     val openDialog = remember { mutableStateOf(false) }
-    val selectedShoppingList = storeState.selectedList as ShoppingList?
     val products by remember { mutableStateOf(store.shoppingListProducts) }
     val cartProducts by remember { mutableStateOf(store.cartProducts) }
     val desiredAmount = remember { mutableStateOf(1) }
-    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20)) }
+    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20, "", listOf())) }
     val queueTime = remember { mutableStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
     val refreshQueueTime = coroutineScope.launch {
         queueTime.value = productsService.timeQueue()
     }
 
-    if (selectedShoppingList == null) return
-    productsService.getShoppingListProducts(selectedShoppingList.id)
+    //productsService.getShoppingListProducts(shoppingList.id)
     refreshQueueTime.start()
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .padding(vertical = 32.dp)
+            .padding(vertical = 18.dp)
             .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -58,25 +59,33 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                selectedShoppingList.name,
+                stringResource(R.string.queue_time),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
 
-            Button(
-                onClick = { refreshQueueTime.start() }
+            IconButton(
+                onClick = { refreshQueueTime.start() },
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .size(36.dp)
+                    .background(
+                        color = MaterialTheme.colors.primaryVariant,
+                        shape = CircleShape
+                    )
             ) {
-                Text("Refresh Queue Time")
+                Icon(
+                    imageVector = Icons.Outlined.Refresh,
+                    contentDescription = "Refresh Queue Time"
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
         Text(
-            "Queue Time: ${queueTime.value}",
+            Math.secondsToMinutes(queueTime.value),
             fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
 
@@ -99,7 +108,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                     if (cartProducts.map { it.first }.contains(product)) {
                         IconButton(
                             onClick = {
-                                storeState.cartProducts.removeAt(cartProducts.map { it.first }.indexOf(product))
+                                store.cartProducts.removeAt(cartProducts.map { it.first }.indexOf(product))
                             },
                         ) {
                             Icon(
@@ -112,7 +121,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                         IconButton(
                             onClick = {
                                 if ((product.amountNeeded - product.amountAvailable) == 1) {
-                                    storeState.cartProducts.add(Pair(product, 1))
+                                    store.cartProducts.add(Pair(product, 1))
                                 } else {
                                     currentProduct.value = product
                                     desiredAmount.value = 0
@@ -179,7 +188,7 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                 Button(
                     onClick = {
                         openDialog.value = false
-                        storeState.cartProducts.add(Pair(currentProduct.value, desiredAmount.value))
+                        store.cartProducts.add(Pair(currentProduct.value, desiredAmount.value))
                     }) {
                     Text("Add to Cart")
                 }
@@ -193,11 +202,5 @@ fun ShoppingList(navController: NavController, productsService: ProductsService,
                 }
             }
         )
-    }
-
-    fun refreshQueueTime() {
-        coroutineScope.launch {
-            queueTime.value = productsService.timeQueue()
-        }
     }
 }

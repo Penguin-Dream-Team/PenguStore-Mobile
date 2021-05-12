@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
 @JsonDeserialize
 data class ProductInShoppingList (
-    val product_id: Long,
-    val pantry_id: Long,
-    val name: String,
-    val barcode: String?,
-    val amountAvailable: Int,
-    val amountNeeded: Int,
-    val price: Double
-)
+    override val id: Long,
+    override val listId: Long,
+    override val name: String,
+    override val barcode: String?,
+    override val amountAvailable: Int,
+    override val amountNeeded: Int,
+    val price: Double,
+    override val image: String?,
+    val pantries: List<PantryList>
+) : ListProduct(id, listId, name, barcode, amountAvailable, amountNeeded, image)

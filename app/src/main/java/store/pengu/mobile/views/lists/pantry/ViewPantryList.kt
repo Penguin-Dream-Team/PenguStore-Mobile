@@ -1,246 +1,121 @@
 package store.pengu.mobile.views.lists.pantry
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.Product
+import store.pengu.mobile.data.ProductInPantry
+import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.views.lists.partials.ProductItem
+import store.pengu.mobile.views.lists.partials.ProductItemDialog
+import store.pengu.mobile.views.partials.pulltodelete.SwipeableAction
+import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
+@Suppress("UNUSED_VALUE")
+@SuppressLint("InflateParams")
 @ExperimentalAnimationApi
 @Composable
 fun ViewPantryList(
     navController: NavController,
+    context: Context,
+    listsService: ListsService,
     productsService: ProductsService,
     store: StoreState,
     pantryList: PantryList
 ) {
-    val openDialogEdit = remember { mutableStateOf(false) }
-    val openDialogDelete = remember { mutableStateOf(false) }
-    val selectedProductId = remember { mutableStateOf(-1L) }
-    val products by remember { mutableStateOf(store.pantryProducts) }
-    val amountAvailable = remember { mutableStateOf(0) }
-    val amountNeeded = remember { mutableStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
+    var isRefreshing: Boolean by remember { mutableStateOf(false) }
+    var needsRefresh: Boolean by remember { mutableStateOf(true) }
+    val refresh = {
+        isRefreshing = true
+        coroutineScope.launch(Dispatchers.IO) {
+            delay(50L)
+            productsService.fetchPantryProducts(pantryList.id)
+            isRefreshing = false
+        }
+    }
 
-    productsService.getPantryProducts(pantryList.id)
+    if (needsRefresh && !isRefreshing) {
+        refresh()
+        needsRefresh = false
+    }
 
-    Spacer(modifier = Modifier.height(32.dp))
+    val products = remember { productsService.getPantryProducts(pantryList.id) }
+    var selectedProduct: ProductInPantry? by remember { mutableStateOf(null) }
+    val (haveAmount, setHaveAmount) = remember { mutableStateOf(0) }
+    val (needAmount, setNeedAmount) = remember { mutableStateOf(0) }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+    PullToRefresh(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            refresh()
+        },
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
-        items(products) { product ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "${product.name}: ${product.amountAvailable} out of ${product.amountNeeded}",
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                IconButton(
-                    onClick = {
-                        selectedProductId.value = product.productId
-                        amountAvailable.value = product.amountAvailable
-                        amountNeeded.value = product.amountNeeded
-
-                        openDialogEdit.value = true
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        tint = Color(52, 247, 133),
-                        contentDescription = "Update Product"
-                    )
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(vertical = 15.dp)
+                .fillMaxSize()
+        ) {
+            if (products.isEmpty() && !isRefreshing) {
+                item {
+                    Text(stringResource(R.string.empty_list_info))
                 }
-
-                IconButton(
-                    onClick = {
-                        selectedProductId.value = product.productId
-                        openDialogDelete.value = true
-                    },
+            }
+            items(items = products) { product ->
+                ProductItem(
+                    title = product.name,
+                    haveAmount = product.amountAvailable,
+                    needAmount = product.amountNeeded,
+                    color = pantryList.color,
+                    image = product.image
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        tint = Color(52, 247, 133),
-                        contentDescription = "Delete Product"
-                    )
+                    selectedProduct = product
+                    setHaveAmount(product.amountAvailable)
+                    setNeedAmount(product.amountNeeded)
                 }
             }
         }
     }
 
-    Spacer(modifier = Modifier.height(32.dp))
-
-    Button(
-        onClick = {
-            navController.navigate("search")
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = "Add new Item",
-            textAlign = TextAlign.Center
-        )
-    }
-
-    if (openDialogEdit.value) {
-        AlertDialog(
-            onDismissRequest = {
-                openDialogEdit.value = false
-            },
-            title = {
-                Text(text = "Select the amount available and desired")
-            },
-            text = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        IconButton(
-                            onClick = {
-                                if (amountAvailable.value > 0)
-                                    amountAvailable.value--
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.RemoveCircle,
-                                contentDescription = "Remove"
-                            )
-                        }
-
-                        Text(text = "Amount Available: ${amountAvailable.value}")
-
-                        IconButton(
-                            onClick = {
-                                amountAvailable.value++
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.AddCircle,
-                                contentDescription = "Add"
-                            )
-                        }
-                    }
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        IconButton(
-                            onClick = {
-                                if (amountNeeded.value > 0)
-                                    amountNeeded.value--
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.RemoveCircle,
-                                contentDescription = "Remove"
-                            )
-                        }
-
-                        Text(text = "Amount Needed: ${amountNeeded.value}")
-
-                        IconButton(
-                            onClick = {
-                                amountNeeded.value++
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.AddCircle,
-                                contentDescription = "Add"
-                            )
-                        }
-                    }
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        openDialogEdit.value = false
-                    }) {
-                    Text("Cancel")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        openDialogEdit.value = false
-                        productsService.updateProduct(
-                            pantryList.id,
-                            selectedProductId.value,
-                            amountAvailable.value,
-                            amountNeeded.value
-                        )
-                    }) {
-                    Text("Edit Product")
-                }
+    ProductItemDialog(
+        product = selectedProduct,
+        haveAmount = haveAmount,
+        needAmount = needAmount,
+        setHaveAmount = setHaveAmount,
+        setNeedAmount = setNeedAmount,
+        onClose = { selectedProduct = null },
+        onViewInfo = {
+            selectedProduct?.let {
+                store.selectedProduct = it.toProduct()
             }
-        )
-    }
-
-    if (openDialogDelete.value) {
-        AlertDialog(
-            onDismissRequest = {
-                openDialogDelete.value = false
-            },
-            title = {
-                Text(text = "You sure you want you remove this product??")
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        openDialogDelete.value = false
-                    }) {
-                    Text("Cancel")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        openDialogDelete.value = false
-                        productsService.deleteProduct(
-                            pantryList.id,
-                            selectedProductId.value
-                        )
-                    }) {
-                    Text("Confirm")
-                }
-            }
-        )
-    }
+            selectedProduct = null
+            navController.navigate("product")
+        }
+    )
 }

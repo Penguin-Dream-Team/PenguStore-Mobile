@@ -3,8 +3,6 @@ package store.pengu.mobile.api
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
 sealed class Response<out T> {
-    @JsonDeserialize
-    open class SuccessResponse2 : Response<Nothing>()
 
     @JsonDeserialize
     data class SuccessResponse<T>(val data: T) : Response<T>()

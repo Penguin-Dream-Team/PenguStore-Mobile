@@ -9,8 +9,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.data.UserList
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
@@ -30,7 +33,7 @@ fun <T : UserList> ListsTab(
         var needsRefresh: Boolean by remember { mutableStateOf(true) }
         val refresh = {
             isRefreshing = true
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.IO) {
                 onRefresh()
                 isRefreshing = false
             }
@@ -58,7 +61,7 @@ fun <T : UserList> ListsTab(
             ) {
                 if (lists.isEmpty() && !isRefreshing) {
                     item {
-                        Text("No items in this view")
+                        Text(stringResource(R.string.empty_list_info))
                     }
                 }
                 items(items = lists) { item ->

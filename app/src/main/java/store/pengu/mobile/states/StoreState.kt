@@ -10,15 +10,20 @@ class StoreState {
     var guest: Boolean by mutableStateOf(true)
     var email: String by mutableStateOf("")
     var selectedListType = mutableStateOf(0)
+    var selectedList: UserList? = null
 
     fun isLoggedIn(): Boolean {
         return token.isNotBlank()
     }
 
+    /**
+     * REWRITE
+     */
+
     var shouldFindListInLocation: Boolean by mutableStateOf(true)
     var location: LatLng? = null
     var numItems: Int? = null
-    var timeInQueue: Int? = null
+    var joinQueueTime: Int? = null
 
     var userId: Long by mutableStateOf(1)
     var products = mutableStateListOf<Product>()
@@ -33,7 +38,6 @@ class StoreState {
     var shoppingListProducts = mutableStateListOf<ProductInShoppingList>()
     var cartProducts = mutableStateListOf<Pair<ProductInShoppingList, Int>>()
 
-    var selectedList: UserList? = null
     var listLocation: LatLng? = null
 }
 

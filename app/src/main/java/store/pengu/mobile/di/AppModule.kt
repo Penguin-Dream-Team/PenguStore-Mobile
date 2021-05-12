@@ -28,6 +28,11 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun getMapsService(@ApplicationContext context: Context): MapsService =
+        MapsService(context)
+
+    @Singleton
+    @Provides
     fun getBeaconsService(
         api: PenguStoreApi,
         store: StoreState

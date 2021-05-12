@@ -1,11 +1,10 @@
 package store.pengu.mobile.views
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -20,35 +19,36 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.core.app.ActivityCompat
-import androidx.core.content.PermissionChecker
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.ktor.util.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.runBlocking
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
 import store.pengu.mobile.api.PenguStoreApi
+import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.*
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
+import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
 import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
-import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.lists.ListsScreen
-import store.pengu.mobile.views.lists.pantry.PantryList
-import store.pengu.mobile.views.lists.partials.ShoppingList
+import store.pengu.mobile.views.lists.pantry.ViewPantryList
+import store.pengu.mobile.views.lists.partials.ListView
+import store.pengu.mobile.views.lists.partials.ShareListView
+import store.pengu.mobile.views.lists.shops.ViewShoppingList
+import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.login.LoginScreen
-import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
-import store.pengu.mobile.utils.camera.Camera
-import store.pengu.mobile.views.lists.pantry.SharePantryListView
 import store.pengu.mobile.views.partials.*
+import store.pengu.mobile.views.products.NewProductView
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
 import store.pengu.mobile.views.search.partials.ProductScreen
@@ -78,8 +78,11 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     @Inject
     lateinit var api: PenguStoreApi
 
+    @Inject
+    lateinit var mapsService: MapsService
+
     private val termiteService = TermiteService(this)
-    private var navController: NavHostController? = null
+    lateinit var navController: NavHostController
     private var mReceiver: WifiP2pBroadcastReceiver? = null
 
     @ExperimentalMaterialApi
@@ -93,41 +96,24 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     @ExperimentalComposeUiApi
     @ExperimentalFoundationApi
     @ExperimentalAnimationApi
-    @SuppressLint("SourceLockedOrientationActivity")
+    @SuppressLint("SourceLockedOrientationActivity", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         var loaded = false
-        val startDestination: String
+        val cameraService = CameraService()
 
         // register broadcast receiver
-        val filter = IntentFilter()
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION)
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION)
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION)
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION)
-        mReceiver = WifiP2pBroadcastReceiver(this, termiteService)
-        registerReceiver(mReceiver, filter)
-
-        requestPermission(Manifest.permission.CAMERA)
-
-        runBlocking {
-            accountService.loadData()
-            startDestination = if (storeState.isLoggedIn()) {
-                "loading"
-            } else {
-                "login"
-            }
-        }
+        registerTermiteReceiver()
 
         setContent {
-            val navController = rememberNavController()
-            this.navController = navController
+            navController = rememberNavController()
 
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+            Log.d("HELP", currentRoute ?: "")
             // put all routes that should not show bottom bar navigation
             val noBottomBarRoutes = listOf("login", "loading")
             val showBottomBar = !noBottomBarRoutes.contains(currentRoute)
@@ -148,9 +134,18 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         collapseBottomSheetMenu()
                     }
                 }
-                termiteService.wifiDirectON()
+
+                accountService.navController = navController
+
+                //termiteService.wifiDirectON()
                 executedOnce = true
             }
+
+            if (loaded && !storeState.isLoggedIn() && currentRoute != "loading" && currentRoute != "login") {
+                navController.navigate("login")
+                navController.backStack.clear()
+            }
+
 
             PenguShopTheme {
                 BottomSheetScaffold(
@@ -161,13 +156,13 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                     sheetContent = {
                         Box {
                             BottomSheetMenus(
-                                navController,
                                 listsService,
                                 storeState,
-                                productsService,
                                 snackbarController,
-                                currentRoute
-                            ) { collapseBottomSheetMenu() }
+                                currentRoute,
+                                isBottomSheetMenuOpen,
+                                cameraService
+                            ) { collapseBottomSheetMenu(it) }
                         }
                     },
                     sheetPeekHeight = 0.dp,
@@ -186,10 +181,6 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         floatingActionButton = {
                             FloatingActionButtons(
                                 buttonShape,
-                                listsService,
-                                storeState,
-                                productsService,
-                                snackbarController,
                                 { expandBottomSheetMenu() },
                                 currentRoute,
                             )
@@ -203,7 +194,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         ) {
                             NavHost(
                                 navController = navController,
-                                startDestination = startDestination
+                                startDestination = "loading"
                             ) {
                                 loaded = true
 
@@ -212,7 +203,14 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("loading") {
-                                    LoadingScreen(navController, listsService, snackbarController)
+                                    LoadingScreen(
+                                        navController,
+                                        listsService,
+                                        snackbarController,
+                                        mapsService,
+                                        accountService,
+                                        storeState
+                                    )
                                 }
 
                                 animatedComposable("lists") {
@@ -224,28 +222,87 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 }
 
-                                animatedComposable("pantry_list") {
-                                    PantryList(
+                                animatedComposable("pantry_list/{pantryId}", listOf(
+                                    navArgument("pantryId") { type = NavType.LongType }
+                                )) { args ->
+                                    ListView(
                                         navController,
-                                        productsService,
-                                        storeState
-                                    )
+                                        snackbarController,
+                                        storeState,
+                                        shareRoute = "share_pantry_list",
+                                        listsService = listsService,
+                                        listId = args!!["pantryId"] as Long,
+                                        type = UserListType.PANTRY,
+                                        mapsService = mapsService
+                                    ) {
+                                        ViewPantryList(
+                                            navController,
+                                            applicationContext,
+                                            listsService,
+                                            productsService,
+                                            storeState,
+                                            it as PantryList
+                                        )
+                                    }
                                 }
 
                                 animatedComposable("share_pantry_list") {
-                                    SharePantryListView(
+                                    ShareListView(
                                         navController,
                                         storeState,
-                                        snackbarController
+                                        snackbarController,
+                                        "Pantry List"
                                     )
                                 }
 
-                                animatedComposable("shopping_list") {
-                                    ShoppingList(navController, productsService, storeState)
+                                animatedComposable("share_shopping_list") {
+                                    ShareListView(
+                                        navController,
+                                        storeState,
+                                        snackbarController,
+                                        "Shopping List"
+                                    )
+                                }
+
+                                animatedComposable("shopping_list/{shopId}", listOf(
+                                    navArgument("shopId") { type = NavType.LongType }
+                                )) { args ->
+                                    ListView(
+                                        navController,
+                                        snackbarController,
+                                        storeState,
+                                        shareRoute = "share_shopping_list",
+                                        listId = args!!["shopId"] as Long,
+                                        type = UserListType.SHOPPING_LIST,
+                                        listsService = listsService,
+                                        mapsService = mapsService
+                                    ) {
+                                        ViewShoppingList(
+                                            navController,
+                                            productsService,
+                                            storeState,
+                                            it as ShoppingList
+                                        )
+                                    }
                                 }
 
                                 animatedComposable("search") {
-                                    SearchScreen(navController, productsService, storeState)
+                                    SearchScreen(
+                                        navController,
+                                        productsService,
+                                        storeState,
+                                    )
+                                }
+
+                                animatedComposable("search/{shopId}", listOf(
+                                    navArgument("shopId") { type = NavType.LongType }
+                                )) { args ->
+                                    SearchScreen(
+                                        navController,
+                                        productsService,
+                                        storeState,
+                                        args!!["shopId"] as Long
+                                    )
                                 }
 
                                 animatedComposable("product") {
@@ -255,6 +312,10 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         this@MainActivity,
                                         storeState
                                     )
+                                }
+
+                                animatedComposable("new_item") {
+                                    NewProductView(snackbarController, cameraService, productsService)
                                 }
 
                                 animatedComposable("cart") {
@@ -271,14 +332,6 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         accountService,
                                         snackbarController,
                                         storeState
-                                    )
-                                }
-
-                                animatedComposable("camera") {
-                                    Camera().CameraPreview(
-                                        navController,
-                                        storeState,
-                                        productsService
                                     )
                                 }
                             }
@@ -300,6 +353,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
         }
     }
 
+
     @ExperimentalMaterialApi
     override fun onBackPressed() {
         if (isBottomSheetMenuOpen) {
@@ -311,11 +365,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     @ExperimentalMaterialApi
     private fun expandBottomSheetMenu() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(true)
-        } else {
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        }
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         coroutineScope.launch {
             bottomSheetState.expand()
             isBottomSheetMenuOpen = true
@@ -323,33 +373,38 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     }
 
     @ExperimentalMaterialApi
-    private fun collapseBottomSheetMenu() {
-        // uncomment to clear when popup is closed
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-        } else {
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-        }
-        //listsService.resetNewListData()
+    private fun collapseBottomSheetMenu(destination: String? = null) {
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
         coroutineScope.launch {
             bottomSheetState.collapse()
             isBottomSheetMenuOpen = false
+            destination?.let {
+                navController.navigate(it)
+            }
         }
     }
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(mReceiver)
+        mReceiver?.let {
+            unregisterReceiver(it)
+        }
+        mReceiver = null
     }
 
-    private fun requestPermission(permission: String) {
-        if (PermissionChecker.checkSelfPermission(
-                applicationContext,
-                permission
-            ) != PermissionChecker.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(this, arrayOf(permission), 100)
-        }
+    override fun onResume() {
+        super.onResume()
+        registerTermiteReceiver()
+    }
+
+    private fun registerTermiteReceiver() {
+        val filter = IntentFilter()
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION)
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION)
+        mReceiver = WifiP2pBroadcastReceiver(this, termiteService)
+        registerReceiver(mReceiver, filter)
     }
 
     /*

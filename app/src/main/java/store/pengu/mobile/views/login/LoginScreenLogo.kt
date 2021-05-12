@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import store.pengu.mobile.R
@@ -39,7 +40,7 @@ fun LoginScreenLogo() {
 
         val logoFont = MaterialTheme.typography.h6
         Text(
-            text = "PenguStore", fontSize = logoFont.fontSize,
+            text = stringResource(R.string.app_name), fontSize = logoFont.fontSize,
             fontWeight = logoFont.fontWeight,
             modifier = Modifier
                 .padding(top = 10.dp),

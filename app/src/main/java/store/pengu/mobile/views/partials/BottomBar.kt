@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,20 +24,39 @@ import androidx.navigation.compose.navigate
 import java.util.*
 
 private val bottomBarItems = listOf(
-    BottomBarItem("Lists", Icons.Filled.List),
-    BottomBarItem("Search", Icons.Filled.Search),
+    BottomBarItem(
+        "Lists", Icons.Filled.List,
+        listOf(
+            "pantry_list/{pantryId}",
+            "shopping_list/{shopId}",
+        )
+    ),
+    BottomBarItem(
+        "New Item",
+        Icons.Filled.Add,
+        listOf(
+            "search",
+            "search/{shopId}",
+        )
+    ),
     BottomBarItem("Cart", Icons.Filled.ShoppingCart),
     BottomBarItem("Profile", Icons.Filled.AccountCircle),
 )
 
 private val bottomBarButtonItems = listOf(
-    "lists"
+    "lists",
+    "pantry_list/{pantryId}",
+    "shopping_list/{shopId}",
 )
 
 data class BottomBarItem(
     val name: String,
-    val icon: ImageVector
-)
+    val icon: ImageVector,
+    val active: List<String> = listOf()
+) {
+    val location = name.toLowerCase(Locale.ENGLISH).replace(" ", "_")
+    val locations = listOf(location) + active
+}
 
 @ExperimentalAnimationApi
 @Composable
@@ -55,12 +71,12 @@ fun BottomBar(navController: NavHostController, buttonShape: RoundedCornerShape)
         )
         {
             bottomBarItems.forEachIndexed { index, item ->
-                val selected = currentRoute == item.name.toLowerCase(Locale.ENGLISH)
+                val selected = item.locations.contains(currentRoute)
                 BottomNavigationItem(
                     selected = selected,
-                    onClick = { navigate(navController, item.name.toLowerCase(Locale.ENGLISH)) },
+                    onClick = { navigate(navController, item.location) },
                     icon = { Icon(item.icon, item.name) },
-                    label = { Text(item.name) },
+                    label = { Text(item.name, maxLines = 1, softWrap = false) },
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = MaterialTheme.colors.onBackground.copy(alpha = 0.8f),
                 )

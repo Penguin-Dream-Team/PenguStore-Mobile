@@ -21,10 +21,20 @@ class ListsService(
     val newListColor = mutableStateOf(AvailableListColor.BLUE)
     val newListLocation: MutableState<LatLng?> = mutableStateOf(null)
 
-    var pantryLists = mutableStateListOf<PantryList>()
+    val newListCode = mutableStateOf("")
+
+    val pantryLists = mutableStateListOf<PantryList>()
     val shoppingLists = mutableStateListOf<ShoppingList>()
 
     private var isCreating = mutableStateOf(false)
+    private var isImporting = mutableStateOf(false)
+
+    fun getList(type: UserListType, id: Long): UserList? {
+        return when (type) {
+            UserListType.PANTRY -> pantryLists.find { it.id == id }
+            UserListType.SHOPPING_LIST -> shoppingLists.find { it.id == id }
+        }
+    }
 
     fun newCanPickLocation(): Boolean {
         return newListName.value.isNotBlank()
@@ -38,6 +48,14 @@ class ListsService(
         newListName.value = ""
         newListColor.value = AvailableListColor.BLUE
         newListLocation.value = null
+    }
+
+    fun resetImportListData() {
+        newListCode.value = ""
+    }
+
+    fun newCanImportList(): Boolean {
+        return !isImporting.value && newListCode.value.isNotBlank()
     }
 
     suspend fun getPantryLists() {
@@ -99,6 +117,29 @@ class ListsService(
     /**
      * @throws PenguStoreApiException
      */
+    suspend fun importNewPantryList() {
+        if (isImporting.value) {
+            return
+        }
+
+        isImporting.value = true
+        try {
+            pantryLists.add(
+                api.importPantry(
+                    newListCode.value,
+                ).data
+            )
+            resetImportListData()
+            isImporting.value = false
+        } catch (e: PenguStoreApiException) {
+            isImporting.value = false
+            throw e
+        }
+    }
+
+    /**
+     * @throws PenguStoreApiException
+     */
     suspend fun createNewShoppingList() {
         if (isCreating.value) {
             return
@@ -116,15 +157,41 @@ class ListsService(
         isCreating.value = false
     }
 
-    suspend fun findListInLocation(latitude: Double, longitude: Double): UserListType? {
+    /**
+     * @throws PenguStoreApiException
+     */
+    suspend fun importNewShoppingList() {
+        if (isImporting.value) {
+            return
+        }
+
+        isImporting.value = true
+        try {
+            shoppingLists.add(
+                api.importShoppingList(
+                    newListCode.value,
+                ).data
+            )
+            resetImportListData()
+            isImporting.value = false
+        } catch (e: PenguStoreApiException) {
+            isImporting.value = false
+            throw e
+        }
+    }
+
+    suspend fun findListInLocation(
+        latitude: Double,
+        longitude: Double
+    ): Pair<UserListType, UserList>? {
         return try {
             with(api.findList(latitude, longitude)) {
-                store.selectedList = when (type) {
+                val list = when (type) {
                     UserListType.PANTRY ->
                         PantryList(
                             (list["id"] as Int).toLong(),
-                            list["code"] as String,
                             list["name"] as String,
+                            list["code"] as String,
                             list["latitude"] as Double,
                             list["longitude"] as Double,
                             list["productCount"] as Int,
@@ -135,14 +202,16 @@ class ListsService(
                         ShoppingList(
                             (list["id"] as Int).toLong(),
                             list["name"] as String,
+                            list["code"] as String,
                             list["latitude"] as Double,
                             list["longitude"] as Double,
                             list["color"] as String,
-                            list["shared"] as Boolean
+                            list["shared"] as Boolean,
+                            list["productCount"] as Int
                         )
                     }
                 }
-                type
+                type to list
             }
         } catch (e: PenguStoreApiException) {
             // No list found in location, so just load default view

@@ -83,7 +83,11 @@ fun ProfileScreenFooter(
                     Text("Are you sure you want to logout?")
                 },
                 text = {
-                    Text("You will lose access to your account and all data")
+                    if (store.guest) {
+                        Text("You will lose access to your account and all data")
+                    } else {
+                        Text("You will have to login again")
+                    }
                 }
             )
         }

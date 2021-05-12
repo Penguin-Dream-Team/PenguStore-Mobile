@@ -1,4 +1,4 @@
-package store.pengu.mobile.views.lists.pantry
+package store.pengu.mobile.views.lists.partials
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
@@ -20,12 +20,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.coil.CoilImage
 import store.pengu.mobile.R
-import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.UserList
 import store.pengu.mobile.utils.QRCodeUtils
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.partials.AnimatedShimmerLoading
@@ -33,9 +32,10 @@ import store.pengu.mobile.views.partials.AnimatedShimmerLoading
 @Suppress("UNUSED_VALUE")
 @ExperimentalAnimationApi
 @Composable
-fun SharePantryList(
-    pantryList: PantryList,
-    snackbarController: SnackbarController
+fun ShareList(
+    list: UserList,
+    snackbarController: SnackbarController,
+    type: String
 ) {
     Divider()
 
@@ -48,7 +48,7 @@ fun SharePantryList(
     if (!isCopying && shouldCopy) {
         isCopying = true
         clipboardManager.setText(
-            AnnotatedString(pantryList.code)
+            AnnotatedString(list.code)
         )
         snackbarController.showDismissibleSnackbar("Copied code to clipboard")
     } else if (isCopying) {
@@ -63,11 +63,11 @@ fun SharePantryList(
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Text(
-            text = "If you want to share this Pantry use this code or scan the QR Code"
+            text = "If you want to share this $type use this code or scan the QR Code"
         )
 
         OutlinedTextField(
-            value = pantryList.code,
+            value = list.code,
             onValueChange = {},
             readOnly = true,
             textStyle = TextStyle(
@@ -89,14 +89,14 @@ fun SharePantryList(
                 .width(300.dp)
         ) {
             CoilImage(
-                data = QRCodeUtils.generateQRCodeUrl(pantryList.code),
-                contentDescription = pantryList.code,
+                data = QRCodeUtils.generateQRCodeUrl(list.code),
+                contentDescription = list.code,
                 fadeIn = true,
                 contentScale = ContentScale.FillBounds,
                 error = {
                     Image(
                         painter = painterResource(id = R.drawable.default_image),
-                        contentDescription = pantryList.code,
+                        contentDescription = list.code,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
