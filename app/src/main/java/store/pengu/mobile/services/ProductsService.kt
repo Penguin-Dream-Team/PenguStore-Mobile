@@ -12,6 +12,7 @@ import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ProductInPantry
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.states.StoreState
+import store.pengu.mobile.storage.PenguCache
 
 class ProductsService(
     private val api: PenguStoreApi,
@@ -121,6 +122,14 @@ class ProductsService(
     suspend fun timeQueue(): Int {
         store.location = LatLng(50.25, 150.25)
         return api.timeQueue(store.location!!).data
+    }
+
+    suspend fun putImageCache(){
+        PenguCache.putAllImage(store.selectedProduct!!.id.toString(), api.getProductImageBarcode(store.selectedProduct!!.barcode!!).data)
+    }
+
+    fun getAllImagesCache(): List<String> {
+        return PenguCache.getAllImage(store.selectedProduct!!.id.toString()) ?: listOf<String>()
     }
 
     suspend fun getProductImages(): List<String> {
