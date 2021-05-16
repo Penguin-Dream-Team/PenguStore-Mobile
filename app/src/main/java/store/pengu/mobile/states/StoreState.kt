@@ -12,6 +12,7 @@ class StoreState {
     var selectedListType = mutableStateOf(0)
     var selectedList: UserList? = null
     var selectedProduct: Product? = null
+    var cartShoppingList: Long? = null
 
     fun isLoggedIn(): Boolean {
         return token.isNotBlank()
@@ -23,7 +24,6 @@ class StoreState {
 
     var shouldFindListInLocation: Boolean by mutableStateOf(true)
     var location: LatLng? = null
-    var numItems: Int? = null
     var joinQueueTime: Int? = null
 
     var userId: Long by mutableStateOf(1)
@@ -36,7 +36,7 @@ class StoreState {
     var amountNeeded: Int = 0
     var pantryProducts = mutableStateListOf<ProductInPantry>()
     var shoppingListProducts = mutableStateListOf<ProductInShoppingList>()
-    var cartProducts = mutableStateListOf<Pair<ProductInShoppingList, Int>>()
+    var cartProducts = mutableMapOf<Long, MutableList<MutableShopItem>>()
 
     var listLocation: LatLng? = null
 }

@@ -5,6 +5,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.navigation.NavController
 import io.ktor.util.*
 import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
@@ -27,6 +28,7 @@ fun BottomSheetMenus(
     productsService: ProductsService,
     store: StoreState,
     snackbarController: SnackbarController,
+    navController: NavController,
     currentRoute: String?,
     isBottomSheetOpen: Boolean,
     cameraService: CameraService,
@@ -56,6 +58,7 @@ fun BottomSheetMenus(
                 productsService,
                 store,
                 snackbarController,
+                navController,
                 cameraService,
             ) { closeMenu(null) }
         "product/{productId}" ->

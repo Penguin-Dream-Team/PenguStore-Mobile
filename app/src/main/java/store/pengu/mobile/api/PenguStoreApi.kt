@@ -323,8 +323,8 @@ class PenguStoreApi(
     suspend fun buyCart(cartRequest: CartRequest): Response.SuccessResponse<String> =
         post(Routes.BUY_CART, cartRequest)
 
-    suspend fun getProductSuggestion(productId: Long): Response.SuccessResponse<Long> =
-        get(Routes.GET_PRODUCT_SUGGESTION, productId.toString())
+    suspend fun getProductSuggestion(barcode: String): Response.SuccessResponse<Product> =
+        get(Routes.GET_PRODUCT_SUGGESTION(barcode))
 
     suspend fun joinQueue(location: LatLng, numItems: Int): Response.SuccessResponse<String> =
         post(Routes.JOIN_QUEUE, location, numItems)

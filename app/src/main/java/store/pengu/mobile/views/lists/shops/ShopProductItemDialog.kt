@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import store.pengu.mobile.data.ListProduct
+import store.pengu.mobile.data.MutableShopItem
 import store.pengu.mobile.views.partials.IconButton
 
 @ExperimentalAnimationApi
@@ -33,7 +34,6 @@ fun ShopProductItemDialog(
     var canFill by remember { mutableStateOf(true) }
 
     if (product != null) {
-        // TODO
         canSave = pantries.values.any { it.inCart.value != 0 }
         canFill = pantries.values.any { it.inCart.value != it.amountNeeded }
 
@@ -109,7 +109,7 @@ fun ShopProductItemDialog(
 
                     pantries.values.forEach { pantry ->
                         Text(
-                            text = pantry.name,
+                            text = pantry.listName,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
                             maxLines = 1
@@ -159,5 +159,4 @@ fun ShopProductItemDialog(
             },
         )
     }
-
 }

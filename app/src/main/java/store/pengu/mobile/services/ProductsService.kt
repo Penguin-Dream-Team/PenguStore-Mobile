@@ -1,16 +1,18 @@
 package store.pengu.mobile.services
 
+import android.util.Log
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
-import store.pengu.mobile.data.ListProduct
-import store.pengu.mobile.data.Product
-import store.pengu.mobile.data.ProductInPantry
-import store.pengu.mobile.data.ProductInShoppingList
+import store.pengu.mobile.data.*
 import store.pengu.mobile.data.productlists.ProductListEntry
 import store.pengu.mobile.data.productlists.ProductPantryListEntry
 import store.pengu.mobile.data.productlists.ProductShoppingListEntry
@@ -181,20 +183,33 @@ class ProductsService(
 
     suspend fun addProductToPantryList(
         productId: Long,
+        barcode: String?,
         pantryId: Long,
         haveAmount: Int,
         needAmount: Int
-    ) {
+    ): Product? {
         try {
             val received =
                 api.addProductToPantryList(productId, pantryId, haveAmount, needAmount).data
             if (!productPantryLists.contains(productId)) {
                 productPantryLists[productId] = mutableStateListOf()
             }
+
+            val oldProduct = productPantryLists[productId]?.firstOrNull {
+                pantryId == it.listId
+            }
             updateProductList(received, productPantryLists[productId]!!)
+
+            return if (barcode != null && (oldProduct == null || oldProduct.amountNeeded < needAmount)) {
+               api.getProductSuggestion(barcode).data
+            } else {
+                null
+            }
+
         } catch (e: Exception) {
             // fetch from cache
             e.printStackTrace()
+            return null
         }
     }
 
@@ -212,6 +227,23 @@ class ProductsService(
         } catch (e: Exception) {
             // fetch from cache
             e.printStackTrace()
+        }
+    }
+
+    fun addProductToCart(
+        pantries: SnapshotStateMap<Long, MutableShopItem>,
+    ) {
+        pantries.keys.forEach { pantryId ->
+            pantries[pantryId]?.let {
+                if (it.inCart.value != 0) {
+                    if (store.cartProducts.containsKey(pantryId)) {
+                        store.cartProducts[pantryId]?.remove(it)
+                        store.cartProducts[pantryId]?.add(it)
+                    } else {
+                        store.cartProducts[pantryId] = mutableListOf(it)
+                    }
+                }
+            }
         }
     }
 

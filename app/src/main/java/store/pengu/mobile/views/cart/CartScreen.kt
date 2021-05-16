@@ -16,17 +16,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import store.pengu.mobile.data.ProductInShoppingList
+import store.pengu.mobile.data.MutableShopItem
+import store.pengu.mobile.services.CartService
 import store.pengu.mobile.states.StoreState
 
 @Composable
-fun CartScreen(navController: NavController, store: StoreState) {
-    val storeState by remember { mutableStateOf(store) }
+fun CartScreen(
+    navController: NavController,
+    cartService: CartService,
+    store: StoreState
+) {
     val openDialog = remember { mutableStateOf(false) }
-    val products by remember { mutableStateOf(store.cartProducts) }
-    val desiredAmount = remember { mutableStateOf(1) }
-    val currentProduct = remember { mutableStateOf(ProductInShoppingList(0L, 0L, "", "", 0, 2, 4.20, "", listOf())) }
-    store.numItems = 0
+    var currentProduct: MutableShopItem? = null
 
     Column(verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
@@ -38,7 +39,7 @@ fun CartScreen(navController: NavController, store: StoreState) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        if (products.isEmpty()) {
+        if (store.cartProducts.isEmpty()) {
             Text(text = "Your cart is empty")
         } else {
             LazyColumn(
@@ -46,44 +47,49 @@ fun CartScreen(navController: NavController, store: StoreState) {
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                items(products) { product ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "${product.first.name}: ${product.second}",
-                            fontWeight = FontWeight.SemiBold
-                        )
+                store.cartProducts.keys.forEach { list ->
+                    val productsInList = mutableStateOf(store.cartProducts[list]?.toList() ?: emptyList())
+                    items(productsInList.value) { product ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "${product.productName} in Pantry ${product.listName}: ${product.inCart.value}",
+                                fontWeight = FontWeight.SemiBold
+                            )
 
-                        if ((product.first.amountNeeded - product.first.amountAvailable) != 1) {
+                            if ((product.amountNeeded - product.amountAvailable) != 1) {
+                                IconButton(
+                                    onClick = {
+                                        currentProduct = product
+                                        openDialog.value = true
+                                    },
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        tint = Color(52, 247, 133),
+                                        contentDescription = "Edit"
+                                    )
+                                }
+                            }
+
                             IconButton(
                                 onClick = {
-                                    currentProduct.value = product.first
-                                    desiredAmount.value = product.second
-                                    openDialog.value = true
+                                    store.cartProducts[list]?.let {
+                                        it.remove(product)
+                                        if (it.isEmpty()) store.cartShoppingList = null
+                                    }
                                 },
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.Edit,
+                                    imageVector = Icons.Filled.RemoveCircle,
                                     tint = Color(52, 247, 133),
-                                    contentDescription = "Edit"
+                                    contentDescription = "Remove"
                                 )
                             }
-                        }
-
-                        IconButton(
-                            onClick = {
-                                storeState.cartProducts.removeAt(products.indexOf(product))
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.RemoveCircle,
-                                tint = Color(52, 247, 133),
-                                contentDescription = "Remove"
-                            )
                         }
                     }
                 }
@@ -94,22 +100,20 @@ fun CartScreen(navController: NavController, store: StoreState) {
 
         Button(
             onClick = {
-                products.forEach { product ->
-                    storeState.numItems = storeState.numItems!!.plus(product.second)
-                }
-                navController.navigate("cart_confirmation")
+                cartService.buyCart()
+                navController.navigate("lists")
             },
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Checkout",
+                text = "Finish Shopping",
                 textAlign = TextAlign.Center
             )
         }
     }
 
-    if (openDialog.value) {
+    if (openDialog.value && currentProduct != null) {
         AlertDialog(
             onDismissRequest = {
                 openDialog.value = false
@@ -127,8 +131,8 @@ fun CartScreen(navController: NavController, store: StoreState) {
                 ) {
                     IconButton(
                         onClick = {
-                            if (desiredAmount.value > 1)
-                                desiredAmount.value--
+                            if (currentProduct!!.inCart.value > 1)
+                                currentProduct!!.inCart.value--
                         }
                     ) {
                         Icon(
@@ -137,12 +141,12 @@ fun CartScreen(navController: NavController, store: StoreState) {
                         )
                     }
 
-                    Text(text = "Amount: ${desiredAmount.value}")
+                    Text(text = "Amount: ${currentProduct!!.inCart.value}")
 
                     IconButton(
                         onClick = {
-                            if (desiredAmount.value < (currentProduct.value.amountNeeded - currentProduct.value.amountAvailable))
-                                desiredAmount.value++
+                            if (currentProduct!!.inCart.value < (currentProduct!!.amountNeeded - currentProduct!!.amountAvailable))
+                                currentProduct!!.inCart.value++
                         }
                     ) {
                         Icon(
@@ -156,9 +160,8 @@ fun CartScreen(navController: NavController, store: StoreState) {
                 Button(
                     onClick = {
                         openDialog.value = false
-                        storeState.cartProducts.add(Pair(currentProduct.value, desiredAmount.value))
                     }) {
-                    Text("Add to Cart")
+                    Text("Save")
                 }
             },
             dismissButton = {

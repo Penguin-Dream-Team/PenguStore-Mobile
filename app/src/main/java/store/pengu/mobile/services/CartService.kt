@@ -17,11 +17,20 @@ class CartService(
 
     fun buyCart() = GlobalScope.launch(Dispatchers.Main) {
         val requests = mutableStateListOf<CartProduct>()
-        store.cartProducts.forEach { product ->
-            val cartProduct = CartProduct(product.first.id, product.first.listId, product.second)
-            requests.add(cartProduct)
+        store.cartProducts.forEach { entry ->
+            entry.value.forEach { product ->
+                val cartProduct = CartProduct(product.productId, entry.key, product.inCart.value)
+                requests.add(cartProduct)
+            }
         }
-        api.buyCart(CartRequest(requests))
-        listsService.getPantryLists()
+        try {
+            api.buyCart(CartRequest(requests))
+            store.cartProducts.clear()
+            store.cartShoppingList = null
+            listsService.getPantryLists()
+        } catch (e: Exception) {
+            // fetch from cache
+            e.printStackTrace()
+        }
     }
 }
