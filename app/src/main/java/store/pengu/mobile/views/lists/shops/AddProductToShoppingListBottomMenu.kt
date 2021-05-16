@@ -68,7 +68,7 @@ fun AddProductToShoppingListBottomMenu(
                 label = "Find Product From Shop",
                 icon = Icons.Filled.Search,
                 onClick = {
-                    closeMenu("search/${selectedList.id}")
+                    closeMenu("search?shopId=${selectedList.id}")
                 },
                 modifier = Modifier.weight(0.5f)
             )
@@ -91,7 +91,7 @@ fun AddProductToShoppingListBottomMenu(
             label = "Create New Product",
             icon = Icons.Filled.Add,
             onClick = {
-                closeMenu("new_product")
+                closeMenu("new_item?shopId=${selectedList.id}")
             }
         )
 

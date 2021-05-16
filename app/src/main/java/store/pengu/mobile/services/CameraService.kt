@@ -163,19 +163,10 @@ class CameraService {
             .addOnSuccessListener { barcodes ->
                 barcodes.forEach { barcode ->
                     barcode.rawValue?.let { it ->
-                        val parameters = it.split("&").mapNotNull {
-                            val split = it.split("=")
-                            if (split.size == 2) {
-                                split[0] to split[1]
-                            } else {
-                                null
-                            }
-                        }.toMap()
-
-                        if (scanType == ScanType.LIST_CODE && parameters.contains("code")) {
+                        if (scanType == ScanType.LIST_CODE) {
+                            onSuccess(it)
                             imageProxy.close()
                             barcodeScanner.close()
-                            onSuccess(parameters["code"]!!)
                         } else if (scanType == ScanType.PRODUCT_BARCODE) {
                             onSuccess(it)
                             imageProxy.close()

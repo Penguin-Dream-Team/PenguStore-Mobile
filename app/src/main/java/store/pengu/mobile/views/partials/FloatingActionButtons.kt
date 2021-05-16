@@ -5,8 +5,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
-import store.pengu.mobile.views.lists.ListsFloatingActionButton
 import store.pengu.mobile.views.lists.AddProductToListFloatingActionButton
+import store.pengu.mobile.views.lists.ListsFloatingActionButton
+import store.pengu.mobile.views.products.ProductInfo.ProductFloatingActionButton
 
 @ExperimentalAnimationApi
 @Composable
@@ -52,4 +53,25 @@ fun FloatingActionButtons(
             expandBottomSheetMenu
         )
     }
+
+    FloatingButton(
+        currentRoute,
+        expectedRoute = "add_product_to_list/{productId}?listType={listType}&listId={listId}"
+    ) {
+        ListsFloatingActionButton(
+            buttonShape,
+            expandBottomSheetMenu
+        )
+    }
+
+    FloatingButton(
+        currentRoute,
+        expectedRoute = "product/{productId}"
+    ) {
+        ProductFloatingActionButton(
+            buttonShape,
+            expandBottomSheetMenu
+        )
+    }
+
 }

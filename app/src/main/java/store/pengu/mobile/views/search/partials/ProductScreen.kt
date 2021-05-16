@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -34,13 +33,18 @@ import store.pengu.mobile.R
 import kotlin.math.max
 import kotlin.math.min
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import com.google.accompanist.coil.CoilImage
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import com.google.accompanist.imageloading.ImageLoadState
 import kotlinx.coroutines.launch
 import store.pengu.mobile.services.ProductsService
 
 import store.pengu.mobile.views.MainActivity
 import store.pengu.mobile.views.partials.AnimatedShimmerLoading
+import store.pengu.mobile.views.partials.pulltorefresh.LoadingProgressIndicator
 
 private val BottomBarHeight = 56.dp
 private val TitleHeight = 128.dp
@@ -54,39 +58,69 @@ private val CollapsedImageSize = 150.dp
 private val HzPadding = Modifier.padding(horizontal = 24.dp)
 
 @ExperimentalAnimationApi
-@SuppressLint("CoroutineCreationDuringComposition")
+@SuppressLint("CoroutineCreationDuringComposition", "RestrictedApi")
 @Composable
 fun ProductScreen(
     navController: NavHostController,
     productsService: ProductsService,
     mainActivity: MainActivity,
-    store: StoreState
+    store: StoreState,
+    productId: Long
 ) {
-    val storeState by remember { mutableStateOf(store) }
-    val selectedProduct = storeState.selectedProduct
     val coroutineScope = rememberCoroutineScope()
     val productImages = remember { mutableStateListOf<String>() }
     var loaded by remember { mutableStateOf(false) }
-    if (!loaded) {
+    var loading by remember { mutableStateOf(true) }
+
+    AnimatedVisibility(visible = loading) {
         coroutineScope.launch {
-            productImages.addAll(productsService.getProductImages())
+            productsService.fetchProduct(productId)
+            loading = false
         }
-        loaded = true
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            LoadingProgressIndicator(
+                progressColor = MaterialTheme.colors.primary,
+                backgroundColor = MaterialTheme.colors.surface
+            )
+            Text(
+                modifier = Modifier.padding(top = 10.dp),
+                text = stringResource(R.string.loading)
+            )
+        }
     }
 
-    Box(Modifier.fillMaxSize()) {
-        val scroll = rememberScrollState(0)
-        Header()
-        Body(scroll)
-        Title(selectedProduct!!, scroll.value)
-        if (productImages.isEmpty()) {
-            Image("", selectedProduct.name, scroll.value)
-        } else {
-            Image(productImages[0], selectedProduct.name, scroll.value)
+    if (!loading) {
+        val selectedProduct = store.selectedProduct
+        if (selectedProduct == null) {
+            navController.popBackStack()
+            return
         }
-        Back(navController)
-        Share(mainActivity)
-        CartBottomBar(modifier = Modifier.align(Alignment.BottomCenter))
+
+
+
+        if (!loaded) {
+            loaded = true
+        }
+
+        Box(Modifier.fillMaxSize()) {
+            val scroll = rememberScrollState(0)
+            Header()
+            Body(scroll)
+            Title(selectedProduct!!, scroll.value)
+            if (productImages.isEmpty()) {
+                Image("", selectedProduct.name, scroll.value)
+            } else {
+                Image(productImages[0], selectedProduct.name, scroll.value)
+            }
+            Back(navController)
+            Share(mainActivity)
+            CartBottomBar(modifier = Modifier.align(Alignment.BottomCenter))
+        }
     }
 }
 
@@ -284,6 +318,11 @@ private fun Image(
     productName: String,
     scroll: Int
 ) {
+    val imagePainter = rememberCoilPainter(
+        request = imageUrl,
+        fadeIn = true,
+    )
+
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
     val collapseFraction = (scroll / collapseRange).coerceIn(0f, 1f)
 
@@ -291,27 +330,30 @@ private fun Image(
         collapseFraction = collapseFraction,
         modifier = HzPadding.then(Modifier.statusBarsPadding())
     ) {
-        Surface(
-            color = Color.LightGray,
-            elevation = 0.dp,
-            shape = CircleShape,
-            modifier = Modifier.fillMaxSize()
+        val imageSize = 300.dp
+        Box(
+            modifier = Modifier
+                .size(imageSize)
+                .padding(end = 10.dp)
+                .clip(RoundedCornerShape(5))
         ) {
-            CoilImage(
-                data = imageUrl ?: "",
-                contentDescription = productName,
-                fadeIn = true,
+            Image(
+                painter = imagePainter,
+                contentDescription = "product image",
                 contentScale = ContentScale.Crop,
-                error = {
-                    Image(
-                        painter = painterResource(id = R.drawable.default_image), productName,
-                        contentScale = ContentScale.Crop
-                    )
-                },
-                loading = {
-                    AnimatedShimmerLoading()
-                }
+                modifier = Modifier.size(imageSize)
             )
+            when (imagePainter.loadState) {
+                is ImageLoadState.Loading -> AnimatedShimmerLoading()
+                is ImageLoadState.Empty,
+                is ImageLoadState.Error -> Image(
+                    painterResource(R.drawable.default_image),
+                    contentDescription = "product image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(imageSize)
+                )
+                else -> Unit
+            }
         }
     }
 }

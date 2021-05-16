@@ -30,17 +30,22 @@ fun SearchScreen(
     navController: NavHostController,
     productsService: ProductsService,
     store: StoreState,
-    shopId: Long? = null
+    shopId: Long? = null,
+    pantryId: Long? = null,
 ) {
     val storeState by remember { mutableStateOf(store) }
     val selectedProductId = remember { mutableStateOf(-2L) }
     val coroutineScope = rememberCoroutineScope()
     val products = remember {
-        if (shopId == null) {
-            productsService.getAllProducts()
-        } else {
-            productsService.getShoppingListProducts(shopId).map {
-                it.toProduct()
+        when {
+            shopId == null && pantryId == null -> {
+                productsService.getAllProducts()
+            }
+            pantryId != null -> {
+                productsService.getMissingPantryProducts(pantryId)
+            }
+            else -> {
+                productsService.getShoppingListProducts(shopId!!).map { it.toProduct() }
             }
         }
     }
@@ -59,10 +64,16 @@ fun SearchScreen(
         val refresh = {
             isRefreshing = true
             coroutineScope.launch(Dispatchers.IO) {
-                if (shopId == null) {
-                    productsService.fetchAllProducts()
-                } else {
-                    productsService.fetchShoppingListProducts(shopId)
+                when {
+                    shopId == null && pantryId == null -> {
+                        productsService.fetchAllProducts()
+                    }
+                    pantryId != null -> {
+                        productsService.fetchMissingPantryProducts(pantryId)
+                    }
+                    else -> {
+                        productsService.fetchShoppingListProducts(shopId!!)
+                    }
                 }
                 isRefreshing = false
             }

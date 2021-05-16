@@ -8,11 +8,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import io.ktor.util.*
 import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
+import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.lists.bottommenu.ListsBottomSheetMenu
 import store.pengu.mobile.views.lists.pantry.AddProductToPantryBottomMenu
 import store.pengu.mobile.views.lists.shops.AddProductToShoppingListBottomMenu
+import store.pengu.mobile.views.products.ProductInfo.bottommenu.EditProductBottomSheetMenu
+import store.pengu.mobile.views.products.AddProductToListView.bottommenu.ListsBottomSheetMenu as AddProductToListBottomSheetMenu
 
 @KtorExperimentalAPI
 @ExperimentalComposeUiApi
@@ -21,6 +24,7 @@ import store.pengu.mobile.views.lists.shops.AddProductToShoppingListBottomMenu
 @Composable
 fun BottomSheetMenus(
     listsService: ListsService,
+    productsService: ProductsService,
     store: StoreState,
     snackbarController: SnackbarController,
     currentRoute: String?,
@@ -44,6 +48,21 @@ fun BottomSheetMenus(
         "shopping_list/{shopId}" ->
             AddProductToShoppingListBottomMenu(
                 store,
+                closeMenu
+            )
+        "add_product_to_list/{productId}?listType={listType}&listId={listId}" ->
+            AddProductToListBottomSheetMenu(
+                listsService,
+                productsService,
+                store,
+                snackbarController,
+                cameraService,
+            ) { closeMenu(null) }
+        "product/{productId}" ->
+            EditProductBottomSheetMenu(
+                productsService,
+                store,
+                snackbarController,
                 closeMenu
             )
         else -> {

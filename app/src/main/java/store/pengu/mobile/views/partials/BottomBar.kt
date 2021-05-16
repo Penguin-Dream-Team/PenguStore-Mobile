@@ -35,8 +35,7 @@ private val bottomBarItems = listOf(
         "New Item",
         Icons.Filled.Add,
         listOf(
-            "search",
-            "search/{shopId}",
+            "search?shopId={shopId}&pantryId={pantryId}",
         )
     ),
     BottomBarItem("Cart", Icons.Filled.ShoppingCart),
@@ -47,6 +46,8 @@ private val bottomBarButtonItems = listOf(
     "lists",
     "pantry_list/{pantryId}",
     "shopping_list/{shopId}",
+    "add_product_to_list/{productId}?listType={listType}&listId={listId}",
+    "product/{productId}"
 )
 
 data class BottomBarItem(

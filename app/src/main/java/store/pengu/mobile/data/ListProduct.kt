@@ -17,7 +17,7 @@ abstract class ListProduct(
             id = id,
             name = name,
             barcode = barcode,
-            productRating = 0f,
+            productRating = 0.0,
             userRating = 0,
             ratings = emptyList(),
             image = image

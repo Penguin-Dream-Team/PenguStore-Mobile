@@ -110,12 +110,24 @@ fun ViewPantryList(
         setHaveAmount = setHaveAmount,
         setNeedAmount = setNeedAmount,
         onClose = { selectedProduct = null },
+        onSave = {
+            coroutineScope.launch {
+                productsService.addProductToPantryList(
+                    selectedProduct!!.id,
+                    pantryList.id,
+                    haveAmount,
+                    needAmount
+                )
+                refresh()
+                selectedProduct = null
+            }
+        },
         onViewInfo = {
             selectedProduct?.let {
                 store.selectedProduct = it.toProduct()
+                navController.navigate("product/${it.id}")
             }
             selectedProduct = null
-            navController.navigate("product")
         }
     )
 }

@@ -79,7 +79,6 @@ fun ListsScreen(
             ListItem(
                 title = item.name,
                 productAmount = item.productCount,
-                //productAmount = 0,
                 location = GeoUtils.getLocationName(context, item.latitude, item.longitude),
                 color = item.color.toColor(),
                 isShared = item.shared,

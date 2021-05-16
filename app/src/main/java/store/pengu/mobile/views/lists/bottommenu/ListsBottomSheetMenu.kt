@@ -51,7 +51,7 @@ fun ListsBottomSheetMenu(
 
     when (selectedListType) {
         0 -> {
-           ListBottomMenu(
+            ListBottomMenu(
                 title = "Pantry List",
                 listsService,
                 closeMenuWrapper,
@@ -93,7 +93,11 @@ fun ListsBottomSheetMenu(
                         listsService.importNewShoppingList()
                     }
                 },
-                onScan = {},
+                onScan = {
+                    listsService.newListCode.value = it
+                    setFormType(1)
+                    snackbarController.showDismissibleSnackbar("Scanned $it")
+                },
                 snackbarController,
                 cameraService
             )

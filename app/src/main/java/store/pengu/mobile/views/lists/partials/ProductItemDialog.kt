@@ -9,7 +9,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import store.pengu.mobile.data.ListProduct
-import store.pengu.mobile.data.ProductInPantry
 import store.pengu.mobile.views.partials.IconButton
 
 @ExperimentalAnimationApi
@@ -29,6 +27,7 @@ fun ProductItemDialog(
     setHaveAmount: (Int) -> Unit,
     setNeedAmount: (Int) -> Unit,
     onClose: () -> Unit,
+    onSave: () -> Unit,
     onViewInfo: () -> Unit,
 ) {
     val close = {
@@ -122,17 +121,7 @@ fun ProductItemDialog(
             },
             confirmButton = {
                 Button(
-                    onClick = {
-                        close()
-/*
-                        productsService.updateProduct(
-                            pantryList.id,
-                            selectedProductId.value,
-                            amountAvailable.value,
-                            amountNeeded.value
-                        )
-*/
-                    },
+                    onClick = onSave,
                     enabled = product.amountAvailable != haveAmount || product.amountNeeded != needAmount
                 ) {
                     Text("Save")

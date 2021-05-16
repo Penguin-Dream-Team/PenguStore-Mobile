@@ -18,14 +18,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
-import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.views.lists.partials.ProductItem
-import store.pengu.mobile.views.lists.partials.ProductItemDialog
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
+
+data class MutableShopItem(
+    val name: String,
+    val amountNeeded: Int,
+    var inCart: MutableState<Int> = mutableStateOf(0)
+)
 
 @Suppress("UNUSED_VALUE")
 @ExperimentalAnimationApi
@@ -55,7 +58,7 @@ fun ViewShoppingList(
 
     val products = remember { productsService.getShoppingListProducts(shoppingList.id) }
     var selectedProduct: ProductInShoppingList? by remember { mutableStateOf(null) }
-    val (haveAmount, setHaveAmount) = remember { mutableStateOf(0) }
+    val pantries = remember { mutableStateMapOf<Long, MutableShopItem>() }
     val (needAmount, setNeedAmount) = remember { mutableStateOf(0) }
 
     PullToRefresh(
@@ -79,34 +82,41 @@ fun ViewShoppingList(
                 }
             }
             items(items = products) { product ->
-                ProductItem(
+                ShopProductItem(
                     title = product.name,
-                    haveAmount = product.amountAvailable,
+                    pantryNum = product.pantries.size,
                     needAmount = product.amountNeeded,
                     color = shoppingList.color,
                     image = product.image
                 ) {
                     selectedProduct = product
-                    setHaveAmount(product.amountAvailable)
+                    pantries.clear()
+                    pantries.putAll(product.pantries.map {
+                        it.listId to MutableShopItem(
+                            it.listName,
+                            it.amountNeeded
+                        )
+                    })
                     setNeedAmount(product.amountNeeded)
                 }
             }
         }
     }
 
-    ProductItemDialog(
+    ShopProductItemDialog(
         product = selectedProduct,
-        haveAmount = haveAmount,
-        needAmount = needAmount,
-        setHaveAmount = setHaveAmount,
-        setNeedAmount = setNeedAmount,
+        pantries = pantries,
         onClose = { selectedProduct = null },
+        onSave = {
+            // TODO
+            selectedProduct = null
+        },
         onViewInfo = {
             selectedProduct?.let {
                 store.selectedProduct = it.toProduct()
+                navController.navigate("product/${it.id}")
             }
             selectedProduct = null
-            navController.navigate("product")
         }
     )
 }

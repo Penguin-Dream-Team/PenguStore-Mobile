@@ -41,7 +41,7 @@ fun ScanListBottomMenu(
     title: String,
     onScan: (String) -> Unit,
     snackbarController: SnackbarController,
-    cameraService: CameraService
+    cameraService: CameraService,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current

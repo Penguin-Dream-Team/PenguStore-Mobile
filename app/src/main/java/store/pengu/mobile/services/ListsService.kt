@@ -1,6 +1,8 @@
 package store.pengu.mobile.services
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.api.PenguStoreApi
@@ -48,10 +50,12 @@ class ListsService(
         newListName.value = ""
         newListColor.value = AvailableListColor.BLUE
         newListLocation.value = null
+        isCreating.value = false
     }
 
     fun resetImportListData() {
         newListCode.value = ""
+        isImporting.value = false
     }
 
     fun newCanImportList(): Boolean {
@@ -97,40 +101,44 @@ class ListsService(
     /**
      * @throws PenguStoreApiException
      */
-    suspend fun createNewPantryList() {
+    suspend fun createNewPantryList(): PantryList {
         if (isCreating.value) {
-            return
+            throw RuntimeException("Oops")
         }
 
         isCreating.value = true
-        pantryLists.add(
-            api.createPantryList(
+        try {
+            val list = api.createPantryList(
                 newListName.value,
                 newListLocation.value!!,
                 newListColor.value
             ).data
-        )
-        resetNewListData()
-        isCreating.value = false
+            pantryLists.add(list)
+            resetNewListData()
+            return list
+        } catch (e: PenguStoreApiException) {
+            isCreating.value = false
+            throw e
+        }
     }
 
     /**
      * @throws PenguStoreApiException
      */
-    suspend fun importNewPantryList() {
+    suspend fun importNewPantryList(): PantryList {
         if (isImporting.value) {
-            return
+            throw RuntimeException("Oops")
         }
 
         isImporting.value = true
         try {
-            pantryLists.add(
-                api.importPantry(
-                    newListCode.value,
-                ).data
-            )
+            val list = api.importPantry(
+                newListCode.value,
+            ).data
+            pantryLists.add(list)
             resetImportListData()
             isImporting.value = false
+            return list
         } catch (e: PenguStoreApiException) {
             isImporting.value = false
             throw e
@@ -140,40 +148,44 @@ class ListsService(
     /**
      * @throws PenguStoreApiException
      */
-    suspend fun createNewShoppingList() {
+    suspend fun createNewShoppingList(): ShoppingList {
         if (isCreating.value) {
-            return
+            throw RuntimeException("Oops")
         }
 
         isCreating.value = true
-        shoppingLists.add(
-            api.createShoppingList(
+        try {
+            val list = api.createShoppingList(
                 newListName.value,
                 newListLocation.value!!,
                 newListColor.value
             ).data
-        )
-        resetNewListData()
-        isCreating.value = false
+            shoppingLists.add(list)
+            resetNewListData()
+            return list
+        } catch (e: PenguStoreApiException) {
+            isCreating.value = false
+            throw e
+        }
     }
 
     /**
      * @throws PenguStoreApiException
      */
-    suspend fun importNewShoppingList() {
+    suspend fun importNewShoppingList(): ShoppingList {
         if (isImporting.value) {
-            return
+            throw RuntimeException("Oops")
         }
 
         isImporting.value = true
         try {
-            shoppingLists.add(
-                api.importShoppingList(
-                    newListCode.value,
-                ).data
-            )
+            val list = api.importShoppingList(
+                newListCode.value,
+            ).data
+            shoppingLists.add(list)
             resetImportListData()
             isImporting.value = false
+            return list
         } catch (e: PenguStoreApiException) {
             isImporting.value = false
             throw e

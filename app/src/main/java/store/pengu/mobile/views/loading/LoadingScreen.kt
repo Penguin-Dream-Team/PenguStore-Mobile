@@ -132,8 +132,8 @@ fun LoadingScreen(
                             listsService.getShoppingLists()
                             navController.navigate("shopping_list/${list?.id}")
                         }
-                        //null -> navController.navigate("lists")
-                        null -> navController.navigate("new_item")
+                        null -> navController.navigate("lists")
+                        //null -> navController.navigate("add_product_to_list/1")
                     }
                 } catch (e: PenguStoreApiException) {
                     snackbarController.showDismissibleSnackbar("Can't reach the server")

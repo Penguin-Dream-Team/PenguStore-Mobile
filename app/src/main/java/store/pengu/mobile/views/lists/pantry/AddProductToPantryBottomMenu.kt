@@ -62,7 +62,7 @@ fun AddProductToPantryBottomMenu(
             label = "Find Product",
             icon = Icons.Filled.Search,
             onClick = {
-                closeMenu("search")
+                closeMenu("search?pantryId=${selectedList.id}")
             }
         )
 
@@ -72,7 +72,7 @@ fun AddProductToPantryBottomMenu(
             label = "Create New Product",
             icon = Icons.Filled.Add,
             onClick = {
-                closeMenu("new_product")
+                closeMenu("new_item?pantryId=${selectedList.id}")
             }
         )
 

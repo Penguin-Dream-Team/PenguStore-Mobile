@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.products
 
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,6 +9,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.navigate
 import coil.Coil
 import coil.request.ImageRequest
 import coil.util.CoilUtils
@@ -54,6 +58,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
+import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ProductsService
@@ -72,7 +77,6 @@ import java.util.*
  *  barcode?
  *  image?
  */
-@InternalCoroutinesApi
 @KtorExperimentalAPI
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -80,7 +84,10 @@ import java.util.*
 fun NewProductView(
     snackbarController: SnackbarController,
     cameraService: CameraService,
-    productsService: ProductsService
+    productsService: ProductsService,
+    shopId: Long? = null,
+    pantryId: Long? = null,
+    navController: NavHostController
 ) {
     Column(
         modifier = Modifier
@@ -101,7 +108,14 @@ fun NewProductView(
             )
         }
 
-        ProductForm(snackbarController, cameraService, productsService)
+        ProductForm(
+            snackbarController,
+            cameraService,
+            productsService,
+            shopId,
+            pantryId,
+            navController
+        )
     }
 
     /**
@@ -120,7 +134,7 @@ fun NewProductView(
  *  barcode?
  *  image?
  */
-@InternalCoroutinesApi
+@SuppressLint("RestrictedApi")
 @KtorExperimentalAPI
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -128,7 +142,10 @@ fun NewProductView(
 private fun ProductForm(
     snackbarController: SnackbarController,
     cameraService: CameraService,
-    productsService: ProductsService
+    productsService: ProductsService,
+    shopId: Long?,
+    pantryId: Long?,
+    navController: NavHostController
 ) {
     var name by remember { mutableStateOf("test") }
     var barcode by remember { mutableStateOf("") }
@@ -159,12 +176,27 @@ private fun ProductForm(
         coroutineScope.launch {
             val imageData = ImageUtils.getEncodedImage(context, productImage)
             try {
-                productsService.createProduct(
+                val product = productsService.createProduct(
                     name,
                     if (barcode.isNotBlank()) barcode else null,
                     if (productImage.isNotBlank()) imageData else null
                 )
-            } catch(e: PenguStoreApiException) {
+
+                navController.popBackStack()
+
+                when {
+                    shopId == null && pantryId == null -> {
+                        navController.navigate("product/${product.id}")
+                    }
+                    pantryId != null -> {
+                        navController.navigate("add_product_to_list/${product.id}?listType=${UserListType.PANTRY.ordinal}&listId=$pantryId")
+                    }
+                    else -> {
+                        navController.navigate("add_product_to_list/${product.id}?listType=${UserListType.SHOPPING_LIST.ordinal}&listId=$shopId")
+                    }
+                }
+
+            } catch (e: PenguStoreApiException) {
                 snackbarController.showDismissibleSnackbar(e.message)
             }
         }
@@ -334,6 +366,7 @@ private fun ProductForm(
                             this
                         )
                     }
+                    Log.d("Hello", photoURI.toString())
                     image = photoURI
                     cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))

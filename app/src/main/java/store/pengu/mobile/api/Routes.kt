@@ -33,9 +33,16 @@ object Routes {
     fun IMPORT_SHOPPING_LIST(code: String) = "/lists/shops/import/$code"
     fun GET_PANTRY(pantryId: Long) = "/lists/pantries/$pantryId"
     fun GET_SHOPPING_LIST(shoppingListId: Long) = "/lists/shops/$shoppingListId"
+    fun GET_PANTRY_MISSING_PRODUCTS(pantryId: Long) = "/lists/pantries/$pantryId/missing"
 
     const val GET_PRODUCTS = "/products"
     const val CREATE_PRODUCT = "/products"
+    fun GET_PRODUCT(productId: Long) = "/products/$productId"
+    fun GET_PRODUCT_PANTRY_LISTS(productId: Long) = "/products/$productId/pantries"
+    fun GET_PRODUCT_SHOPPING_LISTS(productId: Long) = "/products/$productId/shops"
+    fun ADD_PRODUCT_PANTRY_LIST(productId: Long) = "/products/$productId/pantries"
+    fun ADD_PRODUCT_SHOPPING_LIST(productId: Long) = "/products/$productId/shops"
+    fun GET_PRODUCT_IMAGES(productId: Long) = "/products/$productId/images"
 
 
     /**
@@ -61,7 +68,6 @@ object Routes {
     const val UPDATE_PANTRY_PRODUCT = "/pantries/updateProduct"
     const val DELETE_PANTRY_PRODUCT = "/pantries/deleteProduct"
 
-    const val GET_PRODUCT = "/products/id"
     const val UPDATE_PRODUCT = "/products/update"
     const val ADD_BARCODE_PRODUCT = "/products/addBarcode"
 
@@ -83,8 +89,6 @@ object Routes {
 
     const val ADD_IMAGE = "/images/addImage"
     const val DELETE_IMAGE = "/images/deleteImage"
-    const val PRODUCT_IMAGE_BARCODE = "/images/barcode/id"
-    const val PRODUCT_IMAGE_PRODUCT_ID = "/images/productId/id"
 
     const val TRANSLATION = "/translation/id"
 

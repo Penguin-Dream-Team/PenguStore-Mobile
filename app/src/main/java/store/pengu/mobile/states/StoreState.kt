@@ -11,6 +11,7 @@ class StoreState {
     var email: String by mutableStateOf("")
     var selectedListType = mutableStateOf(0)
     var selectedList: UserList? = null
+    var selectedProduct: Product? = null
 
     fun isLoggedIn(): Boolean {
         return token.isNotBlank()
@@ -31,7 +32,6 @@ class StoreState {
     //var shoppingLists = mutableStateListOf<ShoppingList2>()
     var lists = Array(2) { emptyList<UserList>() }
     var listType = -1
-    var selectedProduct: Product? = null
     var amountAvailable: Int = 0
     var amountNeeded: Int = 0
     var pantryProducts = mutableStateListOf<ProductInPantry>()

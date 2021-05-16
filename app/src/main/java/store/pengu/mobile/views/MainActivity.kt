@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.os.StrictMode
 import android.util.Log
 import android.view.WindowManager
 import androidx.activity.compose.setContent
@@ -48,10 +49,11 @@ import store.pengu.mobile.views.lists.shops.ViewShoppingList
 import store.pengu.mobile.views.loading.LoadingScreen
 import store.pengu.mobile.views.login.LoginScreen
 import store.pengu.mobile.views.partials.*
+import store.pengu.mobile.views.products.AddProductToListView.EditProductListsView
 import store.pengu.mobile.views.products.NewProductView
+import store.pengu.mobile.views.products.ProductInfo.ProductInfo
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
-import store.pengu.mobile.views.search.partials.ProductScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -99,6 +101,9 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     @SuppressLint("SourceLockedOrientationActivity", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val builder: StrictMode.VmPolicy.Builder = StrictMode.VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
@@ -157,6 +162,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         Box {
                             BottomSheetMenus(
                                 listsService,
+                                productsService,
                                 storeState,
                                 snackbarController,
                                 currentRoute,
@@ -286,36 +292,78 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     }
                                 }
 
-                                animatedComposable("search") {
+                                animatedComposable("search?shopId={shopId}&pantryId={pantryId}",
+                                    listOf(
+                                        navArgument("shopId") {
+                                            nullable = true
+                                        },
+                                        navArgument("pantryId") {
+                                            nullable = true
+                                        }
+                                    )
+                                ) { args ->
                                     SearchScreen(
                                         navController,
                                         productsService,
                                         storeState,
+                                        args!!["shopId"].toString().toLongOrNull(),
+                                        args["pantryId"].toString().toLongOrNull(),
                                     )
                                 }
 
-                                animatedComposable("search/{shopId}", listOf(
-                                    navArgument("shopId") { type = NavType.LongType }
+                                animatedComposable("product/{productId}", listOf(
+                                    navArgument("productId") { type = NavType.LongType }
                                 )) { args ->
-                                    SearchScreen(
+                                    ProductInfo(
+                                        productsService,
                                         navController,
+                                        storeState,
+                                        args!!["productId"] as Long
+                                    )
+                                }
+
+                                animatedComposable("new_item?shopId={shopId}&pantryId={pantryId}",
+                                    listOf(
+                                        navArgument("shopId") {
+                                            nullable = true
+                                        },
+                                        navArgument("pantryId") {
+                                            nullable = true
+                                        }
+                                    )
+                                ) { args ->
+                                    NewProductView(
+                                        snackbarController,
+                                        cameraService,
+                                        productsService,
+                                        args!!["shopId"].toString().toLongOrNull(),
+                                        args["pantryId"].toString().toLongOrNull(),
+                                        navController
+                                    )
+                                }
+
+                                animatedComposable(
+                                    "add_product_to_list/{productId}?listType={listType}&listId={listId}",
+                                    listOf(
+                                        navArgument("productId") { type = NavType.LongType },
+                                        navArgument("listType") {
+                                            defaultValue = UserListType.PANTRY.ordinal
+                                        },
+                                        navArgument("listId") {
+                                            nullable = true
+                                        }
+                                    )
+                                ) { args ->
+                                    EditProductListsView(
+                                        snackbarController,
+                                        listsService,
                                         productsService,
                                         storeState,
-                                        args!!["shopId"] as Long
-                                    )
-                                }
-
-                                animatedComposable("product") {
-                                    ProductScreen(
+                                        UserListType.values()[args!!["listType"] as Int],
+                                        args["productId"] as Long,
                                         navController,
-                                        productsService,
-                                        this@MainActivity,
-                                        storeState
+                                        args["listId"].toString().toLongOrNull(),
                                     )
-                                }
-
-                                animatedComposable("new_item") {
-                                    NewProductView(snackbarController, cameraService, productsService)
                                 }
 
                                 animatedComposable("cart") {
