@@ -164,9 +164,10 @@ class PenguStoreApi(
     suspend fun editProduct(
         productId: Long,
         name: String,
-        barcode: String?
+        barcode: String?,
+        imageData: String?
     ): Response.SuccessResponse<Product> {
-        val request = EditProductRequest(name, barcode?.run { if (isBlank()) null else this })
+        val request = EditProductRequest(name, barcode?.run { if (isBlank()) null else this }, imageData?.run { if (isBlank()) null else this })
         return post(Routes.EDIT_PRODUCT(productId), request)
     }
 

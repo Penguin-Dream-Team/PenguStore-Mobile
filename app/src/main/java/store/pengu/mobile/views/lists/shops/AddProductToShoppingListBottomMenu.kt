@@ -96,6 +96,7 @@ fun AddProductToShoppingListBottomMenu(
                 closeMenu("new_item?shopId=${selectedList.id}")
             }
         )
+/*
 
         OrDivider()
 
@@ -106,6 +107,7 @@ fun AddProductToShoppingListBottomMenu(
                 closeMenu("import_barcode")
             }
         )
+*/
     }
 }
 

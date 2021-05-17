@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavController
+import coil.ImageLoader
 import io.ktor.util.*
 import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
@@ -24,6 +25,7 @@ import store.pengu.mobile.views.products.AddProductToListView.bottommenu.ListsBo
 @ExperimentalAnimationApi
 @Composable
 fun BottomSheetMenus(
+    imageLoader: ImageLoader,
     listsService: ListsService,
     productsService: ProductsService,
     store: StoreState,
@@ -63,6 +65,7 @@ fun BottomSheetMenus(
             ) { closeMenu(null) }
         "product/{productId}" ->
             EditProductBottomSheetMenu(
+                imageLoader,
                 productsService,
                 store,
                 snackbarController,

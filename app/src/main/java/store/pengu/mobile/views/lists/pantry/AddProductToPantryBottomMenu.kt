@@ -77,6 +77,7 @@ fun AddProductToPantryBottomMenu(
                 closeMenu("new_item?pantryId=${selectedList.id}")
             }
         )
+/*
 
         OrDivider()
 
@@ -87,6 +88,7 @@ fun AddProductToPantryBottomMenu(
                 closeMenu("import_barcode")
             }
         )
+*/
     }
 }
 

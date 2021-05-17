@@ -221,6 +221,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         sheetContent = {
                             Box {
                                 BottomSheetMenus(
+                                    imageLoader,
                                     listsService,
                                     productsService,
                                     storeState,

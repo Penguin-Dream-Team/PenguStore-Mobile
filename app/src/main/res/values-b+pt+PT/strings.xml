@@ -153,4 +153,10 @@ Nome:\u0020</string>
     <string name="welcome">Bem vindo\u0020</string>
     <string name="reset">Repor</string>
     <string name="fill">Preencher</string>
+    <string name="userPromptBarcode">Este produto não tem barcode. Queres adicionar um?</string>
+    <string name="userPromptImage">Este produto não tem imagem. Queres adicionar uma?</string>
+    <string name="editProduct">Editar Produto</string>
+    <string name="userPromptShop">Este produto não está em nenhuma loja. Queres adicionar a uma?</string>
+    <string name="userPromptPantry">Este produto não está em nenhuma despensa. Queres adicionar a uma?</string>
+    <string name="productEditLists">Adicionar a lista</string>
 </resources>

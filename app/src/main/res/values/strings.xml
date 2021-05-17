@@ -153,4 +153,10 @@ Name:\u0020</string>
     <string name="welcome">\"Welcome \"</string>
     <string name="reset">Reset</string>
     <string name="fill">Fill</string>
+    <string name="userPromptBarcode">This product does not currently have a barcode. Do you want to add one?</string>
+    <string name="userPromptImage">This product does not currently have an image. Do you want to add one?</string>
+    <string name="editProduct">Edit Product</string>
+    <string name="userPromptShop">This product is not available in any shopping list. Do you want to add to one?</string>
+    <string name="userPromptPantry">This product is not used in any pantry list. Do you want to add to one?</string>
+    <string name="productEditLists">Edit Lists</string>
 </resources>

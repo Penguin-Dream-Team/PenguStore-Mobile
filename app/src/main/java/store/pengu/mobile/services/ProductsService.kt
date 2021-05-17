@@ -191,7 +191,10 @@ class ProductsService(
             val oldProduct = productPantryLists[productId]?.firstOrNull {
                 pantryId == it.listId
             }
-            updateProductList(received, productPantryLists[productId]!!)
+            if (!(haveAmount == needAmount && haveAmount == 0)) {
+                updateProductList(received, productPantryLists[productId]!!)
+            }
+            productPantryLists[productId]!!.removeIf { it.amountNeeded == it.amountAvailable && it.amountAvailable == 0 }
 
             return if (barcode != null && (oldProduct == null || oldProduct.amountNeeded < needAmount)) {
                 api.getProductSuggestion(barcode).data
@@ -248,7 +251,8 @@ class ProductsService(
 
         try {
             if (productBarcode != null) {
-                val productsInCart = store.cartProducts.values.flatten().toSet().map { it.productId }
+                val productsInCart =
+                    store.cartProducts.values.flatten().toSet().map { it.productId }
                 val remainingItems = products.filterNot { product ->
                     productsInCart.contains(product.id)
                 }.mapNotNull { it.barcode }
@@ -386,8 +390,8 @@ class ProductsService(
     }
 
 
-    suspend fun editProduct(productId: Long, name: String, barcode: String?): Product {
-        val product = api.editProduct(productId, name, barcode).data
+    suspend fun editProduct(productId: Long, name: String, barcode: String?, imageData: String?): Product {
+        val product = api.editProduct(productId, name, barcode, imageData).data
         store.setSelectedProduct(product)
         return product
     }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.stringResource
+import coil.ImageLoader
 import io.ktor.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ import store.pengu.mobile.utils.SnackbarController
 @ExperimentalAnimationApi
 @Composable
 fun EditProductBottomSheetMenu(
+    imageLoader: ImageLoader,
     productsService: ProductsService,
     store: StoreState,
     snackbarController: SnackbarController,
@@ -45,18 +47,17 @@ fun EditProductBottomSheetMenu(
     val product = store.selectedProduct
     if (product != null) {
         ProductFormBottomSheetMenu(
+            imageLoader,
             product,
             { closeMenu(null) },
-            onSave = { name, barcode ->
+            onSave = { name, barcode, imageData ->
                 actionWrapper(updatedProduct) {
-                    productsService.editProduct(product.id, name, barcode)
+                    productsService.editProduct(product.id, name, barcode, imageData)
                 }
             },
             onEditLists = {
                 closeMenu("add_product_to_list/${product.id}")
             },
-            onUploadImage = {
-            }
         )
     }
 }

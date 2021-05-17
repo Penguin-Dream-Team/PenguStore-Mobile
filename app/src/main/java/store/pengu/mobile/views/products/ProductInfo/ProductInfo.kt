@@ -157,9 +157,9 @@ fun ProductInfo(
                     },
                     text = {
                         if (popupType == PopupType.NEED_SHOP) {
-                            Text("This product is not available in any shopping list. Do you want to add to one?")
+                            Text(stringResource(R.string.userPromptShop))
                         } else {
-                            Text("This product is not used in any pantry list. Do you want to add to one?")
+                            Text(stringResource(R.string.userPromptPantry))
                         }
                     },
                     dismissButton = {
@@ -168,7 +168,7 @@ fun ProductInfo(
                                 showPopup = false
                                 popupType = null
                             }) {
-                            Text("Close")
+                            Text(stringResource(R.string.close))
                         }
                     },
                     confirmButton = {
@@ -184,7 +184,7 @@ fun ProductInfo(
                                 navController.navigate("add_product_to_list/${productId}?listType=${listType}")
                             }
                         ) {
-                            Text("Edit Lists")
+                            Text(stringResource(R.string.productEditLists))
                         }
                     }
                 )
@@ -198,9 +198,9 @@ fun ProductInfo(
                     },
                     text = {
                         if (popupType == PopupType.NEED_BARCODE) {
-                            Text("This product does not currently have a barcode. Do you want to add one?")
+                            Text(stringResource(R.string.userPromptBarcode))
                         } else {
-                            Text("This product does not currently have an image. Do you want to add one?")
+                            Text(stringResource(R.string.userPromptImage))
                         }
                     },
                     dismissButton = {
@@ -209,7 +209,7 @@ fun ProductInfo(
                                 showPopup = false
                                 popupType = null
                             }) {
-                            Text("Close")
+                            Text(stringResource(R.string.close))
                         }
                     },
                     confirmButton = {
@@ -220,7 +220,7 @@ fun ProductInfo(
                                 expandBottomSheetMenu()
                             }
                         ) {
-                            Text("Edit Product")
+                            Text(stringResource(R.string.editProduct))
                         }
                     }
                 )

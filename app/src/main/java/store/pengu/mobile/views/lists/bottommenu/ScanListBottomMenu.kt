@@ -82,7 +82,7 @@ fun ScanListBottomMenu(
                     inflatedLayout as PreviewView,
                     onSuccess = onScan,
                     onFail = {
-                        //Toast.makeText(context, "No correct code found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "No correct code found", Toast.LENGTH_SHORT).show()
                         //snackbarController.showDismissibleSnackbar("No correct code found")
                     },
                     CameraService.ScanType.LIST_CODE
