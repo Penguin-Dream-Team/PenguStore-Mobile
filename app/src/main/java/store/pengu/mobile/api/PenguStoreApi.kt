@@ -147,6 +147,10 @@ class PenguStoreApi(
     suspend fun getProductImages(productId: Long): Response.SuccessResponse<List<String>> =
         get(Routes.GET_PRODUCT_IMAGES(productId))
 
+    suspend fun rateProduct(productId: Long, rating: Int): Response.SuccessResponse<List<Int>> {
+        return post(Routes.RATE_PRODUCT(productId, rating))
+    }
+
     /**
      * NEEDS REWRITE
      */
@@ -371,8 +375,4 @@ class PenguStoreApi(
     suspend fun translation(string: String): Response.SuccessResponse<String> =
         get(Routes.TRANSLATION, string)
 
-    suspend fun rateProduct(barcode: String, rating: Int): Response.SuccessResponse<String> {
-        val route = Routes.RATE_PRODUCT.replace("rating", rating.toString())
-        return post(route, barcode)
-    }
 }

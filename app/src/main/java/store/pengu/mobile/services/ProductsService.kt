@@ -314,6 +314,16 @@ class ProductsService(
         })
     }
 
+    suspend fun rateProduct(productId: Long, rating: Int): List<Int> {
+        return try {
+            api.rateProduct(productId, rating).data
+        } catch (e: Exception) {
+            // fetch from cache
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
     /**
      * NO
      */

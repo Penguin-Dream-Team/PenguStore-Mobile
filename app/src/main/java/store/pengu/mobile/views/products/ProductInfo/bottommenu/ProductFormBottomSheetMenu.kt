@@ -45,7 +45,7 @@ fun ProductFormBottomSheetMenu(
     var productBarcode by remember { mutableStateOf(product.barcode) }
 
     var loading by remember { mutableStateOf(false) }
-    val canSave = !loading && (productName != product.name || productBarcode != product.barcode)
+    val canSave = !loading && productName.isNotBlank() && (productName != product.name || productBarcode != product.barcode)
 
     val save: () -> Unit = {
         loading = true
@@ -109,6 +109,7 @@ fun ProductFormBottomSheetMenu(
             leadingIcon = {
                 Icon(imageVector = Icons.Filled.Tag, contentDescription = "product name")
             },
+            isError = productName.isBlank(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 15.dp),

@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.products.ProductInfo
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -38,10 +39,12 @@ fun ProductInfo(
     var loading by remember { mutableStateOf(true) }
     val images = remember { productsService.getProductImages(productId) }
     val product = store.selectedProduct
+    var (rating, setRating) = remember { mutableStateOf(product?.productRating ?: 0.0) }
 
     LaunchedEffect(loading) {
         productsService.fetchProduct(productId)
         productsService.fetchProductImages(productId)
+        setRating(product?.productRating ?: 0.0)
         loading = false
     }
     if (loading) {
@@ -94,7 +97,7 @@ fun ProductInfo(
                 )
             }
 
-            Header(product)
+            Header(product, rating)
 
             Spacer(modifier = Modifier.height(15.dp))
             Divider()
@@ -107,7 +110,15 @@ fun ProductInfo(
             ) {
                 ProductGallery(images)
 
-                ProductRatings(productsService, productId, product.ratings)
+                product.barcode?.let {
+                    ProductRatings(
+                        productsService,
+                        productId,
+                        product.ratings,
+                        product.userRating,
+                        setRating
+                    )
+                }
             }
         }
     }

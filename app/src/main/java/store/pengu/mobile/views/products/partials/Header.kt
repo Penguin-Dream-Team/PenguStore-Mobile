@@ -34,7 +34,7 @@ import store.pengu.mobile.views.partials.AnimatedShimmerLoading
 
 @ExperimentalAnimationApi
 @Composable
-fun Header(product: Product) {
+fun Header(product: Product, ratingOverride: Double = product.productRating) {
     val imagePainter = rememberCoilPainter(
         request = product.image,
         fadeIn = true,
@@ -110,19 +110,22 @@ fun Header(product: Product) {
                 .fillMaxHeight()
                 .weight(0.3f)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "${product.productRating.run { if (this == 0.0) "-" else this }}",
-                    fontSize = 14.sp
-                )
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = "product rating",
-                    modifier = Modifier.padding(start = 5.dp)
-                )
+            product.barcode?.let {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "${ratingOverride.run { if (this == 0.0) "-" else this }}",
+                        fontSize = 14.sp
+                    )
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "product rating",
+                        modifier = Modifier.padding(start = 5.dp)
+                    )
+                }
             }
+
             Button(onClick = {
                 coroutineScope.launch {
                     val sendIntent = Intent(Intent.ACTION_SEND).apply {
