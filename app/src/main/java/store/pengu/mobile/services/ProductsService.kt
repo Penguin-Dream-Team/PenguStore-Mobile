@@ -383,7 +383,6 @@ class ProductsService(
     }
 
     suspend fun timeQueue(): Int {
-        store.location = LatLng(50.25, 150.25)
         return api.timeQueue(store.location!!).data
     }
 }

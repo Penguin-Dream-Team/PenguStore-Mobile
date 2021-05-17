@@ -1,6 +1,7 @@
 package store.pengu.mobile.views
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.os.StrictMode
 import android.util.Log
 import android.view.WindowManager
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -18,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.lifecycleScope
@@ -25,8 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import coil.ImageLoader
-import coil.util.CoilUtils
-import com.github.mikephil.charting.utils.Utils
+import com.google.android.gms.location.LocationSettingsStates
 import dagger.hilt.android.AndroidEntryPoint
 import io.ktor.util.*
 import kotlinx.coroutines.*
@@ -58,6 +60,7 @@ import store.pengu.mobile.views.products.NewProductView
 import store.pengu.mobile.views.products.ProductInfo.ProductInfo
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
+import store.pengu.mobile.views.termite.LocationTimer
 import java.io.File
 import javax.inject.Inject
 
@@ -99,6 +102,12 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     private lateinit var coroutineScope: CoroutineScope
 
     private lateinit var imageLoader: ImageLoader
+
+    private val enabledState = mutableStateOf(false)
+
+    companion object {
+        const val REQUEST_CHECK_SETTINGS = 0x1
+    }
 
     @KtorExperimentalAPI
     @ExperimentalMaterialApi
@@ -162,7 +171,6 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
                 accountService.navController = navController
 
-                //termiteService.wifiDirectON()
                 executedOnce = true
             }
 
@@ -171,250 +179,285 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                 navController.backStack.clear()
             }
 
-
+            var tryAgain by remember { mutableStateOf(false) }
             PenguShopTheme {
-                BottomSheetScaffold(
-                    scaffoldState = bottomSheetScaffoldState,
-                    snackbarHost = {
-                        bottomSheetScaffoldState.snackbarHostState
-                    },
-                    sheetContent = {
-                        Box {
-                            BottomSheetMenus(
-                                listsService,
-                                productsService,
-                                storeState,
-                                snackbarController,
-                                navController,
-                                currentRoute,
-                                isBottomSheetMenuOpen,
-                                cameraService
-                            ) { collapseBottomSheetMenu(it) }
+                LocationTimer(
+                    mapsService,
+                    storeState,
+                    snackbarController,
+                    termiteService,
+                    this@MainActivity,
+                    tryAgain,
+                )
+
+                if (!enabledState.value) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            "You need to enable location access to use the application",
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colors.onBackground,
+                            modifier = Modifier.padding(bottom = 5.dp)
+                        )
+                        Button(onClick = {
+                            enabledState.value = false
+                            tryAgain = !tryAgain
+                        }) {
+                            Text("Try again")
                         }
-                    },
-                    sheetPeekHeight = 0.dp,
-                    sheetGesturesEnabled = true,
-                ) {
-                    Scaffold(
-                        bottomBar = {
-                            if (loaded) {
-                                AnimatedVisibility(visible = showBottomBar) {
-                                    BottomBar(navController, buttonShape)
-                                }
+                    }
+                } else {
+
+                    BottomSheetScaffold(
+                        scaffoldState = bottomSheetScaffoldState,
+                        snackbarHost = {
+                            bottomSheetScaffoldState.snackbarHostState
+                        },
+                        sheetContent = {
+                            Box {
+                                BottomSheetMenus(
+                                    listsService,
+                                    productsService,
+                                    storeState,
+                                    snackbarController,
+                                    navController,
+                                    currentRoute,
+                                    isBottomSheetMenuOpen,
+                                    cameraService
+                                ) { collapseBottomSheetMenu(it) }
                             }
                         },
-                        scaffoldState = scaffoldState,
-                        isFloatingActionButtonDocked = true,
-                        floatingActionButton = {
-                            FloatingActionButtons(
-                                buttonShape,
-                                { expandBottomSheetMenu() },
-                                currentRoute,
-                            )
-                        },
-                        floatingActionButtonPosition = FabPosition.Center
-                    ) { paddingValues ->
-                        Surface(
-                            modifier = Modifier
-                                .padding(paddingValues)
-                                .fillMaxSize(),
-                        ) {
-                            NavHost(
-                                navController = navController,
-                                startDestination = "loading"
+                        sheetPeekHeight = 0.dp,
+                        sheetGesturesEnabled = true,
+                    ) {
+                        Scaffold(
+                            bottomBar = {
+                                if (loaded) {
+                                    AnimatedVisibility(visible = showBottomBar) {
+                                        BottomBar(navController, buttonShape)
+                                    }
+                                }
+                            },
+                            scaffoldState = scaffoldState,
+                            isFloatingActionButtonDocked = true,
+                            floatingActionButton = {
+                                FloatingActionButtons(
+                                    buttonShape,
+                                    { expandBottomSheetMenu() },
+                                    currentRoute,
+                                )
+                            },
+                            floatingActionButtonPosition = FabPosition.Center
+                        ) { paddingValues ->
+                            Surface(
+                                modifier = Modifier
+                                    .padding(paddingValues)
+                                    .fillMaxSize(),
                             ) {
-                                loaded = true
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = "loading"
+                                ) {
+                                    loaded = true
 
-                                animatedComposable("login") {
-                                    LoginScreen(navController, accountService, snackbarController)
-                                }
-
-                                animatedComposable("loading") {
-                                    LoadingScreen(
-                                        navController,
-                                        listsService,
-                                        snackbarController,
-                                        mapsService,
-                                        accountService,
-                                        storeState
-                                    )
-                                }
-
-                                animatedComposable("lists") {
-                                    ListsScreen(
-                                        navController,
-                                        listsService,
-                                        storeState,
-                                        snackbarController,
-                                    )
-                                }
-
-                                animatedComposable("pantry_list/{pantryId}", listOf(
-                                    navArgument("pantryId") { type = NavType.LongType }
-                                )) { args ->
-                                    ListView(
-                                        navController,
-                                        snackbarController,
-                                        storeState,
-                                        shareRoute = "share_pantry_list",
-                                        listsService = listsService,
-                                        listId = args!!["pantryId"] as Long,
-                                        type = UserListType.PANTRY,
-                                        mapsService = mapsService
-                                    ) {
-                                        ViewPantryList(
+                                    animatedComposable("login") {
+                                        LoginScreen(
                                             navController,
-                                            applicationContext,
+                                            accountService,
+                                            snackbarController
+                                        )
+                                    }
+
+                                    animatedComposable("loading") {
+                                        LoadingScreen(
+                                            navController,
+                                            listsService,
+                                            snackbarController,
+                                            mapsService,
+                                            accountService,
+                                            storeState
+                                        )
+                                    }
+
+                                    animatedComposable("lists") {
+                                        ListsScreen(
+                                            navController,
+                                            listsService,
+                                            storeState,
+                                            snackbarController,
+                                        )
+                                    }
+
+                                    animatedComposable("pantry_list/{pantryId}", listOf(
+                                        navArgument("pantryId") { type = NavType.LongType }
+                                    )) { args ->
+                                        ListView(
+                                            navController,
+                                            snackbarController,
+                                            storeState,
+                                            shareRoute = "share_pantry_list",
+                                            listsService = listsService,
+                                            listId = args!!["pantryId"] as Long,
+                                            type = UserListType.PANTRY,
+                                            mapsService = mapsService
+                                        ) {
+                                            ViewPantryList(
+                                                navController,
+                                                applicationContext,
+                                                listsService,
+                                                productsService,
+                                                storeState,
+                                                it as PantryList
+                                            )
+                                        }
+                                    }
+
+                                    animatedComposable("share_pantry_list") {
+                                        ShareListView(
+                                            navController,
+                                            storeState,
+                                            snackbarController,
+                                            "Pantry List"
+                                        )
+                                    }
+
+                                    animatedComposable("share_shopping_list") {
+                                        ShareListView(
+                                            navController,
+                                            storeState,
+                                            snackbarController,
+                                            "Shopping List"
+                                        )
+                                    }
+
+                                    animatedComposable("shopping_list/{shopId}", listOf(
+                                        navArgument("shopId") { type = NavType.LongType }
+                                    )) { args ->
+                                        ListView(
+                                            navController,
+                                            snackbarController,
+                                            storeState,
+                                            shareRoute = "share_shopping_list",
+                                            listId = args!!["shopId"] as Long,
+                                            type = UserListType.SHOPPING_LIST,
+                                            listsService = listsService,
+                                            mapsService = mapsService
+                                        ) {
+                                            ViewShoppingList(
+                                                navController,
+                                                snackbarController,
+                                                productsService,
+                                                storeState,
+                                                it as ShoppingList
+                                            )
+                                        }
+                                    }
+
+                                    animatedComposable("search?shopId={shopId}&pantryId={pantryId}",
+                                        listOf(
+                                            navArgument("shopId") {
+                                                nullable = true
+                                            },
+                                            navArgument("pantryId") {
+                                                nullable = true
+                                            }
+                                        )
+                                    ) { args ->
+                                        SearchScreen(
+                                            imageLoader,
+                                            navController,
+                                            productsService,
+                                            storeState,
+                                            args!!["shopId"].toString().toLongOrNull(),
+                                            args["pantryId"].toString().toLongOrNull(),
+                                        )
+                                    }
+
+                                    animatedComposable("product/{productId}", listOf(
+                                        navArgument("productId") { type = NavType.LongType }
+                                    )) { args ->
+                                        ProductInfo(
+                                            imageLoader,
+                                            productsService,
+                                            navController,
+                                            storeState,
+                                            args!!["productId"] as Long
+                                        ) { expandBottomSheetMenu() }
+                                    }
+
+                                    animatedComposable("new_item?shopId={shopId}&pantryId={pantryId}",
+                                        listOf(
+                                            navArgument("shopId") {
+                                                nullable = true
+                                            },
+                                            navArgument("pantryId") {
+                                                nullable = true
+                                            }
+                                        )
+                                    ) { args ->
+                                        NewProductView(
+                                            imageLoader,
+                                            snackbarController,
+                                            cameraService,
+                                            productsService,
+                                            args!!["shopId"].toString().toLongOrNull(),
+                                            args["pantryId"].toString().toLongOrNull(),
+                                            navController
+                                        )
+                                    }
+
+                                    animatedComposable(
+                                        "add_product_to_list/{productId}?listType={listType}&listId={listId}",
+                                        listOf(
+                                            navArgument("productId") { type = NavType.LongType },
+                                            navArgument("listType") {
+                                                defaultValue = UserListType.PANTRY.ordinal
+                                            },
+                                            navArgument("listId") {
+                                                nullable = true
+                                            }
+                                        )
+                                    ) { args ->
+                                        EditProductListsView(
+                                            imageLoader,
+                                            snackbarController,
                                             listsService,
                                             productsService,
                                             storeState,
-                                            it as PantryList
-                                        )
-                                    }
-                                }
-
-                                animatedComposable("share_pantry_list") {
-                                    ShareListView(
-                                        navController,
-                                        storeState,
-                                        snackbarController,
-                                        "Pantry List"
-                                    )
-                                }
-
-                                animatedComposable("share_shopping_list") {
-                                    ShareListView(
-                                        navController,
-                                        storeState,
-                                        snackbarController,
-                                        "Shopping List"
-                                    )
-                                }
-
-                                animatedComposable("shopping_list/{shopId}", listOf(
-                                    navArgument("shopId") { type = NavType.LongType }
-                                )) { args ->
-                                    ListView(
-                                        navController,
-                                        snackbarController,
-                                        storeState,
-                                        shareRoute = "share_shopping_list",
-                                        listId = args!!["shopId"] as Long,
-                                        type = UserListType.SHOPPING_LIST,
-                                        listsService = listsService,
-                                        mapsService = mapsService
-                                    ) {
-                                        ViewShoppingList(
+                                            UserListType.values()[args!!["listType"] as Int],
+                                            args["productId"] as Long,
                                             navController,
+                                            args["listId"].toString().toLongOrNull(),
+                                        )
+                                    }
+
+                                    animatedComposable("cart") {
+                                        CartScreen(navController, cartService, storeState)
+                                    }
+
+                                    animatedComposable("profile") {
+                                        ProfileScreen(
+                                            navController,
+                                            accountService,
                                             snackbarController,
-                                            productsService,
-                                            storeState,
-                                            it as ShoppingList
+                                            storeState
                                         )
                                     }
                                 }
 
-                                animatedComposable("search?shopId={shopId}&pantryId={pantryId}",
-                                    listOf(
-                                        navArgument("shopId") {
-                                            nullable = true
-                                        },
-                                        navArgument("pantryId") {
-                                            nullable = true
-                                        }
-                                    )
-                                ) { args ->
-                                    SearchScreen(
-                                        imageLoader,
-                                        navController,
-                                        productsService,
-                                        storeState,
-                                        args!!["shopId"].toString().toLongOrNull(),
-                                        args["pantryId"].toString().toLongOrNull(),
-                                    )
+                                Column(
+                                    modifier = Modifier
+                                        .padding(bottom = 8.dp)
+                                        .fillMaxSize()
+                                        .zIndex(1000f),
+                                    verticalArrangement = Arrangement.Bottom,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    PenguSnackbar(snackbarHostState = bottomSheetScaffoldState.snackbarHostState)
                                 }
-
-                                animatedComposable("product/{productId}", listOf(
-                                    navArgument("productId") { type = NavType.LongType }
-                                )) { args ->
-                                    ProductInfo(
-                                        imageLoader,
-                                        productsService,
-                                        navController,
-                                        storeState,
-                                        args!!["productId"] as Long
-                                    ) { expandBottomSheetMenu() }
-                                }
-
-                                animatedComposable("new_item?shopId={shopId}&pantryId={pantryId}",
-                                    listOf(
-                                        navArgument("shopId") {
-                                            nullable = true
-                                        },
-                                        navArgument("pantryId") {
-                                            nullable = true
-                                        }
-                                    )
-                                ) { args ->
-                                    NewProductView(
-                                        imageLoader,
-                                        snackbarController,
-                                        cameraService,
-                                        productsService,
-                                        args!!["shopId"].toString().toLongOrNull(),
-                                        args["pantryId"].toString().toLongOrNull(),
-                                        navController
-                                    )
-                                }
-
-                                animatedComposable(
-                                    "add_product_to_list/{productId}?listType={listType}&listId={listId}",
-                                    listOf(
-                                        navArgument("productId") { type = NavType.LongType },
-                                        navArgument("listType") {
-                                            defaultValue = UserListType.PANTRY.ordinal
-                                        },
-                                        navArgument("listId") {
-                                            nullable = true
-                                        }
-                                    )
-                                ) { args ->
-                                    EditProductListsView(
-                                        imageLoader,
-                                        snackbarController,
-                                        listsService,
-                                        productsService,
-                                        storeState,
-                                        UserListType.values()[args!!["listType"] as Int],
-                                        args["productId"] as Long,
-                                        navController,
-                                        args["listId"].toString().toLongOrNull(),
-                                    )
-                                }
-
-                                animatedComposable("cart") {
-                                    CartScreen(navController, cartService, storeState)
-                                }
-
-                                animatedComposable("profile") {
-                                    ProfileScreen(
-                                        navController,
-                                        accountService,
-                                        snackbarController,
-                                        storeState
-                                    )
-                                }
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .padding(bottom = 8.dp)
-                                    .fillMaxSize()
-                                    .zIndex(1000f),
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                PenguSnackbar(snackbarHostState = bottomSheetScaffoldState.snackbarHostState)
                             }
                         }
                     }
@@ -456,6 +499,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
     override fun onPause() {
         super.onPause()
+        termiteService.wifiDirectOFF()
         mReceiver?.let {
             unregisterReceiver(it)
         }
@@ -481,23 +525,33 @@ class MainActivity : AppCompatActivity(), PeerListListener {
      * Termite listeners
      */
     override fun onPeersAvailable(peers: SimWifiP2pDeviceList) {
-        if (peers.deviceList.isEmpty())
-            beaconsService.leaveQueue()
-        else
-            beaconsService.joinQueue()
-
-        /*val peersStr = StringBuilder()
-        // compile list of devices in range
-        for (device in peers.deviceList) {
-            val dev = "${device.deviceName} (${device.virtIp})\n"
-            peersStr.append(dev)
+        GlobalScope.launch {
+            try {
+                if (peers.deviceList.isEmpty()) {
+                    beaconsService.leaveQueue(storeState.location)
+                } else {
+                    beaconsService.joinQueue(storeState.location)
+                }
+            } catch (e: Exception) {
+                // ignore api exception
+            }
         }
+    }
 
-        // display list of devices in range
-        AlertDialog.Builder(this)
-            .setTitle("Devices in WiFi Range")
-            .setMessage(peersStr.toString())
-            .setNeutralButton("Dismiss") { _, _ -> }
-            .show()*/
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            REQUEST_CHECK_SETTINGS -> {
+                val states = LocationSettingsStates.fromIntent(intent)
+                when (resultCode) {
+                    Activity.RESULT_OK -> enabledState.value = true
+                    Activity.RESULT_CANCELED -> {
+                        // The user was asked to change settings, but chose not to
+                        enabledState.value = false
+                    }
+                }
+            }
+        }
     }
 }

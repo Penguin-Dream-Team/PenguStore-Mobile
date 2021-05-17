@@ -1,5 +1,6 @@
 package store.pengu.mobile.views.cart
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +29,7 @@ fun CartScreen(
 ) {
     val openDialog = remember { mutableStateOf(false) }
     var currentProduct: MutableShopItem? = null
+    Log.d("HELLPPP", store.location.toString())
 
     Column(verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier

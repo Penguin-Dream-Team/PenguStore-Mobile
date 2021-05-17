@@ -32,14 +32,15 @@ import store.pengu.mobile.views.partials.pulltorefresh.LoadingProgressIndicator
 
 class RequestLocationCallback(
     private val setLocation: (LatLng?) -> Unit,
-    private val setLoading: (Boolean) -> Unit
+    private val setLoading: (Boolean) -> Unit = {}
 ) : LocationCallback() {
     override fun onLocationResult(locationResult: LocationResult) {
         super.onLocationResult(locationResult)
 
         setLocation(null)
-        locationResult.lastLocation?.let {
+        locationResult.locations.lastOrNull()?.let {
             setLocation(LatLng(it.latitude, it.longitude))
+            Log.d("HELLPPP: CALLKBACK", it.toString())
         }
         setLoading(false)
     }

@@ -1,34 +1,33 @@
 package store.pengu.mobile.views.maps
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.Looper
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import dagger.hilt.android.AndroidEntryPoint
 import store.pengu.mobile.R
+import store.pengu.mobile.states.StoreState
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
+    @Inject
+    lateinit var storeState: StoreState
+
     private var mapFrag: SupportMapFragment? = null
-    private var lastLocation: Location? = null
     private var selectedLocation: Location? = null
     private lateinit var googleMap: GoogleMap
     private lateinit var locationRequest: LocationRequest
-    private var fusedLocationClient: FusedLocationProviderClient? = null
     private lateinit var button: Button
     private var receivedLatLng: LatLng? = null
     private var pantryName: String = ""
@@ -54,8 +53,6 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
 
         supportActionBar?.title = "Google Maps"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         mapFrag = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFrag?.getMapAsync(this)
@@ -96,35 +93,7 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
             priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         }
 
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient?.requestLocationUpdates(
-                locationRequest,
-                object : LocationCallback() {
-                    override fun onLocationResult(locationResult: LocationResult) {
-                        fusedLocationClient?.removeLocationUpdates(this)
-                    }
-                },
-                Looper.getMainLooper()
-            )
-        } else {
-            //Request Location Permission
-            checkLocationPermission()
-        }
-
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            initMap()
-        } else {
-            //Request Location Permission
-            checkLocationPermission()
-        }
+        initMap()
 
         // Setting a click event handler for the map
         googleMap.setOnMapClickListener { latLng ->
@@ -134,13 +103,10 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         }
 
         googleMap.setOnMyLocationButtonClickListener {
-            if (lastLocation != null) {
-                val latLng = LatLng(lastLocation!!.latitude, lastLocation!!.longitude)
-                selectLocation(pantryName, latLng)
+            return@setOnMyLocationButtonClickListener storeState.location?.run {
+                selectLocation(pantryName, this)
                 false
-            } else {
-                true
-            }
+            } ?: true
         }
     }
 
@@ -168,90 +134,15 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @SuppressLint("MissingPermission")
-    private fun initMap() {
+    fun initMap() {
         googleMap.isMyLocationEnabled = false
         if (receivedLatLng != null) {
             selectLocation(pantryName, receivedLatLng!!, 15.0f)
         } else {
-            //Location Permission already granted
-            fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
-                if (location != null) {
-                    lastLocation = location
-                    googleMap.isMyLocationEnabled = true
-                    //Place current location marker
-                    val latLng = LatLng(location.latitude, location.longitude)
-                    //move map camera
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0F))
-                }
+            storeState.location?.let {
+                googleMap.isMyLocationEnabled = true
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(it, 15.0F))
             }
         }
-    }
-
-    private fun checkLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
-                AlertDialog.Builder(this)
-                    .setTitle("Location Permission Needed")
-                    .setMessage("This app needs the Location permission, please accept to use location functionality")
-                    .setPositiveButton(
-                        "OK"
-                    ) { _, _ ->
-                        //Prompt the user once explanation has been shown
-                        ActivityCompat.requestPermissions(
-                            this@MapScreen,
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                            MY_PERMISSIONS_REQUEST_LOCATION
-                        )
-                    }
-                    .create()
-                    .show()
-            } else {
-                // No explanation needed, we can request the permission
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    MY_PERMISSIONS_REQUEST_LOCATION
-                )
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            MY_PERMISSIONS_REQUEST_LOCATION -> {
-                // If request is cancelled, the result arrays are empty
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted | Do the location-related task
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        initMap()
-                    }
-                } else {
-                    // permission was denied | Disable the location-related task
-                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
-                }
-                return
-            }
-        }
-    }
-
-    companion object {
-        const val MY_PERMISSIONS_REQUEST_LOCATION = 99
     }
 }

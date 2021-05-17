@@ -17,6 +17,10 @@ class StoreState {
     val selectedProduct: Product? get() = selectedProductState.value
     val setSelectedProduct: (Product?) -> Unit get() = selectedProductState.component2()
 
+    private val locationState = mutableStateOf(null as LatLng?)
+    val location: LatLng? get() = locationState.value
+    val setLocation: (LatLng?) -> Unit get() = locationState.component2()
+
     var cartShoppingList: Long? = null
 
     fun isLoggedIn(): Boolean {
@@ -28,7 +32,6 @@ class StoreState {
      */
 
     var shouldFindListInLocation: Boolean by mutableStateOf(true)
-    var location: LatLng? = null
     var joinQueueTime: Int? = null
 
     var userId: Long by mutableStateOf(1)

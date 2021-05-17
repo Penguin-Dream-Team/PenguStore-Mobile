@@ -1,27 +1,22 @@
 package store.pengu.mobile.views.loading
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,7 +29,6 @@ import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.services.MapsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
-import store.pengu.mobile.utils.launcherForActivityResult
 import store.pengu.mobile.views.partials.pulltorefresh.LoadingProgressIndicator
 
 @SuppressLint("RestrictedApi")
@@ -52,10 +46,11 @@ fun LoadingScreen(
     val (loading, setLoading) = remember { mutableStateOf(true) }
     var needsLoadData by remember { mutableStateOf(true) }
     var canGetLoadData by remember { mutableStateOf(true) }
-    var canRequestLocation by remember { mutableStateOf(false) }
     var type: UserListType? by remember { mutableStateOf(null) }
     var list: UserList? by remember { mutableStateOf(null) }
-    val (location, setLocation) = remember { mutableStateOf(null as LatLng?) }
+    var serverConnection by remember { mutableStateOf(true) }
+
+    val location = store.location
 
     /**
      * If there is a list in my location show list
@@ -74,40 +69,36 @@ fun LoadingScreen(
                             canGetLoadData = false
                             accountService.loadData()
                             if (store.isLoggedIn()) {
-                                canRequestLocation = true
+                                delay(3000)
+                                setLoading(false)
                             } else {
                                 navController.navigate("login")
                             }
                         }
                     } catch (e: PenguStoreApiException) {
                         snackbarController.showDismissibleSnackbar("Can't reach the server")
+                        serverConnection = false
                     }
                     canGetLoadData = true
                 }
             }
-            if (canRequestLocation) {
-                RequestLocation(
-                    snackbarController,
-                    loading,
-                    setLoading,
-                    setLocation,
-                    mapsService,
-                    showLoading = false
+            if (serverConnection && location == null) {
+                LoadingProgressIndicator(
+                    progressColor = MaterialTheme.colors.primary,
+                    backgroundColor = MaterialTheme.colors.surface
                 )
-            } else {
-                if (!canGetLoadData) {
-                    LoadingProgressIndicator(
-                        progressColor = MaterialTheme.colors.primary,
-                        backgroundColor = MaterialTheme.colors.surface
-                    )
-                    Text(
-                        modifier = Modifier.padding(top = 10.dp),
-                        text = stringResource(R.string.loading)
-                    )
-                } else {
-                    Button(onClick = { needsLoadData = true }) {
-                        Text("Try again")
-                    }
+                Text(
+                    modifier = Modifier.padding(top = 10.dp),
+                    text = stringResource(R.string.loading)
+                )
+            } else if (location != null) {
+                setLoading(false)
+            } else if(!serverConnection) {
+                Button(onClick = {
+                    needsLoadData = true
+                    serverConnection = true
+                }) {
+                    Text("Try again")
                 }
             }
         }
@@ -133,10 +124,10 @@ fun LoadingScreen(
                             navController.navigate("shopping_list/${list?.id}")
                         }
                         null -> navController.navigate("lists")
-                        //null -> navController.navigate("add_product_to_list/1")
                     }
                 } catch (e: PenguStoreApiException) {
                     snackbarController.showDismissibleSnackbar("Can't reach the server")
+                    serverConnection = false
                 }
             }
         }

@@ -1,5 +1,6 @@
 package store.pengu.mobile.services
 
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -11,14 +12,26 @@ class BeaconsService(
     private val api: PenguStoreApi,
     private val store: StoreState,
 ) {
-    fun joinQueue() = GlobalScope.launch(Dispatchers.Main) {
-        api.joinQueue(store.location!!, getNumItems())
-        store.joinQueueTime = Calendar.getInstance().get(Calendar.SECOND)
+    private var inQueue = false
+    private var queueTime = 0
+
+    suspend fun joinQueue(location: LatLng?) {
+        location?.let {
+            api.joinQueue(location, getNumItems())
+            queueTime = Calendar.getInstance().get(Calendar.SECOND)
+            inQueue = true
+        }
     }
 
-    fun leaveQueue() = GlobalScope.launch(Dispatchers.Main) {
-        val timeInQueue = Calendar.getInstance().get(Calendar.SECOND) - store.joinQueueTime!!
-        api.leaveQueue(store.location!!, getNumItems(), timeInQueue)
+    suspend fun leaveQueue(location: LatLng?) {
+        if (inQueue) {
+            location?.let {
+                val timeInQueue = Calendar.getInstance().get(Calendar.SECOND) - queueTime
+                api.leaveQueue(location, getNumItems(), timeInQueue)
+                queueTime = 0
+            }
+            inQueue = false
+        }
     }
 
     private fun getNumItems(): Int {

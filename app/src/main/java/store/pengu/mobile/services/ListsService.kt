@@ -223,6 +223,8 @@ class ListsService(
                         )
                     }
                 }
+                store.selectedListType.value = type.ordinal
+                store.selectedList = list
                 type to list
             }
         } catch (e: PenguStoreApiException) {
