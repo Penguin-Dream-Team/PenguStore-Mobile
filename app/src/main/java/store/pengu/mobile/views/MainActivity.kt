@@ -189,6 +189,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                     termiteService,
                     this@MainActivity,
                     tryAgain,
+                    enabledState.component2()
                 )
 
                 if (!enabledState.value) {

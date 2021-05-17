@@ -103,7 +103,7 @@
     <string name="replace">Substituir</string>
     <string name="space_image">\u0020imagem</string>
     <string name="clear_image">Limpar Imagem</string>
-    <string name="dismiss">Fecjar</string>
+    <string name="dismiss">Fechar</string>
     <string name="confirm_product_creation">Tem a certeza que pretende criar este Producto?</string>
     <string name="product_creating_dont_have">Parece que o producto que está a tentar criar não tem\u0020</string>
     <string name="barcode_nor_image">um Código de Barras nem uma Imagem</string>

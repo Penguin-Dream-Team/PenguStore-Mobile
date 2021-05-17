@@ -27,7 +27,8 @@ private fun requestLocation(
     mapsService: MapsService,
     store: StoreState,
     termiteService: TermiteService,
-    locationRequest: LocationRequest
+    locationRequest: LocationRequest,
+    setEnabled: (Boolean) -> Unit
 ) {
     val fusedLocationClient = mapsService.fusedLocationProviderClient
 
@@ -39,6 +40,7 @@ private fun requestLocation(
         Looper.myLooper()
     )
     termiteService.wifiDirectON()
+    setEnabled(true)
 }
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -49,7 +51,8 @@ fun LocationTimer(
     snackbarController: SnackbarController,
     termiteService: TermiteService,
     mainActivity: MainActivity,
-    tryAgain: Boolean
+    tryAgain: Boolean,
+    setEnabled: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -69,7 +72,7 @@ fun LocationTimer(
             if (!granted) {
                 snackbarController.showDismissibleSnackbar(errorStringResource)
             } else {
-                requestLocation(mapsService, store, termiteService, locationRequest)
+                requestLocation(mapsService, store, termiteService, locationRequest, setEnabled)
             }
         }
 
@@ -85,7 +88,7 @@ fun LocationTimer(
         result.addOnSuccessListener {
             when (PackageManager.PERMISSION_GRANTED) {
                 context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) -> {
-                    requestLocation(mapsService, store, termiteService, locationRequest)
+                    requestLocation(mapsService, store, termiteService, locationRequest, setEnabled)
                 }
                 else -> {
                     launch {

@@ -31,24 +31,29 @@ private var newItem = mutableStateOf("")
 private var cart = mutableStateOf("")
 private var profile = mutableStateOf("")
 
-private val bottomBarItems = listOf(
-    BottomBarItem(
-        lists.value, Icons.Filled.List,
-        listOf(
-            "pantry_list/{pantryId}",
-            "shopping_list/{shopId}",
-        )
-    ),
-    BottomBarItem(
-        newItem.value,
-        Icons.Filled.Add,
-        listOf(
-            "search?shopId={shopId}&pantryId={pantryId}",
-        )
-    ),
-    BottomBarItem(cart.value, Icons.Filled.ShoppingCart),
-    BottomBarItem(profile.value, Icons.Filled.AccountCircle),
-)
+private val bottomBarItems: List<BottomBarItem>
+    get() = listOf(
+        BottomBarItem(
+            lists.value, Icons.Filled.List,
+            listOf(
+                "pantry_list/{pantryId}",
+                "shopping_list/{shopId}",
+            ),
+            location = "lists"
+        ),
+        BottomBarItem(
+            newItem.value,
+            Icons.Filled.Add,
+            listOf(
+                "search?shopId={shopId}&pantryId={pantryId}",
+                "add_product_to_list/{productId}?listType={listType}&listId={listId}",
+                "new_item?shopId={shopId}&pantryId={pantryId}"
+            ),
+            location = "new_item"
+        ),
+        BottomBarItem(cart.value, Icons.Filled.ShoppingCart, location = "cart"),
+        BottomBarItem(profile.value, Icons.Filled.AccountCircle, location = "profile"),
+    )
 
 private val bottomBarButtonItems = listOf(
     "lists",
@@ -61,9 +66,9 @@ private val bottomBarButtonItems = listOf(
 data class BottomBarItem(
     val name: String,
     val icon: ImageVector,
-    val active: List<String> = listOf()
+    val active: List<String> = listOf(),
+    val location: String
 ) {
-    val location = name.toLowerCase(Locale.ENGLISH).replace(" ", "_")
     val locations = listOf(location) + active
 }
 

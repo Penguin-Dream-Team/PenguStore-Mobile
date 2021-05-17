@@ -71,7 +71,7 @@ fun LoadingScreen(
                             canGetLoadData = false
                             accountService.loadData()
                             if (store.isLoggedIn()) {
-                                delay(3000)
+                                delay(1000)
                                 setLoading(false)
                             } else {
                                 navController.navigate("login")
