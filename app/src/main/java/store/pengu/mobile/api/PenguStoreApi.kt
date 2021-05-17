@@ -8,6 +8,7 @@ import store.pengu.mobile.api.requests.lists.CartRequest
 import store.pengu.mobile.api.requests.lists.CreateListRequest
 import store.pengu.mobile.api.requests.products.AddProductToPantryListRequest
 import store.pengu.mobile.api.requests.products.AddProductToShoppingListRequest
+import store.pengu.mobile.api.requests.products.EditProductRequest
 import store.pengu.mobile.api.responses.account.LoginResponse
 import store.pengu.mobile.api.responses.account.ProfileResponse
 import store.pengu.mobile.api.responses.account.RegisterResponse
@@ -134,12 +135,21 @@ class PenguStoreApi(
     suspend fun getProductShoppingLists(productId: Long): Response.SuccessResponse<List<ProductShoppingListEntry>> =
         get(Routes.GET_PRODUCT_SHOPPING_LISTS(productId))
 
-    suspend fun addProductToPantryList(productId: Long, pantryId: Long, haveAmount: Int, needAmount: Int): Response.SuccessResponse<ProductPantryListEntry> {
+    suspend fun addProductToPantryList(
+        productId: Long,
+        pantryId: Long,
+        haveAmount: Int,
+        needAmount: Int
+    ): Response.SuccessResponse<ProductPantryListEntry> {
         val request = AddProductToPantryListRequest(pantryId, haveAmount, needAmount)
         return post(Routes.ADD_PRODUCT_PANTRY_LIST(productId), request)
     }
 
-    suspend fun addProductToShoppingList(productId: Long, pantryId: Long, price: Double): Response.SuccessResponse<ProductShoppingListEntry> {
+    suspend fun addProductToShoppingList(
+        productId: Long,
+        pantryId: Long,
+        price: Double
+    ): Response.SuccessResponse<ProductShoppingListEntry> {
         val request = AddProductToShoppingListRequest(pantryId, price)
         return post(Routes.ADD_PRODUCT_SHOPPING_LIST(productId), request)
     }
@@ -149,6 +159,15 @@ class PenguStoreApi(
 
     suspend fun rateProduct(productId: Long, rating: Int): Response.SuccessResponse<List<Int>> {
         return post(Routes.RATE_PRODUCT(productId, rating))
+    }
+
+    suspend fun editProduct(
+        productId: Long,
+        name: String,
+        barcode: String?
+    ): Response.SuccessResponse<Product> {
+        val request = EditProductRequest(name, barcode?.run { if (isBlank()) null else this })
+        return post(Routes.EDIT_PRODUCT(productId), request)
     }
 
     /**

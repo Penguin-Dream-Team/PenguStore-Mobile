@@ -44,6 +44,7 @@ object Routes {
     fun ADD_PRODUCT_SHOPPING_LIST(productId: Long) = "/products/$productId/shops"
     fun GET_PRODUCT_IMAGES(productId: Long) = "/products/$productId/images"
     fun RATE_PRODUCT(productId: Long, rating: Int) = "/products/$productId/rate/$rating"
+    fun EDIT_PRODUCT(productId: Long) = "/products/$productId"
 
     const val BUY_CART = "/cart"
 

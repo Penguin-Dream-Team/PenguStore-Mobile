@@ -43,10 +43,9 @@ fun EditProductBottomSheetMenu(
         ProductFormBottomSheetMenu(
             product,
             { closeMenu(null) },
-            onSave = {
+            onSave = { name, barcode ->
                 actionWrapper("Updated product") {
-                    // TODO
-                    delay(500)
+                    productsService.editProduct(product.id, name, barcode)
                 }
             },
             onEditLists = {

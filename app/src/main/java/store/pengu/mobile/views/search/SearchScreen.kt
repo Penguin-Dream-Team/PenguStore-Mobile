@@ -107,7 +107,7 @@ fun SearchScreen(
                             .clickable(
                                 onClickLabel = "Add to pantry"
                             ) {
-                                storeState.selectedProduct = product
+                                storeState.setSelectedProduct(product)
                                 selectedProductId.value = product.id
                                 navController.navigate("product/${product.id}")
                             })

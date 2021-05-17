@@ -34,7 +34,7 @@ import store.pengu.mobile.views.partials.AnimatedShimmerLoading
 
 @ExperimentalAnimationApi
 @Composable
-fun Header(product: Product, ratingOverride: Double = product.productRating) {
+fun Header(product: Product) {
     val imagePainter = rememberCoilPainter(
         request = product.image,
         fadeIn = true,
@@ -115,7 +115,7 @@ fun Header(product: Product, ratingOverride: Double = product.productRating) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "${ratingOverride.run { if (this == 0.0) "-" else this }}",
+                        text = "${product.productRating.run { if (this == 0.0) "-" else this }}",
                         fontSize = 14.sp
                     )
                     Icon(

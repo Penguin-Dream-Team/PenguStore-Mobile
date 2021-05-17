@@ -38,13 +38,11 @@ fun ProductInfo(
 ) {
     var loading by remember { mutableStateOf(true) }
     val images = remember { productsService.getProductImages(productId) }
-    val product = store.selectedProduct
-    var (rating, setRating) = remember { mutableStateOf(product?.productRating ?: 0.0) }
+    val (product, _) = mutableStateOf(store.selectedProduct)
 
     LaunchedEffect(loading) {
         productsService.fetchProduct(productId)
         productsService.fetchProductImages(productId)
-        setRating(product?.productRating ?: 0.0)
         loading = false
     }
     if (loading) {
@@ -97,7 +95,7 @@ fun ProductInfo(
                 )
             }
 
-            Header(product, rating)
+            Header(product)
 
             Spacer(modifier = Modifier.height(15.dp))
             Divider()
@@ -115,8 +113,7 @@ fun ProductInfo(
                         productsService,
                         productId,
                         product.ratings,
-                        product.userRating,
-                        setRating
+                        product.userRating
                     )
                 }
             }

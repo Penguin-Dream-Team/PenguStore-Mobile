@@ -11,7 +11,12 @@ class StoreState {
     var email: String by mutableStateOf("")
     var selectedListType = mutableStateOf(0)
     var selectedList: UserList? = null
-    var selectedProduct: Product? = null
+
+    //var selectedProduct: Product? = null
+    private val selectedProductState = mutableStateOf(null as Product?)
+    val selectedProduct: Product? get() = selectedProductState.value
+    val setSelectedProduct: (Product?) -> Unit get() = selectedProductState.component2()
+
     var cartShoppingList: Long? = null
 
     fun isLoggedIn(): Boolean {

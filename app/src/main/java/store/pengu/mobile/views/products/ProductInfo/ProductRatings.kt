@@ -27,11 +27,9 @@ import store.pengu.mobile.views.partials.IconButton
 fun ProductRatings(
     productsService: ProductsService,
     productId: Long,
-    ratingList: List<Int>,
+    ratings: List<Int>,
     userRating: Int,
-    setRating: (Double) -> Unit
 ) {
-    var ratings by remember { mutableStateOf(ratingList) }
     var rating by remember { mutableStateOf(userRating) }
 
     Column(
@@ -77,12 +75,7 @@ fun ProductRatings(
                     } else {
                         it
                     }
-                    ratings = productsService.rateProduct(productId, rating)
-                    var r = ratings.sum().toDouble() / ratings.size
-                    if (r.isNaN()) {
-                        r = 0.0
-                    }
-                    setRating(r)
+                    productsService.rateProduct(productId, rating)
                     canChangeRating = true
                 }
             }
