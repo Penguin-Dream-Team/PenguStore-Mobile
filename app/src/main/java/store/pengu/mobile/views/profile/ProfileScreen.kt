@@ -1,6 +1,7 @@
 package store.pengu.mobile.views.profile
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ fun ProfileScreen(
     navController: NavController,
     accountService: AccountService,
     snackbarController: SnackbarController,
+    context: Context,
     store: StoreState,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -48,6 +50,7 @@ fun ProfileScreen(
             accountService,
             snackbarController,
             store,
+            context,
             coroutineScope
         )
 

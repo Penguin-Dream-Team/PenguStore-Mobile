@@ -4,8 +4,10 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.stringResource
 import io.ktor.util.*
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.CameraService
 import store.pengu.mobile.services.ListsService
@@ -26,6 +28,10 @@ fun ListsBottomSheetMenu(
 ) {
     val selectedListType by remember { store.selectedListType }
     val coroutineScope = rememberCoroutineScope()
+
+    val createdNewPantryList = stringResource(R.string.created_new_pantry_list)
+    val importedNewPantryList = stringResource(R.string.imported_new_pantry_list)
+    val scanned = stringResource(R.string.scanned)
 
     val (formType, setFormType) = remember { mutableStateOf(0) }
 
@@ -52,25 +58,25 @@ fun ListsBottomSheetMenu(
     when (selectedListType) {
         0 -> {
             ListBottomMenu(
-                title = "Pantry List",
+                title = stringResource(R.string.pantry_list),
                 listsService,
                 closeMenuWrapper,
                 formType,
                 setFormType,
                 onCreate = {
-                    actionWrapper("Created new Pantry List") {
+                    actionWrapper(createdNewPantryList) {
                         listsService.createNewPantryList()
                     }
                 },
                 onImport = {
-                    actionWrapper("Imported new Pantry List") {
+                    actionWrapper(importedNewPantryList) {
                         listsService.importNewPantryList()
                     }
                 },
                 onScan = {
                     listsService.newListCode.value = it
                     setFormType(1)
-                    snackbarController.showDismissibleSnackbar("Scanned $it")
+                    snackbarController.showDismissibleSnackbar(scanned + it)
                 },
                 snackbarController,
                 cameraService
@@ -78,25 +84,25 @@ fun ListsBottomSheetMenu(
         }
         1 -> {
             ListBottomMenu(
-                title = "Shopping List",
+                title = stringResource(R.string.shopping_list),
                 listsService,
                 closeMenuWrapper,
                 formType,
                 setFormType,
                 onCreate = {
-                    actionWrapper("Created new Shopping List") {
+                    actionWrapper(createdNewPantryList) {
                         listsService.createNewShoppingList()
                     }
                 },
                 onImport = {
-                    actionWrapper("Imported new Shopping List") {
+                    actionWrapper(importedNewPantryList) {
                         listsService.importNewShoppingList()
                     }
                 },
                 onScan = {
                     listsService.newListCode.value = it
                     setFormType(1)
-                    snackbarController.showDismissibleSnackbar("Scanned $it")
+                    snackbarController.showDismissibleSnackbar(scanned + it)
                 },
                 snackbarController,
                 cameraService

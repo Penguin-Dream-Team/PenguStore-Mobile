@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.ktor.util.*
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.views.partials.IconButton
 
@@ -71,7 +73,7 @@ fun ProductFormBottomSheetMenu(
                 description = "close edit popup"
             )
             Text(
-                text = "Edit product",
+                text = stringResource(R.string.edit_product),
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -95,7 +97,7 @@ fun ProductFormBottomSheetMenu(
                 productName = it
             },
             placeholder = {
-                Text("Product name")
+                Text(stringResource(R.string.product_name))
             },
             enabled = !loading,
             keyboardOptions = KeyboardOptions(
@@ -120,7 +122,7 @@ fun ProductFormBottomSheetMenu(
                 productBarcode = it
             },
             placeholder = {
-                Text("Product barcode")
+                Text(stringResource(R.string.product_barcode))
             },
             enabled = !loading,
             keyboardOptions = KeyboardOptions(
@@ -145,7 +147,7 @@ fun ProductFormBottomSheetMenu(
             modifier = Modifier
                 .fillMaxWidth(),
         ) {
-            Text(text = "Save changes")
+            Text(text = stringResource(R.string.save_changes))
         }
 
         Row(
@@ -160,7 +162,7 @@ fun ProductFormBottomSheetMenu(
                     .weight(0.5f, true)
             )
             Text(
-                text = "or",
+                text = stringResource(R.string.or),
                 modifier = Modifier
                     .weight(0.2f, true),
                 textAlign = TextAlign.Center
@@ -186,7 +188,7 @@ fun ProductFormBottomSheetMenu(
                     contentDescription = "edit lists",
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(text = "Edit Lists")
+                Text(text = stringResource(R.string.edit_lists))
             }
             Button(
                 onClick = onUploadImage,
@@ -199,7 +201,7 @@ fun ProductFormBottomSheetMenu(
                     contentDescription = "upload image",
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(text = "Upload Image")
+                Text(text = stringResource(R.string.upload_image))
             }
         }
     }

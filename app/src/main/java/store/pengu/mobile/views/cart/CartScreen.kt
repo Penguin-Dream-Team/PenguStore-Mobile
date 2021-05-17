@@ -11,11 +11,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.R
 import store.pengu.mobile.data.MutableShopItem
 import store.pengu.mobile.services.CartService
 import store.pengu.mobile.states.StoreState
@@ -57,7 +59,7 @@ fun CartScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "${product.productName} in Pantry ${product.listName}: ${product.inCart.value}",
+                                text = product.productName + stringResource(R.string.in_pantry) + product.listName + ": " + product.inCart.value,
                                 fontWeight = FontWeight.SemiBold
                             )
 
@@ -107,7 +109,7 @@ fun CartScreen(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Finish Shopping",
+                text = stringResource(R.string.finish_shopping),
                 textAlign = TextAlign.Center
             )
         }
@@ -119,7 +121,7 @@ fun CartScreen(
                 openDialog.value = false
             },
             title = {
-                Text(text = "Select the desired amount")
+                Text(text = stringResource(R.string.select_desired_amount))
             },
             text = {
                 Row(
@@ -141,7 +143,7 @@ fun CartScreen(
                         )
                     }
 
-                    Text(text = "Amount: ${currentProduct!!.inCart.value}")
+                    Text(text = stringResource(R.string.amount) + currentProduct!!.inCart.value)
 
                     IconButton(
                         onClick = {
@@ -161,7 +163,7 @@ fun CartScreen(
                     onClick = {
                         openDialog.value = false
                     }) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             },
             dismissButton = {
@@ -169,7 +171,7 @@ fun CartScreen(
                     onClick = {
                         openDialog.value = false
                     }) {
-                    Text("Close")
+                    Text(stringResource(R.string.close))
                 }
             }
         )

@@ -14,9 +14,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import store.pengu.mobile.R
 
 @ExperimentalComposeUiApi
 @Composable
@@ -44,7 +46,7 @@ fun SearchTopBar() {
                 query = newValue
             },
             label = {
-                Text(text = "Search")
+                Text(text = stringResource(R.string.search))
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,

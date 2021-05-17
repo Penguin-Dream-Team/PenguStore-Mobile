@@ -37,7 +37,7 @@ fun ListItem(
         shape = RoundedCornerShape(5),
         elevation = 1.dp,
         modifier = Modifier
-            .clickable(onClick = onClick, onClickLabel = "Open $title", enabled = enabled)
+            .clickable(onClick = onClick, onClickLabel = stringResource(R.string.open) + title, enabled = enabled)
     ) {
         Column(
             modifier = Modifier

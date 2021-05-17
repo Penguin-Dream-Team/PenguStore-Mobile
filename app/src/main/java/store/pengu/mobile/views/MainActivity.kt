@@ -376,6 +376,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                         navController,
                                         accountService,
                                         snackbarController,
+                                        applicationContext,
                                         storeState
                                     )
                                 }

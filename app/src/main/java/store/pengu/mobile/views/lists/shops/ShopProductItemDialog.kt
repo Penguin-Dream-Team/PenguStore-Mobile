@@ -11,9 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import store.pengu.mobile.R
 import store.pengu.mobile.data.ListProduct
 import store.pengu.mobile.data.MutableShopItem
 import store.pengu.mobile.views.partials.IconButton
@@ -129,7 +131,7 @@ fun ShopProductItemDialog(
                                 description = "Decrement amount needed"
                             )
 
-                            Text(text = "Amount Needed: ${pantry.inCart.value} / ${pantry.amountNeeded}")
+                            Text(text = stringResource(R.string.amount_needed) + pantry.inCart.value + " / " + pantry.amountNeeded)
 
                             IconButton(
                                 onClick = { pantry.inCart.value++ },
@@ -146,7 +148,7 @@ fun ShopProductItemDialog(
                     onClick = {
                         close()
                     }) {
-                    Text("Close")
+                    Text(stringResource(R.string.close))
                 }
             },
             confirmButton = {
@@ -154,7 +156,7 @@ fun ShopProductItemDialog(
                     onClick = onSave,
                     enabled = canSave
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             },
         )

@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.coil.CoilImage
@@ -45,7 +46,7 @@ fun ShopProductItem(
         shape = RoundedCornerShape(5),
         elevation = 1.dp,
         modifier = Modifier
-            .clickable(onClick = onClick, onClickLabel = "Open $title")
+            .clickable(onClick = onClick, onClickLabel = stringResource(R.string.open) + title)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

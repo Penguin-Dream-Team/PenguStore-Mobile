@@ -10,9 +10,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import store.pengu.mobile.R
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.utils.Histogram
 
@@ -32,7 +34,7 @@ fun ProductRatings(
     ) {
 
         Text(
-            text = "Ratings",
+            text = stringResource(R.string.ratings),
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             modifier = Modifier

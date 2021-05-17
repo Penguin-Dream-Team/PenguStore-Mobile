@@ -3,6 +3,7 @@ package store.pengu.mobile.utils
 import android.graphics.Color
 import android.view.LayoutInflater
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.HorizontalBarChart
@@ -11,9 +12,10 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import store.pengu.mobile.R
 
-
 @Composable
 fun Histogram(ratings: List<Int>) {
+    val starts = stringResource(R.string.starts)
+
     AndroidView(factory = {
         LayoutInflater.from(it).inflate(R.layout.histogram_layout, null)
     }) { inflatedLayout ->
@@ -24,7 +26,7 @@ fun Histogram(ratings: List<Int>) {
             barEntries.add(BarEntry(rating.key.toFloat(), rating.value.toFloat()))
         }
 
-        val barDataSet = BarDataSet(barEntries, "Stars")
+        val barDataSet = BarDataSet(barEntries, starts)
         barDataSet.colors = mutableListOf (
             Color.parseColor("#FF4500"),
             Color.parseColor("#FFA500"),

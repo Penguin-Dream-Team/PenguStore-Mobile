@@ -14,8 +14,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import store.pengu.mobile.R
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.launcherForActivityResult
 
@@ -67,7 +69,7 @@ fun ProfileScreenCameraButton(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Grant Camera Access")
+                Text(text = stringResource(R.string.grant_camera_access))
             }
         }
         AnimatedVisibility(visible = canUseCamera) {
@@ -77,7 +79,7 @@ fun ProfileScreenCameraButton(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Granted Camera Access")
+                Text(text = stringResource(R.string.granted_camera_access))
             }
         }
     }

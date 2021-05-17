@@ -57,6 +57,8 @@ fun LoadingScreen(
     var list: UserList? by remember { mutableStateOf(null) }
     val (location, setLocation) = remember { mutableStateOf(null as LatLng?) }
 
+    val cant_reach_server = stringResource(R.string.cant_reach_server)
+
     /**
      * If there is a list in my location show list
      */
@@ -80,7 +82,7 @@ fun LoadingScreen(
                             }
                         }
                     } catch (e: PenguStoreApiException) {
-                        snackbarController.showDismissibleSnackbar("Can't reach the server")
+                        snackbarController.showDismissibleSnackbar(cant_reach_server)
                     }
                     canGetLoadData = true
                 }
@@ -106,7 +108,7 @@ fun LoadingScreen(
                     )
                 } else {
                     Button(onClick = { needsLoadData = true }) {
-                        Text("Try again")
+                        Text(stringResource(R.string.try_again))
                     }
                 }
             }
@@ -136,7 +138,7 @@ fun LoadingScreen(
                         //null -> navController.navigate("add_product_to_list/1")
                     }
                 } catch (e: PenguStoreApiException) {
-                    snackbarController.showDismissibleSnackbar("Can't reach the server")
+                    snackbarController.showDismissibleSnackbar(cant_reach_server)
                 }
             }
         }

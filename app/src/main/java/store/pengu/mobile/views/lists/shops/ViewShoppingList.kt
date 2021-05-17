@@ -23,7 +23,6 @@ import store.pengu.mobile.data.ProductInShoppingList
 import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.theme.shop
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
@@ -58,7 +57,7 @@ fun ViewShoppingList(
     var selectedProduct: ProductInShoppingList? by remember { mutableStateOf(null) }
     val pantries = remember { mutableStateMapOf<Long, MutableShopItem>() }
     val (needAmount, setNeedAmount) = remember { mutableStateOf(0) }
-    val string = stringResource(R.string.NotInStore)
+    val string = stringResource(R.string.not_in_store)
 
     PullToRefresh(
         isRefreshing = isRefreshing,

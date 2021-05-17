@@ -1,6 +1,7 @@
 package store.pengu.mobile.views.profile
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -23,12 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.states.StoreState
@@ -44,8 +47,10 @@ suspend fun handleSubmission(
     confirmPassword: String,
     snackbarController: SnackbarController,
     accountService: AccountService,
-    isRegistering: Boolean
+    isRegistering: Boolean,
+    context: Context
 ) {
+
     if (!creating.value) {
         creating.value = true
         return
@@ -60,29 +65,29 @@ suspend fun handleSubmission(
     // if not, then its just updating
     if (isRegistering) {
         if (username.isBlank()) {
-            snackbarController.showDismissibleSnackbar("You need to choose a username")
+            snackbarController.showDismissibleSnackbar(context.getString(R.string.need_choose_username))
             return
         }
         if (email.isBlank()) {
-            snackbarController.showDismissibleSnackbar("You need to choose an email")
+            snackbarController.showDismissibleSnackbar(context.getString(R.string.need_chose_email))
             return
         }
         if (password.isBlank()) {
-            snackbarController.showDismissibleSnackbar("You need to choose a password")
+            snackbarController.showDismissibleSnackbar(context.getString(R.string.need_choose_password))
             return
         }
     }
 
     if (password != confirmPassword) {
-        snackbarController.showDismissibleSnackbar("Passwords don't match")
+        snackbarController.showDismissibleSnackbar(context.getString(R.string.passwords_dont_match))
         return
     }
 
     try {
         accountService.updateAccount(username, email, password)
         snackbarController.showDismissibleSnackbar(
-            if (isRegistering) "Registered successfully"
-            else "Updated successfully"
+            if (isRegistering) context.getString(R.string.registered_successfully)
+            else context.getString(R.string.updated_successfully)
         )
     } catch (e: PenguStoreApiException) {
         snackbarController.showDismissibleSnackbar(e.message)
@@ -112,6 +117,7 @@ fun ProfileScreenAccountCreation(
     accountService: AccountService,
     snackbarController: SnackbarController,
     store: StoreState,
+    context: Context,
     coroutineScope: CoroutineScope
 ) {
     val creating = remember { mutableStateOf(false) }
@@ -122,7 +128,7 @@ fun ProfileScreenAccountCreation(
     val passwordFocusRequester = FocusRequester()
     val confirmPasswordFocusRequester = FocusRequester()
     val keyboardController = LocalSoftwareKeyboardController.current
-
+    
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -145,7 +151,8 @@ fun ProfileScreenAccountCreation(
                 confirmPassword,
                 snackbarController,
                 accountService,
-                store.guest
+                store.guest,
+                context
             )
 
             username = if (store.guest) "" else store.username
@@ -180,7 +187,7 @@ fun ProfileScreenAccountCreation(
                             store.guest
                         )
                     },
-                    placeholder = { Text("Username") },
+                    placeholder = { Text(stringResource(R.string.username_label)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
@@ -208,7 +215,7 @@ fun ProfileScreenAccountCreation(
                             store.guest
                         )
                     },
-                    placeholder = { Text("Email") },
+                    placeholder = { Text(stringResource(R.string.email_label)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next
@@ -245,7 +252,7 @@ fun ProfileScreenAccountCreation(
                     keyboardActions = KeyboardActions(onNext = {
                         confirmPasswordFocusRequester.requestFocus()
                     }),
-                    placeholder = { Text("Password") },
+                    placeholder = { stringResource(R.string.password_label) },
                     modifier = Modifier
                         .focusRequester(passwordFocusRequester)
                         .fillMaxWidth()
@@ -275,7 +282,7 @@ fun ProfileScreenAccountCreation(
                     keyboardActions = KeyboardActions(onGo = {
                         submit()
                     }),
-                    placeholder = { Text("Confirm Password") },
+                    placeholder = { Text(stringResource(R.string.confirm_password)) },
                     modifier = Modifier
                         .focusRequester(confirmPasswordFocusRequester)
                         .fillMaxWidth()
@@ -298,7 +305,7 @@ fun ProfileScreenAccountCreation(
                 .fillMaxWidth()
         ) {
             Text(
-                text = if (store.guest) "Create account" else "Update account"
+                text = if (store.guest) stringResource(R.string.create_account) else stringResource(R.string.update_account)
             )
         }
     }

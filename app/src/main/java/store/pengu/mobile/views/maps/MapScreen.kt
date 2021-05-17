@@ -73,7 +73,7 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         button.setOnClickListener {
             if (selectedLocation == null) {
                 button.isEnabled = false
-                Toast.makeText(applicationContext, "No location selected", Toast.LENGTH_SHORT)
+                Toast.makeText(applicationContext, getString(R.string.no_location_selected), Toast.LENGTH_SHORT)
                     .show()
             } else {
                 setResult(
@@ -199,8 +199,8 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                 )
             ) {
                 AlertDialog.Builder(this)
-                    .setTitle("Location Permission Needed")
-                    .setMessage("This app needs the Location permission, please accept to use location functionality")
+                    .setTitle(getString(R.string.location_permition_needed))
+                    .setMessage(getString(R.string.location_permission_needed_text))
                     .setPositiveButton(
                         "OK"
                     ) { _, _ ->
@@ -244,7 +244,7 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                     }
                 } else {
                     // permission was denied | Disable the location-related task
-                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_LONG).show()
                 }
                 return
             }

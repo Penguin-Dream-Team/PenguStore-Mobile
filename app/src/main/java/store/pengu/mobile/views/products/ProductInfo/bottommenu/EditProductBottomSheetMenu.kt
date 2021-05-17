@@ -5,9 +5,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.stringResource
 import io.ktor.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
@@ -25,6 +27,8 @@ fun EditProductBottomSheetMenu(
     closeMenu: (String?) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+
+    val updatedProduct = stringResource(R.string.updated_product)
 
     val actionWrapper: (String, suspend () -> Unit) -> Unit = { successMessage, callable ->
         coroutineScope.launch {
@@ -44,7 +48,7 @@ fun EditProductBottomSheetMenu(
             product,
             { closeMenu(null) },
             onSave = {
-                actionWrapper("Updated product") {
+                actionWrapper(updatedProduct) {
                     // TODO
                     delay(500)
                 }

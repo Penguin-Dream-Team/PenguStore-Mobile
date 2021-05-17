@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,7 +64,7 @@ fun ShareList(
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Text(
-            text = "If you want to share this $type use this code or scan the QR Code"
+            text = stringResource(R.string.if_you_want_to_share_this) + type + stringResource(R.string.use_this_code_or_scan_qr_code)
         )
 
         OutlinedTextField(
@@ -79,7 +80,7 @@ fun ShareList(
                 .padding(vertical = 10.dp)
                 .width(300.dp),
             trailingIcon = {
-                Icon(imageVector = Icons.Filled.ContentCopy, contentDescription = "copy code")
+                Icon(imageVector = Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.copy_code))
             }
         )
 

@@ -1,6 +1,5 @@
 package store.pengu.mobile.views.lists.bottommenu
 
-import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,8 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -23,8 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import io.ktor.util.*
+import store.pengu.mobile.R
 import store.pengu.mobile.services.ListsService
-import store.pengu.mobile.views.maps.MapScreen
 import store.pengu.mobile.views.partials.IconButton
 
 @KtorExperimentalAPI
@@ -57,7 +56,7 @@ fun ImportListBottomMenu(
                 description = "close import popup"
             )
             Text(
-                text = "Import ${title.toLowerCase(Locale.current)}",
+                text = stringResource(R.string.import_string) + title.toLowerCase(Locale.current),
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -79,9 +78,7 @@ fun ImportListBottomMenu(
             },
             placeholder = {
                 Text(
-                    "${
-                        title.toLowerCase(Locale.current).capitalize(Locale.current)
-                    } code"
+                    title.toLowerCase(Locale.current).capitalize(Locale.current) + stringResource(R.string.code)
                 )
             },
             keyboardOptions = KeyboardOptions(
@@ -101,7 +98,7 @@ fun ImportListBottomMenu(
         )
 
         Text(
-            text = "Alternatively you can scan the QR Code"
+            text = stringResource(R.string.alternatively_scan_qr_code)
         )
 
         Button(
@@ -110,7 +107,7 @@ fun ImportListBottomMenu(
                 .padding(top = 25.dp, bottom = 15.dp)
                 .fillMaxWidth()
         ) {
-            Text(text = "Scan QR Code")
+            Text(text = stringResource(R.string.scan_qr_code))
         }
 
         Button(
@@ -118,7 +115,7 @@ fun ImportListBottomMenu(
             modifier = Modifier
                 .fillMaxWidth(),
         ) {
-            Text(text = "Import $title")
+            Text(text = stringResource(R.string.import_string) + title)
         }
 
         Row(
@@ -133,7 +130,7 @@ fun ImportListBottomMenu(
                     .weight(0.5f, true)
             )
             Text(
-                text = "or",
+                text = stringResource(R.string.or),
                 modifier = Modifier
                     .weight(0.2f, true),
                 textAlign = TextAlign.Center
@@ -150,7 +147,7 @@ fun ImportListBottomMenu(
                 .fillMaxWidth()
                 .padding(bottom = 10.dp)
         ) {
-            Text(text = "Create $title")
+            Text(text = stringResource(R.string.create) + title)
         }
     }
 }

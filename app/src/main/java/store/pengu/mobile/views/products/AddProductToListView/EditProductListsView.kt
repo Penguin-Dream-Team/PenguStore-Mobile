@@ -161,7 +161,7 @@ fun EditProductListsView(
                     .padding(bottom = 10.dp)
             ) {
                 Text(
-                    "Edit Product Lists",
+                    stringResource(R.string.edit_product_lists),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center

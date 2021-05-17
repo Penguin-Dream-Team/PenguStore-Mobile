@@ -60,12 +60,14 @@ fun RequestLocation(
     var canGetLocation by remember { mutableStateOf(false) }
     var needsLocationPermission by remember { mutableStateOf(true) }
 
+    val cannotFetchCurrentLocation = stringResource(R.string.cannot_fetch_current_location)
+
     val launcher =
         launcherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { granted ->
             if (!granted) {
-                snackbarController.showDismissibleSnackbar("Cannot fetch current location")
+                snackbarController.showDismissibleSnackbar(cannotFetchCurrentLocation)
                 setLoading(false)
             }
             canGetLocation = granted

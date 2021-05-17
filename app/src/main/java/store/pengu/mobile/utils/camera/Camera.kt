@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,6 +50,7 @@ class Camera {
 
     private var previewView: PreviewView? = null
     private var analysisUseCase: ImageAnalysis? = null
+    private var string: String = ""
 
     companion object {
 
@@ -103,11 +105,13 @@ class Camera {
             scan = false
         }
 
+        string = stringResource(R.string.add_barcode_product)
+
         Column(
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
             Text(
-                text = "Insert the code or scan it to add pantry",
+                text = stringResource(R.string.insert_code_scan),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(vertical = 32.dp)
@@ -120,7 +124,7 @@ class Camera {
                 onValueChange = {
                     pantryCode = it
                 },
-                placeholder = { Text("Pantry code") },
+                placeholder = { Text(stringResource(R.string.pantry_code)) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
@@ -144,16 +148,16 @@ class Camera {
                     .padding(bottom = 25.dp)
                     .fillMaxWidth()
             ) {
-                Text(text = "Scan QR Code")
+                Text(text = stringResource(R.string.scan_qr_code))
             }
 
             Button(
-                onClick = { scan = false }, // TODO
+                onClick = { scan = false },
                 modifier = Modifier
                     .padding(bottom = 25.dp)
                     .fillMaxWidth()
             ) {
-                Text(text = "Add Pantry")
+                Text(text = stringResource(R.string.add_pantry))
             }
 
             if (scan) {
@@ -248,7 +252,11 @@ class Camera {
                         val parameters = URLBuilder(it).parameters
 
                         productsService.addBarcodeProduct(parameters.toString())
-                        Toast.makeText(context, "Added Barcode to Product ${store.selectedProduct}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            string + store.selectedProduct,
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                         imageProxy.close()
 

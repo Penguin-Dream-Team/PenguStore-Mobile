@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.coil.rememberCoilPainter
@@ -41,6 +42,11 @@ fun Header(product: Product) {
     )
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    val textShare = stringResource(R.string.text_share)
+    val ratingShare = stringResource(R.string.rating_share)
+    val starsShare = stringResource(R.string.stars_share)
+    val barcodeShare = stringResource(R.string.barcode_share)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -128,9 +134,9 @@ fun Header(product: Product) {
                     val sendIntent = Intent(Intent.ACTION_SEND).apply {
                         putExtra(
                             Intent.EXTRA_TEXT,
-                            "Checkout this awesome product!\nName: ${product.name}\n${
-                                product.barcode?.run { "Barcode: $this\n" } ?: ""
-                            }Rating: ${product.productRating} Stars"
+                            textShare + product.name + "\n" +
+                                    (product.barcode?.run { barcodeShare + this + "\n" } ?: "") +
+                                    ratingShare + product.productRating + starsShare
                         )
                         putExtra(Intent.EXTRA_SUBJECT, "PenguStore Product")
                         //putExtra(Intent.EXTRA_STREAM, image)
@@ -143,7 +149,7 @@ fun Header(product: Product) {
                 }
             }) {
                 Text(
-                    text = "Share",
+                    text = stringResource(R.string.share),
                     fontSize = 14.sp,
                 )
                 Icon(

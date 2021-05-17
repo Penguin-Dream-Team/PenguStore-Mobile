@@ -12,10 +12,12 @@ import androidx.compose.material.icons.filled.EuroSymbol
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import store.pengu.mobile.R
 import store.pengu.mobile.data.productlists.ProductShoppingListEntry
 
 @ExperimentalAnimationApi
@@ -76,7 +78,7 @@ fun ShoppingListDialog(
                     ) {
                         var text by remember { mutableStateOf(price?.toString() ?: "") }
                         OutlinedTextField(
-                            placeholder = { Text("Price") },
+                            placeholder = { Text(stringResource(R.string.price)) },
                             value = text,
                             onValueChange = {
                                 setPrice(it.toDoubleOrNull())
@@ -108,7 +110,7 @@ fun ShoppingListDialog(
                     onClick = {
                         close()
                     }) {
-                    Text("Close")
+                    Text(stringResource(R.string.close))
                 }
             },
             confirmButton = {
@@ -118,7 +120,7 @@ fun ShoppingListDialog(
                     },
                     enabled = canSave
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             },
         )

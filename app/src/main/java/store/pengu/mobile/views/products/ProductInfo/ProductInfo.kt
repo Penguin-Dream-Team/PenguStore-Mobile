@@ -81,7 +81,7 @@ fun ProductInfo(
                     .padding(bottom = 10.dp)
             ) {
                 Text(
-                    "View Product Info",
+                    stringResource(R.string.view_product_info),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center

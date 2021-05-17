@@ -14,9 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import store.pengu.mobile.R
 import store.pengu.mobile.data.productlists.ProductShoppingListEntry
 import store.pengu.mobile.utils.Border
 import store.pengu.mobile.utils.border
@@ -38,7 +40,7 @@ fun ShoppingListCard(
                 .clickable(
                     enabled = enabled,
                     onClick = onClick,
-                    onClickLabel = "Edit list $listName"
+                    onClickLabel = stringResource(R.string.edit_list) + listName
                 )
         ) {
             Column(
