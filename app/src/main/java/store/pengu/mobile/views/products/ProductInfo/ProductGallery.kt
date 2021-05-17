@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.ImageLoader
+import com.google.accompanist.coil.LocalImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.ImageLoadState
 import store.pengu.mobile.R
@@ -30,6 +32,7 @@ import kotlin.math.roundToInt
 @ExperimentalFoundationApi
 @Composable
 fun ProductGallery(
+    imageLoader: ImageLoader,
     images: List<String>
 ) {
     var showcaseImage by remember { mutableStateOf(null as Painter?) }
@@ -69,11 +72,11 @@ fun ProductGallery(
                             .fillMaxWidth()
                     ) {
                         val offset = it * rowSize
-                        ProductImage(images[offset], onClick = { showcaseImage = it })
+                        ProductImage(imageLoader, images[offset], onClick = { showcaseImage = it })
                         if (offset + 1 < totalCount) {
-                            ProductImage(images[offset + 1], onClick = { showcaseImage = it })
+                            ProductImage(imageLoader, images[offset + 1], onClick = { showcaseImage = it })
                             if (offset + 2 < totalCount) {
-                                ProductImage(images[offset + 2], onClick = { showcaseImage = it })
+                                ProductImage(imageLoader, images[offset + 2], onClick = { showcaseImage = it })
                             }
                         }
                     }
@@ -120,44 +123,46 @@ fun ProductGallery(
 
 @ExperimentalAnimationApi
 @Composable
-private fun ProductImage(image: String, onClick: (Painter) -> Unit) {
-    val imagePainter = rememberCoilPainter(
-        request = image,
-        fadeIn = true,
-    )
+private fun ProductImage(imageLoader: ImageLoader, image: String, onClick: (Painter) -> Unit) {
+    CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+        val imagePainter = rememberCoilPainter(
+            request = image,
+            fadeIn = true,
+        )
 
-    val imageSize = 100.dp
-    Box(
-        modifier = Modifier
-            .size(imageSize)
-            .clip(RoundedCornerShape(5))
-            .padding(all = 5.dp)
-    ) {
-        Image(
-            painter = imagePainter,
-            contentDescription = "product image",
-            contentScale = ContentScale.Crop,
+        val imageSize = 100.dp
+        Box(
             modifier = Modifier
                 .size(imageSize)
                 .clip(RoundedCornerShape(5))
-                .clickable(onClick = {
-                    onClick(imagePainter)
-                })
-                .align(Alignment.Center)
-        )
-        when (imagePainter.loadState) {
-            is ImageLoadState.Loading -> AnimatedShimmerLoading()
-            is ImageLoadState.Empty,
-            is ImageLoadState.Error -> Image(
-                painterResource(R.drawable.default_image),
+                .padding(all = 5.dp)
+        ) {
+            Image(
+                painter = imagePainter,
                 contentDescription = "product image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(imageSize)
                     .clip(RoundedCornerShape(5))
+                    .clickable(onClick = {
+                        onClick(imagePainter)
+                    })
                     .align(Alignment.Center)
             )
-            else -> Unit
+            when (imagePainter.loadState) {
+                is ImageLoadState.Loading -> AnimatedShimmerLoading()
+                is ImageLoadState.Empty,
+                is ImageLoadState.Error -> Image(
+                    painterResource(R.drawable.default_image),
+                    contentDescription = "product image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(imageSize)
+                        .clip(RoundedCornerShape(5))
+                        .align(Alignment.Center)
+                )
+                else -> Unit
+            }
         }
     }
 }

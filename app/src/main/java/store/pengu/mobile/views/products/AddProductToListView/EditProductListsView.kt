@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.ImageLoader
 import io.ktor.util.*
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
@@ -55,6 +56,7 @@ import store.pengu.mobile.views.products.partials.Suggestions
 @ExperimentalComposeUiApi
 @Composable
 fun EditProductListsView(
+    imageLoader: ImageLoader,
     snackbarController: SnackbarController,
     listsService: ListsService,
     productsService: ProductsService,
@@ -174,7 +176,7 @@ fun EditProductListsView(
                 )
             }
 
-            Header(store.selectedProduct!!)
+            Header(imageLoader, store.selectedProduct!!)
 
             TabRow(
                 selectedTabIndex = selectedTab,

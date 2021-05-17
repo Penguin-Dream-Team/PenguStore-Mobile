@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
+import coil.ImageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.pengu.mobile.services.ProductsService
@@ -27,6 +28,7 @@ import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 @ExperimentalFoundationApi
 @Composable
 fun SearchScreen(
+    imageLoader: ImageLoader,
     navController: NavHostController,
     productsService: ProductsService,
     store: StoreState,
@@ -100,6 +102,7 @@ fun SearchScreen(
             ) {
                 items(products) { product ->
                     ItemCard(
+                        imageLoader,
                         name = product.name,
                         image = product.image,
                         modifier = Modifier
@@ -110,7 +113,8 @@ fun SearchScreen(
                                 storeState.setSelectedProduct(product)
                                 selectedProductId.value = product.id
                                 navController.navigate("product/${product.id}")
-                            })
+                            }
+                    )
                 }
             }
         }

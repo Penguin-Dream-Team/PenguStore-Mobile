@@ -1,9 +1,5 @@
 package store.pengu.mobile.services
 
-import android.util.Log
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -17,7 +13,6 @@ import store.pengu.mobile.data.productlists.ProductListEntry
 import store.pengu.mobile.data.productlists.ProductPantryListEntry
 import store.pengu.mobile.data.productlists.ProductShoppingListEntry
 import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.storage.PenguCache
 
 class ProductsService(
     private val api: PenguStoreApi,
@@ -390,14 +385,5 @@ class ProductsService(
     suspend fun timeQueue(): Int {
         store.location = LatLng(50.25, 150.25)
         return api.timeQueue(store.location!!).data
-    }
-
-    fun putImageCache() {
-        // TODO
-        //PenguCache.putAllImage(store.selectedProduct!!.id.toString(), )
-    }
-
-    fun getAllImagesCache(): List<String> {
-        return PenguCache.getAllImage(store.selectedProduct!!.id.toString()) ?: listOf<String>()
     }
 }
