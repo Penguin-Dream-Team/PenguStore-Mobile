@@ -1,6 +1,7 @@
 package store.pengu.mobile.states
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.android.gms.maps.model.LatLng
 import store.pengu.mobile.data.*
 
@@ -44,7 +45,7 @@ class StoreState {
     var amountNeeded: Int = 0
     var pantryProducts = mutableStateListOf<ProductInPantry>()
     var shoppingListProducts = mutableStateListOf<ProductInShoppingList>()
-    var cartProducts = mutableMapOf<Long, MutableList<MutableShopItem>>()
+    var cartProducts = mutableStateMapOf<Long, SnapshotStateList<MutableShopItem>>()
 
     var listLocation: LatLng? = null
 }

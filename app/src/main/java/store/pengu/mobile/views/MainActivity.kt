@@ -439,6 +439,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
                                     animatedComposable("cart") {
                                         CartScreen(
+                                            snackbarController,
                                             navController,
                                             cartService,
                                             productsService,

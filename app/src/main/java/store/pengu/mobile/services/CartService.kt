@@ -1,9 +1,6 @@
 package store.pengu.mobile.services
 
-import androidx.compose.runtime.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.mutableStateListOf
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.api.requests.lists.CartRequest
 import store.pengu.mobile.data.CartProduct
@@ -15,7 +12,7 @@ class CartService(
     private val store: StoreState
 ) {
 
-    fun buyCart() = GlobalScope.launch(Dispatchers.Main) {
+    suspend fun buyCart() {
         val requests = mutableStateListOf<CartProduct>()
         store.cartProducts.forEach { entry ->
             entry.value.forEach { product ->
@@ -23,14 +20,9 @@ class CartService(
                 requests.add(cartProduct)
             }
         }
-        try {
-            api.buyCart(CartRequest(requests))
-            store.cartProducts.clear()
-            store.cartShoppingList = null
-            listsService.getPantryLists()
-        } catch (e: Exception) {
-            // fetch from cache
-            e.printStackTrace()
-        }
+        api.buyCart(CartRequest(requests))
+        store.cartProducts.clear()
+        store.cartShoppingList = null
+        listsService.getPantryLists()
     }
 }

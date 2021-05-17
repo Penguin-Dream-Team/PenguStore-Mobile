@@ -239,7 +239,7 @@ class ProductsService(
                         store.cartProducts[pantryId]?.remove(it)
                         store.cartProducts[pantryId]?.add(it)
                     } else {
-                        store.cartProducts[pantryId] = mutableListOf(it)
+                        store.cartProducts[pantryId] = mutableStateListOf(it)
                     }
                 } else {
                     store.cartProducts[pantryId]?.removeIf { product ->
