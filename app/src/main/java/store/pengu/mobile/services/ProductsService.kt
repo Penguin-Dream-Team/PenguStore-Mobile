@@ -100,7 +100,8 @@ class ProductsService(
             if (!shoppingProducts.contains(shoppingListId)) {
                 shoppingProducts[shoppingListId] = mutableStateListOf()
             }
-            updateList(received, shoppingProducts[shoppingListId]!!)
+            shoppingProducts[shoppingListId]!!.clear()
+            shoppingProducts[shoppingListId]!!.addAll(received)
         } catch (e: Exception) {
             // fetch from cache
             e.printStackTrace()
