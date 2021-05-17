@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import kotlinx.coroutines.delay
@@ -20,6 +21,7 @@ import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.launcherForActivityResult
 import store.pengu.mobile.views.MainActivity
 import store.pengu.mobile.views.MainActivity.Companion.REQUEST_CHECK_SETTINGS
+import store.pengu.mobile.views.loading.RequestLocation
 import store.pengu.mobile.views.loading.RequestLocationCallback
 
 @SuppressLint("MissingPermission")
@@ -64,6 +66,7 @@ fun LocationTimer(
         })
     }
     val errorStringResource = stringResource(R.string.error_current_location)
+    var token by remember { mutableStateOf(false) }
 
     val launcher =
         launcherForActivityResult(
@@ -72,40 +75,53 @@ fun LocationTimer(
             if (!granted) {
                 snackbarController.showDismissibleSnackbar(errorStringResource)
             } else {
+                token = !token
                 requestLocation(mapsService, store, termiteService, locationRequest, setEnabled)
             }
         }
 
-    LaunchedEffect(tryAgain) {
-        val result = LocationServices.getSettingsClient(context).checkLocationSettings(
-            LocationSettingsRequest.Builder().apply {
-                addLocationRequest(locationRequest)
-                setNeedBle(true)
-                setAlwaysShow(true)
-            }.build()
-        )
+    LaunchedEffect(tryAgain, token) {
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) -> {
+                val result = LocationServices.getSettingsClient(context).checkLocationSettings(
+                    LocationSettingsRequest.Builder().apply {
+                        addLocationRequest(locationRequest)
+                        setNeedBle(true)
+                        setAlwaysShow(true)
+                    }.build()
+                )
 
-        result.addOnSuccessListener {
-            when (PackageManager.PERMISSION_GRANTED) {
-                context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) -> {
-                    requestLocation(mapsService, store, termiteService, locationRequest, setEnabled)
+                result.addOnSuccessListener {
+                    when (PackageManager.PERMISSION_GRANTED) {
+                        context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                            requestLocation(mapsService, store, termiteService, locationRequest, setEnabled)
+                        }
+                        else -> {
+                            launch {
+                                // needs to wait for launcher to finish initializing
+                                delay(100L)
+                                launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            }
+                        }
+                    }
                 }
-                else -> {
-                    launch {
-                        // needs to wait for launcher to finish initializing
-                        delay(100L)
-                        launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
+                result.addOnFailureListener { exception ->
+                    if (exception is ResolvableApiException) {
+                        exception.startResolutionForResult(
+                            mainActivity,
+                            REQUEST_CHECK_SETTINGS
+                        )
                     }
                 }
             }
-        }
-
-        result.addOnFailureListener { exception ->
-            if (exception is ResolvableApiException) {
-                exception.startResolutionForResult(
-                    mainActivity,
-                    REQUEST_CHECK_SETTINGS
-                )
+            else -> {
+                // needs to wait for launcher to finish initializing
+                delay(100L)
+                launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
 

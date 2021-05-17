@@ -40,7 +40,6 @@ class RequestLocationCallback(
         setLocation(null)
         locationResult.locations.lastOrNull()?.let {
             setLocation(LatLng(it.latitude, it.longitude))
-            Log.d("HELLPPP: CALLKBACK", it.toString())
         }
         setLoading(false)
     }
