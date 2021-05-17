@@ -35,7 +35,7 @@ import store.pengu.mobile.views.partials.IconButton
 fun ProductFormBottomSheetMenu(
     product: Product,
     closeMenu: () -> Unit,
-    onSave: suspend () -> Unit,
+    onSave: suspend (String, String?) -> Unit,
     onEditLists: () -> Unit,
     onUploadImage: () -> Unit,
 ) {
@@ -47,14 +47,20 @@ fun ProductFormBottomSheetMenu(
     var productBarcode by remember { mutableStateOf(product.barcode) }
 
     var loading by remember { mutableStateOf(false) }
-    val canSave = !loading && (productName != product.name || productBarcode != product.barcode)
+    val canSave =
+        !loading && productName.isNotBlank() && (productName != product.name || productBarcode != product.barcode)
 
     val save: () -> Unit = {
         loading = true
+        keyboardController?.hide()
         coroutineScope.launch {
             if (canSave) {
-                onSave()
+                if (productBarcode.isNullOrBlank()) {
+                    productBarcode = null
+                }
+                onSave(productName, productBarcode)
                 loading = false
+                closeMenu()
             }
         }
     }
@@ -109,8 +115,20 @@ fun ProductFormBottomSheetMenu(
                 focusRequester.requestFocus()
             }),
             leadingIcon = {
-                Icon(imageVector = Icons.Filled.Tag, contentDescription = "product name")
+                Icon(imageVector = Icons.Filled.Label, contentDescription = "product name")
             },
+            trailingIcon = {
+                if (productName != product.name) {
+                    IconButton(
+                        onClick = {
+                            productName = product.name
+                        },
+                        icon = Icons.Filled.Clear,
+                        description = "Clear"
+                    )
+                }
+            },
+            isError = productName.isBlank(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 15.dp),
@@ -135,6 +153,17 @@ fun ProductFormBottomSheetMenu(
             }),
             leadingIcon = {
                 Icon(imageVector = Icons.Filled.QrCode, contentDescription = "product barcode")
+            },
+            trailingIcon = {
+                if (productBarcode != product.barcode) {
+                    IconButton(
+                        onClick = {
+                            productBarcode = product.barcode
+                        },
+                        icon = Icons.Filled.Clear,
+                        description = "Clear"
+                    )
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

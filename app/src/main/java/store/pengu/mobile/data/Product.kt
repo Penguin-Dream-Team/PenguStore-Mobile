@@ -7,9 +7,9 @@ data class Product (
     val id: Long,
     val name: String,
     val barcode: String?,
-    val productRating: Double,
-    val userRating: Int,
-    val ratings: List<Int>,
+    var productRating: Double,
+    var userRating: Int,
+    var ratings: List<Int>,
     val image: String?
 ) {
     fun toProductInPantry(listId: Long, amountAvailable: Int, amountNeeded: Int): ListProduct {

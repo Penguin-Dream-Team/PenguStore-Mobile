@@ -124,7 +124,7 @@ fun ViewShoppingList(
         },
         onViewInfo = {
             selectedProduct?.let {
-                store.selectedProduct = it.toProduct()
+                store.setSelectedProduct(it.toProduct())
                 navController.navigate("product/${it.id}")
             }
             selectedProduct = null

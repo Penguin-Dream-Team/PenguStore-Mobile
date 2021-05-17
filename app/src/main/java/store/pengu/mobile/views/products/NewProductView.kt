@@ -45,6 +45,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
+import coil.ImageLoader
+import com.google.accompanist.coil.LocalImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.ImageLoadState
 import io.ktor.util.*
@@ -74,6 +76,7 @@ import java.util.*
 @ExperimentalComposeUiApi
 @Composable
 fun NewProductView(
+    imageLoader: ImageLoader,
     snackbarController: SnackbarController,
     cameraService: CameraService,
     productsService: ProductsService,
@@ -101,6 +104,7 @@ fun NewProductView(
         }
 
         ProductForm(
+            imageLoader,
             snackbarController,
             cameraService,
             productsService,
@@ -132,6 +136,7 @@ fun NewProductView(
 @ExperimentalComposeUiApi
 @Composable
 private fun ProductForm(
+    imageLoader: ImageLoader,
     snackbarController: SnackbarController,
     cameraService: CameraService,
     productsService: ProductsService,
@@ -156,66 +161,67 @@ private fun ProductForm(
     var showDialog by remember { mutableStateOf(false) }
 
     val permissionToUseCamera = stringResource(R.string.permission_to_use_camera_not_granted)
-    val valid_barcode_not_found = stringResource(R.string.valid_barcode_not_found)
+    val validBarcodeNotFound = stringResource(R.string.valid_barcode_not_found)
     val chooseImageForProduct = stringResource(R.string.choose_image_for_product)
 
-    val imagePainter = rememberCoilPainter(
-        request = productImage,
-        fadeIn = true,
-    )
+    CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+        val imagePainter = rememberCoilPainter(
+            request = productImage,
+            fadeIn = true,
+        )
 
-    canScanBarcode = name.isNotBlank()
-    canUploadImage = name.isNotBlank()
-    canCreate = name.isNotBlank()
+        canScanBarcode = name.isNotBlank()
+        canUploadImage = name.isNotBlank()
+        canCreate = name.isNotBlank()
 
-    val createProduct = {
-        coroutineScope.launch {
-            val imageData = ImageUtils.getEncodedImage(context, productImage)
-            try {
-                val product = productsService.createProduct(
-                    name,
-                    if (barcode.isNotBlank()) barcode else null,
-                    if (productImage.isNotBlank()) imageData else null
-                )
+        val createProduct = {
+            coroutineScope.launch {
+                val imageData = ImageUtils.getEncodedImage(context, productImage)
+                try {
+                    val product = productsService.createProduct(
+                        name,
+                        if (barcode.isNotBlank()) barcode else null,
+                        if (productImage.isNotBlank()) imageData else null
+                    )
 
-                navController.popBackStack()
+                    navController.popBackStack()
 
-                when {
-                    shopId == null && pantryId == null -> {
-                        navController.navigate("product/${product.id}")
+                    when {
+                        shopId == null && pantryId == null -> {
+                            navController.navigate("product/${product.id}")
+                        }
+                        pantryId != null -> {
+                            navController.navigate("add_product_to_list/${product.id}?listType=${UserListType.PANTRY.ordinal}&listId=$pantryId")
+                        }
+                        else -> {
+                            navController.navigate("add_product_to_list/${product.id}?listType=${UserListType.SHOPPING_LIST.ordinal}&listId=$shopId")
+                        }
                     }
-                    pantryId != null -> {
-                        navController.navigate("add_product_to_list/${product.id}?listType=${UserListType.PANTRY.ordinal}&listId=$pantryId")
-                    }
-                    else -> {
-                        navController.navigate("add_product_to_list/${product.id}?listType=${UserListType.SHOPPING_LIST.ordinal}&listId=$shopId")
-                    }
-                }
 
-            } catch (e: PenguStoreApiException) {
-                snackbarController.showDismissibleSnackbar(e.message)
-            }
-        }
-    }
-
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
-            with(it) {
-                if (resultCode == RESULT_OK) {
-                    productImage = if (data != null && data?.data != null) {
-                        data?.data.toString()
-                    } else {
-                        MediaScannerConnection.scanFile(
-                            context,
-                            arrayOf(image.toString()),
-                            null,
-                            null
-                        )
-                        image.toString()
-                    }
+                } catch (e: PenguStoreApiException) {
+                    snackbarController.showDismissibleSnackbar(e.message)
                 }
             }
         }
+
+        val launcher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+                with(it) {
+                    if (resultCode == RESULT_OK) {
+                        productImage = if (data != null && data?.data != null) {
+                            data?.data.toString()
+                        } else {
+                            MediaScannerConnection.scanFile(
+                                context,
+                                arrayOf(image.toString()),
+                                null,
+                                null
+                            )
+                            image.toString()
+                        }
+                    }
+                }
+            }
 
     OutlinedTextField(
         value = name,
@@ -260,200 +266,199 @@ private fun ProductForm(
                         scanBarcode = false
                     },
                     onFail = {
-                        snackbarController.showDismissibleSnackbar(valid_barcode_not_found)
+                        snackbarController.showDismissibleSnackbar(validBarcodeNotFound)
                         scanBarcode = false
                     },
                     CameraService.ScanType.PRODUCT_BARCODE
-                )
+                    )
+                }
             }
         }
-    }
 
-    OutlinedTextField(
-        value = barcode,
-        onValueChange = {
-            barcode = it
-        },
-        placeholder = {
-            Text(stringResource(R.string.product_barcode))
-        },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next
-        ),
-        keyboardActions = KeyboardActions(onNext = {
-            keyboardController?.hide()
-        }),
-        leadingIcon = {
-            Icon(imageVector = Icons.Filled.QrCode, contentDescription = "product barcode")
-        },
-        trailingIcon = {
-            Button(
-                onClick = {
-                    scanBarcode = !scanBarcode
-                },
-                shape = CircleShape,
-                enabled = canScanBarcode,
-                contentPadding = PaddingValues(5.dp),
-                modifier = Modifier
-                    .size(45.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.PhotoCamera,
-                    contentDescription = "scan barcode",
-                    tint = Color.White,
-                )
-            }
-        },
-        enabled = canScanBarcode,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 35.dp)
-    )
-
-    AnimatedVisibility(visible = productImage.isNotBlank()) {
-        Box(
+        OutlinedTextField(
+            value = barcode,
+            onValueChange = {
+                barcode = it
+            },
+            placeholder = {
+                Text(stringResource(R.string.product_barcode))
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                keyboardController?.hide()
+            }),
+            leadingIcon = {
+                Icon(imageVector = Icons.Filled.QrCode, contentDescription = "product barcode")
+            },
+            trailingIcon = {
+                Button(
+                    onClick = {
+                        scanBarcode = !scanBarcode
+                    },
+                    shape = CircleShape,
+                    enabled = canScanBarcode,
+                    contentPadding = PaddingValues(5.dp),
+                    modifier = Modifier
+                        .size(45.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PhotoCamera,
+                        contentDescription = "scan barcode",
+                        tint = Color.White,
+                    )
+                }
+            },
+            enabled = canScanBarcode,
             modifier = Modifier
-                .size(200.dp)
-                .padding(bottom = 15.dp)
-                .clip(RoundedCornerShape(5))
-        ) {
-            Image(
-                painter = imagePainter,
-                contentDescription = "product image",
-                contentScale = ContentScale.Crop
-            )
-            when (imagePainter.loadState) {
-                is ImageLoadState.Loading -> AnimatedShimmerLoading()
-                is ImageLoadState.Error -> Image(
-                    painterResource(R.drawable.default_image),
+                .fillMaxWidth()
+                .padding(bottom = 35.dp)
+        )
+
+        AnimatedVisibility(visible = productImage.isNotBlank()) {
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .padding(bottom = 15.dp)
+                    .clip(RoundedCornerShape(5))
+            ) {
+                Image(
+                    painter = imagePainter,
                     contentDescription = "product image",
                     contentScale = ContentScale.Crop
                 )
-                else -> Unit
+                when (imagePainter.loadState) {
+                    is ImageLoadState.Loading -> AnimatedShimmerLoading()
+                    is ImageLoadState.Error -> Image(
+                        painterResource(R.drawable.default_image),
+                        contentDescription = "product image",
+                        contentScale = ContentScale.Crop
+                    )
+                    else -> Unit
+                }
             }
         }
-    }
 
-    Row(
-        modifier = Modifier
-            .padding(bottom = 35.dp)
-            .fillMaxWidth()
-    ) {
-        Button(
-            onClick = {
-                val outputPath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                val chooser = Intent.createChooser(
-                    Intent(Intent.ACTION_CHOOSER),
-                    chooseImageForProduct
-                ).apply {
-                    putExtra(Intent.EXTRA_INTENT,
-                        Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" })
-                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                    val photoURI = File.createTempFile(
-                        "JPEG_${timeStamp}_",
-                        ".jpg",
-                        outputPath
-                    ).run {
-                        FileProvider.getUriForFile(
-                            context,
-                            "store.pengu.mobile.fileprovider",
-                            this
-                        )
-                    }
-                    Log.d("Hello", photoURI.toString())
-                    image = photoURI
-                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
-                }
-                launcher.launch(chooser)
-            }, enabled = canUploadImage,
+        Row(
             modifier = Modifier
-                .weight(0.5f)
-        ) {
-            Icon(imageVector = Icons.Filled.Image, contentDescription = "choose image")
-            Text(text = (if (productImage.isBlank()) stringResource(R.string.choose) else stringResource(
-                R.string.replace
-            )) + stringResource(R.string.space_image)
-            )
-        }
-        AnimatedVisibility(
-            visible = productImage.isNotBlank(),
-            modifier = Modifier
-                .padding(start = 5.dp)
-                .weight(0.5f)
+                .padding(bottom = 35.dp)
+                .fillMaxWidth()
         ) {
             Button(
                 onClick = {
-                    productImage = ""
-                },
-                enabled = canUploadImage && productImage.isNotBlank(),
+                    val outputPath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                    val chooser = Intent.createChooser(
+                        Intent(Intent.ACTION_CHOOSER),
+                        chooseImageForProduct
+                    ).apply {
+                        putExtra(Intent.EXTRA_INTENT,
+                            Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" })
+                        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+                        val photoURI = File.createTempFile(
+                            "JPEG_${timeStamp}_",
+                            ".jpg",
+                            outputPath
+                        ).run {
+                            FileProvider.getUriForFile(
+                                context,
+                                "store.pengu.mobile.fileprovider",
+                                this
+                            )
+                        }
+                        Log.d("Hello", photoURI.toString())
+                        image = photoURI
+                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                        putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
+                    }
+                    launcher.launch(chooser)
+                }, enabled = canUploadImage,
+                modifier = Modifier
+                    .weight(0.5f)
             ) {
-                Icon(imageVector = Icons.Filled.Clear, contentDescription = "clear image")
-                Text(text = stringResource(R.string.clear_image))
+                Icon(imageVector = Icons.Filled.Image, contentDescription = "choose image")
+                Text(text = (if (productImage.isBlank()) stringResource(R.string.choose) else stringResource(R.string.replace)) + stringResource(R.string.space_image))
             }
-        }
-    }
-
-    Button(
-        onClick = {
-            if (barcode.isBlank() || productImage.isBlank()) {
-                showDialog = true
-            } else {
-                createProduct()
-            }
-        }, enabled = canCreate,
-        modifier = Modifier
-            .padding(bottom = 15.dp)
-            .fillMaxWidth()
-    ) {
-        Icon(imageVector = Icons.Filled.Add, contentDescription = "create product")
-        Text(text = stringResource(R.string.create_product))
-    }
-
-    val dismissAlert = {
-        showDialog = false
-    }
-
-    AnimatedVisibility(visible = showDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                dismissAlert()
-            },
-            confirmButton = {
+            AnimatedVisibility(
+                visible = productImage.isNotBlank(),
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .weight(0.5f)
+            ) {
                 Button(
                     onClick = {
-                        createProduct()
-                        dismissAlert()
-                    }
+                        productImage = ""
+                    },
+                    enabled = canUploadImage && productImage.isNotBlank(),
                 ) {
-                    Text(stringResource(R.string.create_without_space))
+                    Icon(imageVector = Icons.Filled.Clear, contentDescription = "clear image")
+                    Text(text = stringResource(R.string.clear_image))
                 }
-            },
-            dismissButton = {
-                Button(
-                    onClick = dismissAlert
-                ) {
-                    Text(stringResource(R.string.dismiss))
-                }
-            },
-            title = {
-                Text(stringResource(R.string.confirm_product_creation))
-            },
-            text = {
-                Text(
-                    stringResource(R.string.product_creating_dont_have) + if (barcode.isBlank()) {
-                        if (productImage.isBlank()) {
-                            stringResource(R.string.barcode_nor_image)
-                        } else {
-                            stringResource(R.string.a_barcode)
-                        }
-                    } else {
-                        stringResource(R.string.an_image)
-                    }
-                )
             }
-        )
+        }
+
+        Button(
+            onClick = {
+                if (barcode.isBlank() || productImage.isBlank()) {
+                    showDialog = true
+                } else {
+                    createProduct()
+                }
+            }, enabled = canCreate,
+            modifier = Modifier
+                .padding(bottom = 15.dp)
+                .fillMaxWidth()
+        ) {
+            Icon(imageVector = Icons.Filled.Add, contentDescription = "create product")
+            Text(text = stringResource(R.string.create_product))
+        }
+
+        val dismissAlert = {
+            showDialog = false
+        }
+
+        AnimatedVisibility(visible = showDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    dismissAlert()
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            createProduct()
+                            dismissAlert()
+                        }
+                    ) {
+                        Text(stringResource(R.string.create))
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = dismissAlert
+                    ) {
+                        Text(stringResource(R.string.dismiss))
+                    }
+                },
+                title = {
+                    Text(stringResource(R.string.confirm_product_creation))
+                },
+                text = {
+                    Text(
+                        stringResource(R.string.product_creating_dont_have) +
+                            if (barcode.isBlank()) {
+                                if (productImage.isBlank()) {
+                                    stringResource(R.string.barcode_nor_image)
+                                } else {
+                                    stringResource(R.string.a_barcode)
+                                }
+                            } else {
+                                stringResource(R.string.an_image)
+                            }
+                    )
+                }
+            )
+        }
     }
 }

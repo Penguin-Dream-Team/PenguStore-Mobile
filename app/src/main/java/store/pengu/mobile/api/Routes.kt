@@ -43,6 +43,8 @@ object Routes {
     fun ADD_PRODUCT_PANTRY_LIST(productId: Long) = "/products/$productId/pantries"
     fun ADD_PRODUCT_SHOPPING_LIST(productId: Long) = "/products/$productId/shops"
     fun GET_PRODUCT_IMAGES(productId: Long) = "/products/$productId/images"
+    fun RATE_PRODUCT(productId: Long, rating: Int) = "/products/$productId/rate/$rating"
+    fun EDIT_PRODUCT(productId: Long) = "/products/$productId"
 
     const val BUY_CART = "/cart"
 
@@ -91,6 +93,4 @@ object Routes {
     const val DELETE_IMAGE = "/images/deleteImage"
 
     const val TRANSLATION = "/translation/id"
-
-    const val RATE_PRODUCT = "/ratings/id/rating"
 }

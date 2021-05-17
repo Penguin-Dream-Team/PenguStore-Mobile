@@ -20,7 +20,7 @@
     <string name="add_pantry">Add Pantry</string>
     <string name="add_barcode_product">Added Barcode to Product\u0020</string>
     <string name="unknown">Unknown</string>
-    <string name="starts">Stars</string>
+    <string name="stars">Stars</string>
     <string name="zero_seconds">0 seconds</string>
     <string name="minute">\u0020minute</string>
     <string name="minutes">\u0020minutes</string>
@@ -144,4 +144,6 @@ Name:\u0020</string>
     <string name="rating_share">Rating:\u0020</string>
     <string name="stars_share">\u0020Stars</string>
     <string name="barcode_share">Barcode:\u0020</string>
+    <string name="no_ratings">No ratings</string>
+    <string name="your_rating">Your rating</string>
 </resources>

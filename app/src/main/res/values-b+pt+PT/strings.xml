@@ -20,7 +20,7 @@
     <string name="add_pantry">Adicionar à Despensa</string>
     <string name="add_barcode_product">Código de Barras adicionado ao Produto\u0020</string>
     <string name="unknown">Desconhecido</string>
-    <string name="starts">Estrelas</string>
+    <string name="stars">Estrelas</string>
     <string name="zero_seconds">0 segundos</string>
     <string name="minute">\u0020minuto</string>
     <string name="minutes">\u0020minutos</string>
@@ -144,4 +144,6 @@ Nome:\u0020</string>
     <string name="rating_share">Classificação:\u0020</string>
     <string name="stars_share">\u0020Estrelas</string>
     <string name="barcode_share">Código de Barras:\u0020</string>
+    <string name="no_ratings">Sem Classificações</string>
+    <string name="your_rating">Sua Classificação</string>
 </resources>

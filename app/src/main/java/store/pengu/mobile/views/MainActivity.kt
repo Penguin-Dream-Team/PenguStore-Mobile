@@ -24,9 +24,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import coil.ImageLoader
+import coil.util.CoilUtils
+import com.github.mikephil.charting.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import io.ktor.util.*
 import kotlinx.coroutines.*
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
@@ -53,6 +58,7 @@ import store.pengu.mobile.views.products.NewProductView
 import store.pengu.mobile.views.products.ProductInfo.ProductInfo
 import store.pengu.mobile.views.profile.ProfileScreen
 import store.pengu.mobile.views.search.SearchScreen
+import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -92,6 +98,8 @@ class MainActivity : AppCompatActivity(), PeerListListener {
     private var isBottomSheetMenuOpen: Boolean = false
     private lateinit var coroutineScope: CoroutineScope
 
+    private lateinit var imageLoader: ImageLoader
+
     @KtorExperimentalAPI
     @ExperimentalMaterialApi
     @ExperimentalComposeUiApi
@@ -111,6 +119,19 @@ class MainActivity : AppCompatActivity(), PeerListListener {
 
         // register broadcast receiver
         registerTermiteReceiver()
+
+        imageLoader = ImageLoader.Builder(applicationContext).apply {
+            val CACHE_DIRECTORY_NAME = "image_cache"
+            val CACHE_SIZE = 10L * 1024 * 1024 // MB
+            val cacheDirectory =
+                File(applicationContext.cacheDir, CACHE_DIRECTORY_NAME).apply { mkdirs() }
+            val cache = Cache(cacheDirectory, CACHE_SIZE)
+            okHttpClient {
+                OkHttpClient.Builder()
+                    .cache(cache)
+                    .build()
+            }
+        }.build()
 
         setContent {
             navController = rememberNavController()
@@ -304,6 +325,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 ) { args ->
                                     SearchScreen(
+                                        imageLoader,
                                         navController,
                                         productsService,
                                         storeState,
@@ -316,11 +338,12 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     navArgument("productId") { type = NavType.LongType }
                                 )) { args ->
                                     ProductInfo(
+                                        imageLoader,
                                         productsService,
                                         navController,
                                         storeState,
                                         args!!["productId"] as Long
-                                    )
+                                    ) { expandBottomSheetMenu() }
                                 }
 
                                 animatedComposable("new_item?shopId={shopId}&pantryId={pantryId}",
@@ -334,6 +357,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 ) { args ->
                                     NewProductView(
+                                        imageLoader,
                                         snackbarController,
                                         cameraService,
                                         productsService,
@@ -356,6 +380,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     )
                                 ) { args ->
                                     EditProductListsView(
+                                        imageLoader,
                                         snackbarController,
                                         listsService,
                                         productsService,

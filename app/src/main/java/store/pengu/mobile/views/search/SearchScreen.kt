@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
+import coil.ImageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
@@ -29,6 +30,7 @@ import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 @ExperimentalFoundationApi
 @Composable
 fun SearchScreen(
+    imageLoader: ImageLoader,
     navController: NavHostController,
     productsService: ProductsService,
     store: StoreState,
@@ -102,6 +104,7 @@ fun SearchScreen(
             ) {
                 items(products) { product ->
                     ItemCard(
+                        imageLoader,
                         name = product.name,
                         image = product.image,
                         modifier = Modifier
@@ -109,10 +112,11 @@ fun SearchScreen(
                             .clickable(
                                 onClickLabel = stringResource(R.string.add_to_pantry)
                             ) {
-                                storeState.selectedProduct = product
+                                storeState.setSelectedProduct(product)
                                 selectedProductId.value = product.id
                                 navController.navigate("product/${product.id}")
-                            })
+                            }
+                    )
                 }
             }
         }

@@ -1,9 +1,5 @@
 package store.pengu.mobile.services
 
-import android.util.Log
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -17,7 +13,6 @@ import store.pengu.mobile.data.productlists.ProductListEntry
 import store.pengu.mobile.data.productlists.ProductPantryListEntry
 import store.pengu.mobile.data.productlists.ProductShoppingListEntry
 import store.pengu.mobile.states.StoreState
-import store.pengu.mobile.storage.PenguCache
 
 class ProductsService(
     private val api: PenguStoreApi,
@@ -155,7 +150,7 @@ class ProductsService(
 
     suspend fun createProduct(name: String, barcode: String?, image: String?): Product {
         val product = api.createProduct(name, barcode, image).data
-        store.selectedProduct = product
+        store.setSelectedProduct(product)
         return product
     }
 
@@ -164,7 +159,7 @@ class ProductsService(
         mutableMapOf<Long, SnapshotStateList<ProductShoppingListEntry>>()
 
     suspend fun fetchProduct(productId: Long) {
-        store.selectedProduct = api.getProduct(productId).data
+        store.setSelectedProduct(api.getProduct(productId).data)
     }
 
     fun getProductPantryLists(productId: Long): SnapshotStateList<ProductPantryListEntry> {
@@ -201,7 +196,7 @@ class ProductsService(
             updateProductList(received, productPantryLists[productId]!!)
 
             return if (barcode != null && (oldProduct == null || oldProduct.amountNeeded < needAmount)) {
-               api.getProductSuggestion(barcode).data
+                api.getProductSuggestion(barcode).data
             } else {
                 null
             }
@@ -346,6 +341,39 @@ class ProductsService(
         })
     }
 
+    suspend fun rateProduct(productId: Long, rating: Int): List<Int> {
+        return try {
+            val ratings = api.rateProduct(productId, rating).data
+            store.selectedProduct?.let {
+                if (it.id == productId) {
+                    var r = ratings.sum().toDouble() / ratings.size
+                    if (r.isNaN()) {
+                        r = 0.0
+                    }
+                    store.setSelectedProduct(
+                        it.copy(
+                            ratings = ratings,
+                            productRating = r,
+                            userRating = rating
+                        )
+                    )
+                }
+            }
+            ratings
+        } catch (e: Exception) {
+            // fetch from cache
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+
+    suspend fun editProduct(productId: Long, name: String, barcode: String?): Product {
+        val product = api.editProduct(productId, name, barcode).data
+        store.setSelectedProduct(product)
+        return product
+    }
+
     /**
      * NO
      */
@@ -357,14 +385,5 @@ class ProductsService(
     suspend fun timeQueue(): Int {
         store.location = LatLng(50.25, 150.25)
         return api.timeQueue(store.location!!).data
-    }
-
-    fun putImageCache(){
-        // TODO
-        //PenguCache.putAllImage(store.selectedProduct!!.id.toString(), )
-    }
-
-    fun getAllImagesCache(): List<String> {
-        return PenguCache.getAllImage(store.selectedProduct!!.id.toString()) ?: listOf<String>()
     }
 }
