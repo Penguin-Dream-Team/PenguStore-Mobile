@@ -223,7 +223,10 @@ class ProductsService(
         }
     }
 
-    fun addProductToCart(
+    suspend fun addProductToCart(
+        productBarcode: String?,
+        shoppingListId: Long,
+        products: SnapshotStateList<ProductInShoppingList>,
         pantries: SnapshotStateMap<Long, MutableShopItem>,
     ) {
         pantries.keys.forEach { pantryId ->
@@ -235,8 +238,25 @@ class ProductsService(
                     } else {
                         store.cartProducts[pantryId] = mutableListOf(it)
                     }
+                } else {
+                    store.cartProducts[pantryId]?.removeIf { product ->
+                        product.productId == it.productId
+                    }
                 }
             }
+        }
+
+        try {
+            if (productBarcode != null) {
+                val productsInCart = store.cartProducts.values.flatten().toSet().map { it.productId }
+                val remainingItems = products.filterNot { product ->
+                    productsInCart.contains(product.id)
+                }.mapNotNull { it.barcode }
+                api.updateSmartSortingEntries(shoppingListId, productBarcode, remainingItems)
+            }
+        } catch (e: Exception) {
+            // fetch from cache
+            e.printStackTrace()
         }
     }
 

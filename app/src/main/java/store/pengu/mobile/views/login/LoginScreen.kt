@@ -13,10 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.navigate
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.errors.PenguStoreApiException
 import store.pengu.mobile.services.AccountService
 import store.pengu.mobile.utils.SnackbarController
@@ -32,6 +34,8 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
     val canRegister = remember { mutableStateOf(true) }
 
+    val welcome = stringResource(R.string.welcome)
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val attemptLogin: (suspend () -> String) -> Unit = { login ->
         keyboardController?.hide()
@@ -41,7 +45,7 @@ fun LoginScreen(
                 val username = login()
                 navController.backStack.clear()
                 navController.navigate("loading")
-                snackbarController.showDismissibleSnackbar("Welcome $username")
+                snackbarController.showDismissibleSnackbar(welcome + username)
             } catch (e: PenguStoreApiException) {
                 snackbarController.showDismissibleSnackbar(e.message)
                 canRegister.value = true

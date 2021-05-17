@@ -8,6 +8,7 @@ import store.pengu.mobile.data.productlists.ProductPantryListEntry
 @JsonDeserialize
 data class MutableShopItem(
     val productId: Long,
+    val barcode: String?,
     val listName: String,
     val productName: String,
     val amountNeeded: Int,

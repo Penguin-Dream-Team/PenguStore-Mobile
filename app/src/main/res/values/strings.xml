@@ -149,4 +149,8 @@ Name:\u0020</string>
     <string name="error_current_location">Cannot fetch current location</string>
     <string name="noLocationAccess">You need to enable location access to use the application</string>
     <string name="queueTimeLabel">Queue Time: </string>
+    <string name="cart_empty">Your cart is empty</string>
+    <string name="welcome">\"Welcome \"</string>
+    <string name="reset">Reset</string>
+    <string name="fill">Fill</string>
 </resources>

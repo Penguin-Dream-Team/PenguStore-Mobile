@@ -89,7 +89,7 @@ fun ShopProductItemDialog(
                                 imageVector = Icons.Filled.RemoveShoppingCart,
                                 contentDescription = "Clear"
                             )
-                            Text("Reset")
+                            Text(stringResource(R.string.reset))
                         }
                         Button(
                             onClick = {
@@ -104,7 +104,7 @@ fun ShopProductItemDialog(
                                 imageVector = Icons.Filled.AddShoppingCart,
                                 contentDescription = "Fill"
                             )
-                            Text("Fill")
+                            Text(stringResource(R.string.fill))
                         }
                     }
                     Divider()

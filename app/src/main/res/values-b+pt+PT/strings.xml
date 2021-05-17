@@ -149,4 +149,8 @@ Nome:\u0020</string>
     <string name="error_current_location">Localização atual não encontrada</string>
     <string name="noLocationAccess">Precisa de ativar a localização para usar a aplicação</string>
     <string name="queueTimeLabel">Tempo de espera: </string>
+    <string name="cart_empty">O seu carrinho está vazio</string>
+    <string name="welcome">Bem vindo\u0020</string>
+    <string name="reset">Repor</string>
+    <string name="fill">Preencher</string>
 </resources>

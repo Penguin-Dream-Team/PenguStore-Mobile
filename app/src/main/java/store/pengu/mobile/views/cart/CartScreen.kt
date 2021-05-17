@@ -72,7 +72,7 @@ fun CartScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Cart", fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.cart), fontWeight = FontWeight.Bold)
         AnimatedVisibility(visible = queueTime != null) {
             Divider()
 
@@ -109,7 +109,7 @@ fun CartScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         if (store.cartProducts.isEmpty()) {
-            Text(text = "Your cart is empty")
+            Text(text = stringResource(R.string.cart_empty))
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),

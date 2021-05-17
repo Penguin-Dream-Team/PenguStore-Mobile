@@ -145,6 +145,7 @@ fun ViewShoppingList(
                         pantries.putAll(product.pantries.map {
                             it.listId to MutableShopItem(
                                 selectedProduct!!.id,
+                                selectedProduct!!.barcode,
                                 it.listName,
                                 selectedProduct!!.name,
                                 it.amountNeeded,
@@ -170,7 +171,7 @@ fun ViewShoppingList(
         onSave = {
             coroutineScope.launch(Dispatchers.IO) {
                 store.cartShoppingList = shoppingList.id
-                productsService.addProductToCart(pantries)
+                productsService.addProductToCart(selectedProduct?.barcode, shoppingList.id, products, pantries)
                 selectedProduct = null
             }
         },

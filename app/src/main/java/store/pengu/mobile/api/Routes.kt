@@ -49,6 +49,9 @@ object Routes {
     const val BUY_CART = "/cart"
 
     fun GET_PRODUCT_SUGGESTION(barcode: String) = "/cart/suggestion/$barcode"
+
+    fun UPDATE_SMART_SORTING_ENTRIES(shoppingListId: Long, barcode: String) = "/shoppingList/$shoppingListId/smartSortingInfo/$barcode"
+
     const val TIME_QUEUE = "/queue/time"
 
     /**
@@ -65,7 +68,6 @@ object Routes {
     const val UPDATE_SHOPPING_LIST = "/users/updateShoppingList"
     const val DELETE_SHOPPING_LIST = "/users/deleteShoppingList"
     const val GET_USER_SHOPPING_LIST = "/shoppingList/id"
-    const val UPDATE_SMART_SORTING_ENTRIES = "/shoppingList/smartSortingInfo/id"
 
     const val GET_PANTRY_LIST = "/pantries/id"
     const val ADD_PANTRY_LIST = "/pantries/add"
