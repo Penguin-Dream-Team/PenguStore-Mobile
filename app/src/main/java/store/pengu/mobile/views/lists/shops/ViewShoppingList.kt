@@ -1,17 +1,21 @@
 package store.pengu.mobile.views.lists.shops
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +28,7 @@ import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
+import store.pengu.mobile.utils.secondsToMinutes
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
 
 @Suppress("UNUSED_VALUE")
@@ -37,6 +42,7 @@ fun ViewShoppingList(
     shoppingList: ShoppingList
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     var isRefreshing: Boolean by remember { mutableStateOf(false) }
     var needsRefresh: Boolean by remember { mutableStateOf(true) }
     val refresh = {
@@ -58,6 +64,52 @@ fun ViewShoppingList(
     val pantries = remember { mutableStateMapOf<Long, MutableShopItem>() }
     val (needAmount, setNeedAmount) = remember { mutableStateOf(0) }
     val string = stringResource(R.string.not_in_store)
+    var (queueTime, setQueueTime) = remember { mutableStateOf(null as Int?) }
+
+    LaunchedEffect(null) {
+        while (true) {
+            try {
+                setQueueTime(productsService.getQueueTime(shoppingList.location))
+            } catch (e: Exception) {
+                queueTime = null
+            }
+            delay(5000)
+        }
+    }
+
+    AnimatedVisibility(visible = queueTime != null) {
+        Divider()
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp)
+                .alpha(0.7f),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.queueTimeLabel),
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.padding(end = 3.dp),
+                    maxLines = 1
+                )
+                Text(
+                    text = queueTime!!.secondsToMinutes(context) ?: "",
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.padding(start = 3.dp),
+                    maxLines = 1
+                )
+            }
+        }
+    }
+
+    Divider()
 
     PullToRefresh(
         isRefreshing = isRefreshing,
@@ -99,7 +151,7 @@ fun ViewShoppingList(
                                 it.amountAvailable,
                                 store.cartProducts[it.listId]?.firstOrNull { product ->
                                     product.productId == selectedProduct!!.id
-                                }?.inCart?: mutableStateOf(0)
+                                }?.inCart ?: mutableStateOf(0)
                             )
                         })
                         setNeedAmount(product.amountNeeded)

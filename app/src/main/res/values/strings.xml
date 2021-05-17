@@ -148,4 +148,5 @@ Name:\u0020</string>
     <string name="your_rating">Your rating</string>
     <string name="error_current_location">Cannot fetch current location</string>
     <string name="noLocationAccess">You need to enable location access to use the application</string>
+    <string name="queueTimeLabel">Queue Time: </string>
 </resources>

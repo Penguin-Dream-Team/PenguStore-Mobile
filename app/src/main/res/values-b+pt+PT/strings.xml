@@ -90,7 +90,7 @@
     <string name="product_name">Nome do Producto</string>
     <string name="product_barcode">Código de Barras do Produto</string>
     <string name="save_changes">Guardar Alterações</string>
-    <string name="edit_lists">Editar Listas</string>
+    <string name="edit_lists">Adicionar a Listas</string>
     <string name="upload_image">Inserir Imagem</string>
     <string name="gallery">Galeria</string>
     <string name="no_images">Não possui Imagens</string>
@@ -148,4 +148,5 @@ Nome:\u0020</string>
     <string name="your_rating">Sua Classificação</string>
     <string name="error_current_location">Localização atual não encontrada</string>
     <string name="noLocationAccess">Precisa de ativar a localização para usar a aplicação</string>
+    <string name="queueTimeLabel">Tempo de espera: </string>
 </resources>

@@ -4,9 +4,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.data.*
 import store.pengu.mobile.data.productlists.ProductListEntry
@@ -374,15 +371,9 @@ class ProductsService(
         return product
     }
 
-    /**
-     * NO
-     */
-
-    fun addBarcodeProduct(barcode: String) = GlobalScope.launch(Dispatchers.Main) {
-        api.addBarcodeProduct(barcode)
-    }
-
-    suspend fun timeQueue(): Int {
-        return api.timeQueue(store.location!!).data
+    suspend fun getQueueTime(location: LatLng?): Int {
+        return location?.let {
+            return api.getTimeQueue(it.latitude, it.longitude).data
+        } ?: 0
     }
 }

@@ -170,6 +170,10 @@ class PenguStoreApi(
         return post(Routes.EDIT_PRODUCT(productId), request)
     }
 
+    suspend fun getTimeQueue(latitude: Double, longitude: Double): Response.SuccessResponse<Int> =
+        get(Routes.TIME_QUEUE, mapOf("latitude" to latitude, "longitude" to longitude))
+
+
     /**
      * NEEDS REWRITE
      */
@@ -362,9 +366,6 @@ class PenguStoreApi(
             LeaveQueueRequest(location.latitude, location.longitude, numItems, time)
         )
     }
-
-    suspend fun timeQueue(location: LatLng): Response.SuccessResponse<Int> =
-        get(Routes.TIME_QUEUE, location)
 
     suspend fun addProductImage(
         id: Int,

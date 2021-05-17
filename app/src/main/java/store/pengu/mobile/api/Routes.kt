@@ -49,6 +49,7 @@ object Routes {
     const val BUY_CART = "/cart"
 
     fun GET_PRODUCT_SUGGESTION(barcode: String) = "/cart/suggestion/$barcode"
+    const val TIME_QUEUE = "/queue/time"
 
     /**
      * NEED REWRITE
@@ -87,7 +88,6 @@ object Routes {
 
     const val JOIN_QUEUE = "/queue/join/"
     const val LEAVE_QUEUE = "/queue/leave"
-    const val TIME_QUEUE = "/queue/time/"
 
     const val ADD_IMAGE = "/images/addImage"
     const val DELETE_IMAGE = "/images/deleteImage"

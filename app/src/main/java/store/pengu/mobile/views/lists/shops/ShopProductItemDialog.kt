@@ -36,7 +36,8 @@ fun ShopProductItemDialog(
     var canFill by remember { mutableStateOf(true) }
 
     if (product != null) {
-        canSave = pantries.values.any { it.inCart.value != 0 }
+        //canSave = pantries.values.any { it.inCart.value != 0 }
+        canSave = true
         canFill = pantries.values.any { it.inCart.value != it.amountNeeded }
 
         AlertDialog(

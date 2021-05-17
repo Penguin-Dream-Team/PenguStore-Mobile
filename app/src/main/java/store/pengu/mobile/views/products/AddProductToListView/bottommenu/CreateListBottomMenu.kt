@@ -39,6 +39,7 @@ import store.pengu.mobile.R
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.utils.Border
 import store.pengu.mobile.utils.border
+import store.pengu.mobile.utils.geo.GeoUtils
 import store.pengu.mobile.views.lists.AvailableListColor
 import store.pengu.mobile.views.maps.MapScreen
 import store.pengu.mobile.views.partials.IconButton
@@ -141,6 +142,7 @@ fun CreateListBottomMenu(
 
         Surface(
             modifier = Modifier
+                .padding(bottom = 25.dp)
                 .fillMaxWidth(),
         ) {
             DropdownMenuItem(
@@ -208,6 +210,20 @@ fun CreateListBottomMenu(
             }
         }
 
+        AnimatedVisibility(visible = location != null) {
+            OutlinedTextField(
+                value = GeoUtils.getLocationName(context, location!!),
+                onValueChange = { },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Filled.AddLocation, contentDescription = "list location")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 15.dp),
+                readOnly = true
+            )
+        }
+
         Button(
             onClick = {
                 launcher.launch(Intent(context, MapScreen::class.java).apply {
@@ -218,7 +234,7 @@ fun CreateListBottomMenu(
                 })
             }, enabled = listsService.newCanPickLocation(),
             modifier = Modifier
-                .padding(top = 25.dp, bottom = 15.dp)
+                .padding(bottom = 15.dp)
                 .fillMaxWidth()
         ) {
             Text(text = stringResource(R.string.pick_location))
