@@ -5,9 +5,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.navigation.NavController
 import io.ktor.util.*
 import kotlinx.coroutines.launch
 import store.pengu.mobile.data.PantryList
+import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ShoppingList
 import store.pengu.mobile.data.UserList
 import store.pengu.mobile.data.productlists.ProductListEntry
@@ -21,6 +23,7 @@ import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.products.AddProductToListView.PantryListDialog
 import store.pengu.mobile.views.products.AddProductToListView.ShoppingListDialog
+import store.pengu.mobile.views.products.partials.Suggestions
 
 @KtorExperimentalAPI
 @ExperimentalComposeUiApi
@@ -32,6 +35,7 @@ fun ListsBottomSheetMenu(
     productsService: ProductsService,
     store: StoreState,
     snackbarController: SnackbarController,
+    navController: NavController,
     cameraService: CameraService,
     closeMenu: () -> Unit,
 ) {
@@ -43,6 +47,9 @@ fun ListsBottomSheetMenu(
     var selectedList by remember { mutableStateOf(null as ProductListEntry?) }
     var showDialog by remember { mutableStateOf(false) }
     val product = store.selectedProduct
+
+    val (showSuggestion, setShowSuggestion) = remember { mutableStateOf(false) }
+    var suggestion: Product? by remember{ mutableStateOf(null) }
 
     val setFormType: (Int) -> Unit = {
         selectedList = null
@@ -189,12 +196,14 @@ fun ListsBottomSheetMenu(
                     },
                     onSave = {
                         coroutineScope.launch {
-                            productsService.addProductToPantryList(
+                            suggestion = productsService.addProductToPantryList(
                                 product!!.id,
+                                product.barcode,
                                 it.listId,
                                 haveAmount,
                                 needAmount
                             )
+                            setShowSuggestion(true)
                             showDialog = false
                         }
                     }
@@ -223,6 +232,12 @@ fun ListsBottomSheetMenu(
                 )
             }
         }
+    }
+
+    if (showSuggestion) {
+        if (suggestion != null && selectedList != null)
+            Suggestions(navController, suggestion!!, selectedList!!.listId, setShowSuggestion)
+        else setShowSuggestion(false)
     }
 }
 

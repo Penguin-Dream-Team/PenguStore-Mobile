@@ -26,6 +26,7 @@ import io.ktor.util.*
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
 import store.pengu.mobile.api.responses.lists.UserListType
+import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.productlists.ProductListEntry
 import store.pengu.mobile.data.productlists.ProductPantryListEntry
 import store.pengu.mobile.data.productlists.ProductShoppingListEntry
@@ -38,6 +39,7 @@ import store.pengu.mobile.views.partials.pulltorefresh.LoadingProgressIndicator
 import store.pengu.mobile.views.products.partials.Header
 import store.pengu.mobile.views.products.partials.PantryListCard
 import store.pengu.mobile.views.products.partials.ShoppingListCard
+import store.pengu.mobile.views.products.partials.Suggestions
 
 /**
  * Step 2:
@@ -73,6 +75,8 @@ fun EditProductListsView(
     var showPantryDialog by remember { mutableStateOf(false) }
     var showShoppingListDialog by remember { mutableStateOf(false) }
 
+    val (showSuggestion, setShowSuggestion) = remember { mutableStateOf(false) }
+    var suggestion: Product? by remember{ mutableStateOf(null) }
 
     AnimatedVisibility(visible = loading) {
         coroutineScope.launch {
@@ -236,13 +240,15 @@ fun EditProductListsView(
                     },
                     onSave = {
                         coroutineScope.launch {
-                            productsService.addProductToPantryList(
+                            suggestion = productsService.addProductToPantryList(
                                 productId,
+                                store.selectedProduct?.barcode,
                                 it.listId,
                                 haveAmount,
                                 needAmount
                             )
                             showPantryDialog = false
+                            setShowSuggestion(true)
                             selectedList = null
                             if (addToList) {
                                 navController.popBackStack()
@@ -283,5 +289,11 @@ fun EditProductListsView(
                 )
             }
         }
+    }
+
+    if (showSuggestion) {
+        if (suggestion != null && selectedList != null)
+            Suggestions(navController, suggestion!!, selectedList!!.listId, setShowSuggestion)
+        else setShowSuggestion(false)
     }
 }

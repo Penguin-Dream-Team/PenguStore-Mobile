@@ -45,6 +45,9 @@ object Routes {
     fun GET_PRODUCT_IMAGES(productId: Long) = "/products/$productId/images"
     fun RATE_PRODUCT(productId: Long, rating: Int) = "/products/$productId/rate/$rating"
 
+    const val BUY_CART = "/cart"
+
+    fun GET_PRODUCT_SUGGESTION(barcode: String) = "/cart/suggestion/$barcode"
 
     /**
      * NEED REWRITE
@@ -80,9 +83,6 @@ object Routes {
     const val UPDATE_SHOP_PRODUCT = "/shops/updateProduct"
     const val DELETE_SHOP_PRODUCT = "/shops/deleteProduct"
     const val GET_SHOP_PRODUCTS = "/shops/id/products"
-
-    const val BUY_CART = "/cart"
-    const val GET_PRODUCT_SUGGESTION = "/cart/suggestion/id"
 
     const val JOIN_QUEUE = "/queue/join/"
     const val LEAVE_QUEUE = "/queue/leave"

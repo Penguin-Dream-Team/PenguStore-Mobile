@@ -2,6 +2,7 @@ package store.pengu.mobile.views.lists.pantry
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +29,8 @@ import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.lists.partials.ProductItem
 import store.pengu.mobile.views.lists.partials.ProductItemDialog
-import store.pengu.mobile.views.partials.pulltodelete.SwipeableAction
 import store.pengu.mobile.views.partials.pulltorefresh.PullToRefresh
+import store.pengu.mobile.views.products.partials.Suggestions
 
 @Suppress("UNUSED_VALUE")
 @SuppressLint("InflateParams")
@@ -66,6 +65,9 @@ fun ViewPantryList(
     var selectedProduct: ProductInPantry? by remember { mutableStateOf(null) }
     val (haveAmount, setHaveAmount) = remember { mutableStateOf(0) }
     val (needAmount, setNeedAmount) = remember { mutableStateOf(0) }
+
+    val (showSuggestion, setShowSuggestion) = remember { mutableStateOf(false) }
+    var suggestion: Product? by remember{ mutableStateOf(null) }
 
     PullToRefresh(
         isRefreshing = isRefreshing,
@@ -112,12 +114,14 @@ fun ViewPantryList(
         onClose = { selectedProduct = null },
         onSave = {
             coroutineScope.launch {
-                productsService.addProductToPantryList(
+                suggestion = productsService.addProductToPantryList(
                     selectedProduct!!.id,
+                    selectedProduct?.barcode,
                     pantryList.id,
                     haveAmount,
                     needAmount
                 )
+                setShowSuggestion(true)
                 refresh()
                 selectedProduct = null
             }
@@ -130,4 +134,9 @@ fun ViewPantryList(
             selectedProduct = null
         }
     )
+
+    if (showSuggestion) {
+        if (suggestion != null) Suggestions(navController, suggestion!!, pantryList.id, setShowSuggestion)
+        else setShowSuggestion(false)
+    }
 }

@@ -13,4 +13,5 @@
     <string name="shopping">Shopping</string>
     <string name="product">product</string>
     <string name="queue_time">Queue Time:</string>
+    <string name="NotInStore">You are not in this store right now</string>
 </resources>

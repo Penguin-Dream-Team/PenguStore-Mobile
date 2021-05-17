@@ -126,8 +126,7 @@ fun ProductItemDialog(
                 ) {
                     Text("Save")
                 }
-            },
+            }
         )
     }
-
 }

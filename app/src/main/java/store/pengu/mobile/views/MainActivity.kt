@@ -39,7 +39,6 @@ import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.theme.PenguShopTheme
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.WifiP2pBroadcastReceiver
-import store.pengu.mobile.views.cart.CartConfirmationScreen
 import store.pengu.mobile.views.cart.CartScreen
 import store.pengu.mobile.views.lists.ListsScreen
 import store.pengu.mobile.views.lists.pantry.ViewPantryList
@@ -165,6 +164,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 productsService,
                                 storeState,
                                 snackbarController,
+                                navController,
                                 currentRoute,
                                 isBottomSheetMenuOpen,
                                 cameraService
@@ -285,6 +285,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                     ) {
                                         ViewShoppingList(
                                             navController,
+                                            snackbarController,
                                             productsService,
                                             storeState,
                                             it as ShoppingList
@@ -367,11 +368,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                 }
 
                                 animatedComposable("cart") {
-                                    CartScreen(navController, storeState)
-                                }
-
-                                animatedComposable("cart_confirmation") {
-                                    CartConfirmationScreen(navController, cartService, storeState)
+                                    CartScreen(navController, cartService, storeState)
                                 }
 
                                 animatedComposable("profile") {
