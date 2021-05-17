@@ -3,8 +3,6 @@ package store.pengu.mobile.views.products
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
@@ -36,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,20 +43,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
-import coil.Coil
 import coil.ImageLoader
-import coil.request.ImageRequest
-import coil.util.CoilUtils
 import com.google.accompanist.coil.LocalImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.ImageLoadState
-import com.google.accompanist.imageloading.isFinalState
 import io.ktor.util.*
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
 import store.pengu.mobile.api.responses.lists.UserListType
@@ -104,7 +96,7 @@ fun NewProductView(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                "Create Product",
+                stringResource(R.string.create_product),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -168,6 +160,9 @@ private fun ProductForm(
     var canCreate by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
+    val permissionToUseCamera = stringResource(R.string.permission_to_use_camera_not_granted)
+    val validBarcodeNotFound = stringResource(R.string.valid_barcode_not_found)
+    val chooseImageForProduct = stringResource(R.string.choose_image_for_product)
 
     CompositionLocalProvider(LocalImageLoader provides imageLoader) {
         val imagePainter = rememberCoilPainter(
@@ -228,53 +223,53 @@ private fun ProductForm(
                 }
             }
 
-        OutlinedTextField(
-            value = name,
-            onValueChange = {
-                name = it
-            },
-            placeholder = {
-                Text("Product name")
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                keyboardController?.hide()
-            }),
-            leadingIcon = {
-                Icon(imageVector = Icons.Filled.Label, contentDescription = "product name")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp),
-        )
+    OutlinedTextField(
+        value = name,
+        onValueChange = {
+            name = it
+        },
+        placeholder = {
+            Text(stringResource(R.string.product_name))
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(onNext = {
+            keyboardController?.hide()
+        }),
+        leadingIcon = {
+            Icon(imageVector = Icons.Filled.Label, contentDescription = "product name")
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 15.dp),
+    )
 
-        AnimatedVisibility(visible = scanBarcode) {
-            RequestCameraPermission(
-                snackbarController,
-                onFail = {
-                    snackbarController.showDismissibleSnackbar("Permission to use camera not granted")
-                    scanBarcode = false
-                }
-            ) {
-                AndroidView(factory = {
-                    LayoutInflater.from(it).inflate(R.layout.camera_layout, null)
-                }) { inflatedLayout ->
-                    cameraService.initCamera(
-                        context,
-                        lifecycleOwner,
-                        inflatedLayout as PreviewView,
-                        onSuccess = {
-                            barcode = it
-                            scanBarcode = false
-                        },
-                        onFail = {
-                            snackbarController.showDismissibleSnackbar("Valid barcode not found")
-                            scanBarcode = false
-                        },
-                        CameraService.ScanType.PRODUCT_BARCODE
+    AnimatedVisibility(visible = scanBarcode) {
+        RequestCameraPermission(
+            snackbarController,
+            onFail = {
+                snackbarController.showDismissibleSnackbar(permissionToUseCamera)
+                scanBarcode = false
+            }
+        ) {
+            AndroidView(factory = {
+                LayoutInflater.from(it).inflate(R.layout.camera_layout, null)
+            }) { inflatedLayout ->
+                cameraService.initCamera(
+                    context,
+                    lifecycleOwner,
+                    inflatedLayout as PreviewView,
+                    onSuccess = {
+                        barcode = it
+                        scanBarcode = false
+                    },
+                    onFail = {
+                        snackbarController.showDismissibleSnackbar(validBarcodeNotFound)
+                        scanBarcode = false
+                    },
+                    CameraService.ScanType.PRODUCT_BARCODE
                     )
                 }
             }
@@ -286,7 +281,7 @@ private fun ProductForm(
                 barcode = it
             },
             placeholder = {
-                Text("Product barcode")
+                Text(stringResource(R.string.product_barcode))
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -356,7 +351,7 @@ private fun ProductForm(
                     val outputPath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                     val chooser = Intent.createChooser(
                         Intent(Intent.ACTION_CHOOSER),
-                        "Choose an image for the product"
+                        chooseImageForProduct
                     ).apply {
                         putExtra(Intent.EXTRA_INTENT,
                             Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" })
@@ -384,7 +379,7 @@ private fun ProductForm(
                     .weight(0.5f)
             ) {
                 Icon(imageVector = Icons.Filled.Image, contentDescription = "choose image")
-                Text(text = "${if (productImage.isBlank()) "Choose" else "Replace"} image")
+                Text(text = (if (productImage.isBlank()) stringResource(R.string.choose) else stringResource(R.string.replace)) + stringResource(R.string.space_image))
             }
             AnimatedVisibility(
                 visible = productImage.isNotBlank(),
@@ -399,7 +394,7 @@ private fun ProductForm(
                     enabled = canUploadImage && productImage.isNotBlank(),
                 ) {
                     Icon(imageVector = Icons.Filled.Clear, contentDescription = "clear image")
-                    Text(text = "Clear image")
+                    Text(text = stringResource(R.string.clear_image))
                 }
             }
         }
@@ -417,7 +412,7 @@ private fun ProductForm(
                 .fillMaxWidth()
         ) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = "create product")
-            Text(text = "Create Product")
+            Text(text = stringResource(R.string.create_product))
         }
 
         val dismissAlert = {
@@ -436,32 +431,31 @@ private fun ProductForm(
                             dismissAlert()
                         }
                     ) {
-                        Text("Create")
+                        Text(stringResource(R.string.create))
                     }
                 },
                 dismissButton = {
                     Button(
                         onClick = dismissAlert
                     ) {
-                        Text("Dismiss")
+                        Text(stringResource(R.string.dismiss))
                     }
                 },
                 title = {
-                    Text("Are you sure you want to create this product?")
+                    Text(stringResource(R.string.confirm_product_creation))
                 },
                 text = {
                     Text(
-                        "Looks like the product you're trying to create does not have ${
+                        stringResource(R.string.product_creating_dont_have) +
                             if (barcode.isBlank()) {
                                 if (productImage.isBlank()) {
-                                    "a barcode nor an image"
+                                    stringResource(R.string.barcode_nor_image)
                                 } else {
-                                    "a barcode"
+                                    stringResource(R.string.a_barcode)
                                 }
                             } else {
-                                "an image"
+                                stringResource(R.string.an_image)
                             }
-                        }"
                     )
                 }
             )

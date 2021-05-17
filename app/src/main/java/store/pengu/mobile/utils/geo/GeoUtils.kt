@@ -3,6 +3,7 @@ package store.pengu.mobile.utils.geo
 import android.content.Context
 import android.location.Geocoder
 import com.google.android.gms.maps.model.LatLng
+import store.pengu.mobile.R
 import java.lang.StringBuilder
 
 
@@ -25,10 +26,10 @@ object GeoUtils {
                 sb.append(countryName)
             }
             if (sb.isBlank()) {
-                "Unknown"
+                context.getString(R.string.unknown)
             } else {
                 sb.toString()
             }
-        } ?: "Unknown"
+        } ?: context.getString(R.string.unknown)
     }
 }

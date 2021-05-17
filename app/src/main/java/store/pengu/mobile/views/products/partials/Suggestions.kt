@@ -4,8 +4,10 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import store.pengu.mobile.R
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.Product
 
@@ -14,13 +16,13 @@ fun Suggestions(navController: NavController, product: Product, pantryId: Long, 
     AlertDialog(
         onDismissRequest = { setShowSuggestion(false) },
         text = {
-            Text(text = "You usually buy this product with ${product.name}")
+            Text(text = stringResource(R.string.suggestion_text) + product.name)
         },
         dismissButton = {
             Button(
                 onClick = {  setShowSuggestion(false) }
             ) {
-                Text("Close")
+                Text(stringResource(R.string.close))
             }
         },
         confirmButton = {
@@ -30,7 +32,7 @@ fun Suggestions(navController: NavController, product: Product, pantryId: Long, 
                     setShowSuggestion(false)
                 }
             ) {
-                Text("Add Product")
+                Text(stringResource(R.string.add_product))
             }
         }
     )

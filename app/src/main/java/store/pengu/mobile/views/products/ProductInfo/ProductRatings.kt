@@ -11,13 +11,13 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import store.pengu.mobile.R
 import kotlinx.coroutines.launch
-import store.pengu.mobile.data.Product
 import store.pengu.mobile.services.ProductsService
-import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.Histogram
 import store.pengu.mobile.views.partials.IconButton
 
@@ -40,7 +40,7 @@ fun ProductRatings(
     ) {
 
         Text(
-            text = "Ratings",
+            text = stringResource(R.string.ratings),
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             modifier = Modifier
@@ -51,11 +51,11 @@ fun ProductRatings(
         if (ratings.isNotEmpty()) {
             Histogram(ratings)
         } else {
-            Text(text = "No ratings")
+            Text(text = stringResource(R.string.no_ratings))
         }
 
         Text(
-            text = "Your rating",
+            text = stringResource(R.string.your_rating),
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             modifier = Modifier

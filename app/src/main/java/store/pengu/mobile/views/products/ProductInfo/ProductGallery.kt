@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +45,7 @@ fun ProductGallery(
     ) {
 
         Text(
-            text = "Gallery",
+            text = stringResource(R.string.gallery),
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             modifier = Modifier
@@ -53,7 +54,7 @@ fun ProductGallery(
         Divider(modifier = Modifier.padding(top = 3.dp, bottom = 5.dp))
 
         AnimatedVisibility(visible = images.isEmpty()) {
-            Text(text = "No images")
+            Text(text = stringResource(R.string.no_images))
         }
         rememberScrollState()
 

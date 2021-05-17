@@ -11,11 +11,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import store.pengu.mobile.R
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.views.lists.partials.ShareList
@@ -45,7 +47,7 @@ fun ShareListView(
             IconButton(
                 onClick = { navController.popBackStack() },
                 icon = Icons.Filled.ArrowBack,
-                description = "Go back"
+                description = stringResource(R.string.go_back)
             )
 
             Text(

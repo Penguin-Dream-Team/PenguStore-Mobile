@@ -19,6 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toLowerCase
@@ -60,7 +61,7 @@ fun ScanListBottomMenu(
                 description = "close scan popup"
             )
             Text(
-                text = "Scan ${title.toLowerCase(Locale.current)}",
+                text = stringResource(R.string.scan) + title.toLowerCase(Locale.current),
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -81,7 +82,7 @@ fun ScanListBottomMenu(
                     inflatedLayout as PreviewView,
                     onSuccess = onScan,
                     onFail = {
-                        Toast.makeText(context, "No correct code found", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(context, "No correct code found", Toast.LENGTH_SHORT).show()
                         //snackbarController.showDismissibleSnackbar("No correct code found")
                     },
                     CameraService.ScanType.LIST_CODE

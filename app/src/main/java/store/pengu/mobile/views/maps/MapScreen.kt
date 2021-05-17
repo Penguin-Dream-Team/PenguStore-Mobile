@@ -70,7 +70,7 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
         button.setOnClickListener {
             if (selectedLocation == null) {
                 button.isEnabled = false
-                Toast.makeText(applicationContext, "No location selected", Toast.LENGTH_SHORT)
+                Toast.makeText(applicationContext, getString(R.string.no_location_selected), Toast.LENGTH_SHORT)
                     .show()
             } else {
                 setResult(

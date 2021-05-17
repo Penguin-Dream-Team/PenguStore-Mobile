@@ -14,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.ktor.util.*
+import store.pengu.mobile.R
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.partials.IconButton
 
@@ -50,7 +52,7 @@ fun AddProductToShoppingListBottomMenu(
                 description = "close create popup"
             )
             Text(
-                text = "Add Product",
+                text = stringResource(R.string.add_product),
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -65,7 +67,7 @@ fun AddProductToShoppingListBottomMenu(
                 .fillMaxWidth()
         ) {
             IconTextButton(
-                label = "Find Product From Shop",
+                label = stringResource(R.string.find_product_from_shop),
                 icon = Icons.Filled.Search,
                 onClick = {
                     closeMenu("search?shopId=${selectedList.id}")
@@ -76,7 +78,7 @@ fun AddProductToShoppingListBottomMenu(
             Spacer(modifier = Modifier.width(10.dp))
 
             IconTextButton(
-                label = "Find Any Product",
+                label = stringResource(R.string.find_any_product),
                 icon = Icons.Filled.Search,
                 onClick = {
                     closeMenu("search")
@@ -88,7 +90,7 @@ fun AddProductToShoppingListBottomMenu(
         OrDivider()
 
         IconTextButton(
-            label = "Create New Product",
+            label = stringResource(R.string.create_new_product),
             icon = Icons.Filled.Add,
             onClick = {
                 closeMenu("new_item?shopId=${selectedList.id}")
@@ -98,7 +100,7 @@ fun AddProductToShoppingListBottomMenu(
         OrDivider()
 
         IconTextButton(
-            label = "Scan Barcode",
+            label = stringResource(R.string.scan_barcode),
             icon = Icons.Filled.PhotoCamera,
             onClick = {
                 closeMenu("import_barcode")

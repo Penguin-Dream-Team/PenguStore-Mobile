@@ -14,8 +14,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import store.pengu.mobile.R
 import store.pengu.mobile.utils.SnackbarController
 import store.pengu.mobile.utils.launcherForActivityResult
 
@@ -29,12 +31,14 @@ fun ProfileScreenLocationButton(
     var needsLocationPermission by remember { mutableStateOf(true) }
     var canGrantPermission by remember { mutableStateOf(true) }
 
+    val cannotFetchCurrentLocation = stringResource(R.string.cannot_fetch_current_location)
+
     val launcher =
         launcherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { granted ->
             if (!granted) {
-                snackbarController.showDismissibleSnackbar("Cannot fetch current location")
+                snackbarController.showDismissibleSnackbar(cannotFetchCurrentLocation)
                 canGrantPermission = true
             }
             canGetLocation = granted
@@ -67,7 +71,7 @@ fun ProfileScreenLocationButton(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Grant Location Access")
+                Text(text = stringResource(R.string.grant_location_access))
             }
         }
         AnimatedVisibility(visible = canGetLocation) {
@@ -77,7 +81,7 @@ fun ProfileScreenLocationButton(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Granted Location Access")
+                Text(text = stringResource(R.string.granted_location_access))
             }
         }
     }

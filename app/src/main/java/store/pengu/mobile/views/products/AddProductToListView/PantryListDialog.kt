@@ -14,8 +14,10 @@ import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import store.pengu.mobile.R
 import store.pengu.mobile.data.ListProduct
 import store.pengu.mobile.views.partials.IconButton
 
@@ -75,7 +77,7 @@ fun PantryListDialog(
                             description = "Decrement amount available"
                         )
 
-                        Text(text = "Amount Available: $haveAmount")
+                        Text(text = stringResource(R.string.amount_available) + haveAmount)
 
                         IconButton(
                             onClick = { setHaveAmount(haveAmount + 1) },
@@ -98,7 +100,7 @@ fun PantryListDialog(
                             description = "Decrement amount needed"
                         )
 
-                        Text(text = "Amount Needed: $needAmount")
+                        Text(text = stringResource(R.string.amount_needed) + needAmount)
 
                         IconButton(
                             onClick = { setNeedAmount(needAmount + 1) },
@@ -113,7 +115,7 @@ fun PantryListDialog(
                     onClick = {
                         close()
                     }) {
-                    Text("Close")
+                    Text(stringResource(R.string.close))
                 }
             },
             confirmButton = {
@@ -124,10 +126,9 @@ fun PantryListDialog(
                     },
                     enabled = (product.amountAvailable != haveAmount || product.amountNeeded != needAmount) && enabled
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             },
         )
     }
-
 }

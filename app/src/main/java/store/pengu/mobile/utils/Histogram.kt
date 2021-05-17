@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,8 @@ private class RatingFormatter : ValueFormatter() {
 
 @Composable
 fun Histogram(ratings: List<Int>) {
+    val stars = stringResource(R.string.stars)
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -53,7 +56,9 @@ fun Histogram(ratings: List<Int>) {
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxHeight().padding(vertical = 28.dp)
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(vertical = 28.dp)
         ) {
             repeat(5) {
                 StarLabeled(amount = 5 - it)
@@ -79,7 +84,7 @@ fun Histogram(ratings: List<Int>) {
                 barEntries.add(BarEntry(it.toFloat(), 0f))
             }
 
-            val barDataSet = BarDataSet(barEntries, "Stars")
+            val barDataSet = BarDataSet(barEntries, stars)
             barDataSet.colors = mutableListOf(
                 ContextCompat.getColor(inflatedLayout.context, android.R.color.holo_green_light),
                 Color.parseColor("#F9DB22"),
@@ -118,7 +123,6 @@ fun Histogram(ratings: List<Int>) {
             barChart.isClickable = false
             barChart.isDragEnabled = false
             barChart.setBorderWidth(0f)
-            //barChart.setBackgroundColor(Color.parseColor("#121212"))
             barChart.invalidate()
         }
     }

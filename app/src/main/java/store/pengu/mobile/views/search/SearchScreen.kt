@@ -11,12 +11,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
 import coil.ImageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.services.ProductsService
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.partials.ItemCard
@@ -108,7 +110,7 @@ fun SearchScreen(
                         modifier = Modifier
                             .padding(horizontal = 5.dp, vertical = 7.dp)
                             .clickable(
-                                onClickLabel = "Add to pantry"
+                                onClickLabel = stringResource(R.string.add_to_pantry)
                             ) {
                                 storeState.setSelectedProduct(product)
                                 selectedProductId.value = product.id

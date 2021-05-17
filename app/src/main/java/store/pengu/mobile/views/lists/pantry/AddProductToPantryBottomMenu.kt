@@ -14,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.ktor.util.*
+import store.pengu.mobile.R
 import store.pengu.mobile.states.StoreState
 import store.pengu.mobile.views.partials.IconButton
 
@@ -50,7 +52,7 @@ fun AddProductToPantryBottomMenu(
                 description = "close create popup"
             )
             Text(
-                text = "Add Product",
+                text = stringResource(R.string.add_product),
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -59,7 +61,7 @@ fun AddProductToPantryBottomMenu(
         Divider(modifier = Modifier.padding(top = 2.dp, bottom = 25.dp))
 
         IconTextButton(
-            label = "Find Product",
+            label = stringResource(R.string.find_product),
             icon = Icons.Filled.Search,
             onClick = {
                 closeMenu("search?pantryId=${selectedList.id}")
@@ -69,7 +71,7 @@ fun AddProductToPantryBottomMenu(
         OrDivider()
 
         IconTextButton(
-            label = "Create New Product",
+            label = stringResource(R.string.create_new_product),
             icon = Icons.Filled.Add,
             onClick = {
                 closeMenu("new_item?pantryId=${selectedList.id}")
@@ -79,7 +81,7 @@ fun AddProductToPantryBottomMenu(
         OrDivider()
 
         IconTextButton(
-            label = "Scan Barcode",
+            label = stringResource(R.string.scan_barcode),
             icon = Icons.Filled.PhotoCamera,
             onClick = {
                 closeMenu("import_barcode")
@@ -102,7 +104,7 @@ private fun OrDivider() {
                 .weight(0.5f, true)
         )
         Text(
-            text = "or",
+            text = stringResource(R.string.or),
             modifier = Modifier
                 .weight(0.2f, true),
             textAlign = TextAlign.Center

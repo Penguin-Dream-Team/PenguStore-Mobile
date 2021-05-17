@@ -7,10 +7,12 @@ import android.os.Looper
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.services.MapsService
 import store.pengu.mobile.services.TermiteService
 import store.pengu.mobile.states.StoreState
@@ -58,13 +60,14 @@ fun LocationTimer(
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         })
     }
+    val errorStringResource = stringResource(R.string.error_current_location)
 
     val launcher =
         launcherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { granted ->
             if (!granted) {
-                snackbarController.showDismissibleSnackbar("Cannot fetch current location")
+                snackbarController.showDismissibleSnackbar(errorStringResource)
             } else {
                 requestLocation(mapsService, store, termiteService, locationRequest)
             }

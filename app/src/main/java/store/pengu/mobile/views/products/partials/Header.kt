@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
@@ -46,6 +47,11 @@ fun Header(
             request = product.image,
             fadeIn = true,
         )
+
+        val textShare = stringResource(R.string.text_share)
+        val barcodeShare = stringResource(R.string.barcode_share)
+        val ratingShare = stringResource(R.string.rating_share)
+        val starsShare = stringResource(R.string.stars_share)
 
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
@@ -139,14 +145,11 @@ fun Header(
                         val sendIntent = Intent(Intent.ACTION_SEND).apply {
                             putExtra(
                                 Intent.EXTRA_TEXT,
-                                "Checkout this awesome product!\nName: ${product.name}\n${
-                                    product.barcode?.run { "Barcode: $this\n" } ?: ""
-                                }Rating: ${product.productRating} Stars"
+                            textShare + product.name + "\n" +
+                                    (product.barcode?.run { barcodeShare + this + "\n" } ?: "") +
+                                    ratingShare + product.productRating + starsShare
                             )
                             putExtra(Intent.EXTRA_SUBJECT, "PenguStore Product")
-                            //putExtra(Intent.EXTRA_STREAM, image)
-                            //putExtra(Intent.EXTRA_STREAM, Uri.parse(image))
-                            //type = "image/*"
                             type = "text/plain"
 
                         }
@@ -154,7 +157,7 @@ fun Header(
                     }
                 }) {
                     Text(
-                        text = "Share",
+                        text = stringResource(R.string.share),
                         fontSize = 14.sp,
                     )
                     Icon(

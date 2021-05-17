@@ -37,6 +37,7 @@ import okhttp3.OkHttpClient
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener
+import store.pengu.mobile.R
 import store.pengu.mobile.api.PenguStoreApi
 import store.pengu.mobile.api.responses.lists.UserListType
 import store.pengu.mobile.data.PantryList
@@ -197,7 +198,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         Text(
-                            "You need to enable location access to use the application",
+                            getString(R.string.noLocationAccess),
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colors.onBackground,
                             modifier = Modifier.padding(bottom = 5.dp)
@@ -206,7 +207,7 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                             enabledState.value = false
                             tryAgain = !tryAgain
                         }) {
-                            Text("Try again")
+                            Text(getString(R.string.try_again))
                         }
                     }
                 } else {
@@ -443,11 +444,11 @@ class MainActivity : AppCompatActivity(), PeerListListener {
                                             navController,
                                             accountService,
                                             snackbarController,
+                                            applicationContext,
                                             storeState
                                         )
                                     }
                                 }
-
                                 Column(
                                     modifier = Modifier
                                         .padding(bottom = 8.dp)

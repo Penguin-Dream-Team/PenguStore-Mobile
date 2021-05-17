@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import io.ktor.util.*
+import store.pengu.mobile.R
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.utils.Border
 import store.pengu.mobile.utils.border
@@ -70,8 +72,8 @@ fun CreateListBottomMenu(
                     val lat = data?.getDoubleExtra("LATITUDE", 0.0) ?: 0.0
                     val long = data?.getDoubleExtra("LONGITUDE", 0.0) ?: 0.0
                     location = LatLng(lat, long)
-                    Toast.makeText(context, "Chosen location at $lat, $long", Toast.LENGTH_SHORT)
-                        .show()
+                    //Toast.makeText(context, "Chosen location at $lat, $long", Toast.LENGTH_SHORT)
+                    //    .show()
                 }
             }
         }
@@ -90,7 +92,7 @@ fun CreateListBottomMenu(
                 description = "close create popup"
             )
             Text(
-                text = "Create ${title.toLowerCase(Locale.current)}",
+                text = stringResource(R.string.create) + title.toLowerCase(Locale.current),
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -112,9 +114,7 @@ fun CreateListBottomMenu(
             },
             placeholder = {
                 Text(
-                    "${
-                        title.toLowerCase(Locale.current).capitalize(Locale.current)
-                    } name"
+                    title.toLowerCase(Locale.current).capitalize(Locale.current) + stringResource(R.string.name)
                 )
             },
             keyboardOptions = KeyboardOptions(
@@ -133,7 +133,7 @@ fun CreateListBottomMenu(
         )
 
         Text(
-            text = "Choose ${title.toLowerCase(Locale.current)} color:",
+            text = stringResource(R.string.choose) + title.toLowerCase(Locale.current) + stringResource(R.string.color),
             modifier = Modifier
                 .padding(bottom = 3.dp)
                 .alpha(0.8f),
@@ -221,7 +221,7 @@ fun CreateListBottomMenu(
                 .padding(top = 25.dp, bottom = 15.dp)
                 .fillMaxWidth()
         ) {
-            Text(text = "Pick Location")
+            Text(text = stringResource(R.string.pick_location))
         }
 
         Button(
@@ -229,7 +229,7 @@ fun CreateListBottomMenu(
             modifier = Modifier
                 .fillMaxWidth(),
         ) {
-            Text(text = "Create $title")
+            Text(text = stringResource(R.string.create) + title)
         }
 
         Row(
@@ -270,7 +270,7 @@ fun CreateListBottomMenu(
                     contentDescription = "import $title",
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(text = "Import")
+                Text(text = stringResource(R.string.import_string))
             }
             Button(
                 onClick = onSearch,
@@ -283,7 +283,7 @@ fun CreateListBottomMenu(
                     contentDescription = "search $title",
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(text = "Search")
+                Text(text = stringResource(R.string.search))
             }
         }
     }

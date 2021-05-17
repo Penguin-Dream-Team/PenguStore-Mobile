@@ -52,6 +52,8 @@ fun LoadingScreen(
 
     val location = store.location
 
+    val cant_reach_server = stringResource(R.string.cant_reach_server)
+
     /**
      * If there is a list in my location show list
      */
@@ -76,7 +78,7 @@ fun LoadingScreen(
                             }
                         }
                     } catch (e: PenguStoreApiException) {
-                        snackbarController.showDismissibleSnackbar("Can't reach the server")
+                        snackbarController.showDismissibleSnackbar(cant_reach_server)
                         serverConnection = false
                     }
                     canGetLoadData = true
@@ -98,7 +100,7 @@ fun LoadingScreen(
                     needsLoadData = true
                     serverConnection = true
                 }) {
-                    Text("Try again")
+                    Text(stringResource(R.string.try_again))
                 }
             }
         }
@@ -126,7 +128,7 @@ fun LoadingScreen(
                         null -> navController.navigate("lists")
                     }
                 } catch (e: PenguStoreApiException) {
-                    snackbarController.showDismissibleSnackbar("Can't reach the server")
+                    snackbarController.showDismissibleSnackbar(cant_reach_server)
                     serverConnection = false
                 }
             }

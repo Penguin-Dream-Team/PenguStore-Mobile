@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import store.pengu.mobile.R
@@ -31,6 +30,8 @@ fun RequestCameraPermission(
     var loading by remember { mutableStateOf(true) }
     var canUseCamera by remember { mutableStateOf(false) }
 
+    val cannotAccessCamera = stringResource(R.string.cannot_access_camera)
+
     /**
      * If there is a list in my location show list
      */
@@ -40,7 +41,7 @@ fun RequestCameraPermission(
             contract = ActivityResultContracts.RequestPermission()
         ) { granted ->
             if (!granted) {
-                snackbarController.showDismissibleSnackbar("Cannot access camera")
+                snackbarController.showDismissibleSnackbar(cannotAccessCamera)
                 loading = false
                 onFail()
             }

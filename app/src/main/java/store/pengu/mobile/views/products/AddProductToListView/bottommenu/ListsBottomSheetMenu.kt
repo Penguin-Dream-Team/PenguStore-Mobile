@@ -5,9 +5,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import io.ktor.util.*
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.data.PantryList
 import store.pengu.mobile.data.Product
 import store.pengu.mobile.data.ShoppingList
@@ -50,6 +52,12 @@ fun ListsBottomSheetMenu(
 
     val (showSuggestion, setShowSuggestion) = remember { mutableStateOf(false) }
     var suggestion: Product? by remember{ mutableStateOf(null) }
+
+    val createdNewPantryList = stringResource(R.string.created_new_pantry_list)
+    val createdNewShoppingList = stringResource(R.string.created_new_shopping_list)
+    val importedNewPantryList = stringResource(R.string.imported_new_pantry_list)
+    val importedNewShoppingList = stringResource(R.string.imported_new_shopping_list)
+    val scanned = stringResource(R.string.scanned)
 
     val setFormType: (Int) -> Unit = {
         selectedList = null
@@ -106,20 +114,20 @@ fun ListsBottomSheetMenu(
     when (selectedListType) {
         0 -> {
             ListBottomMenu(
-                title = "Pantry List",
+                title = stringResource(R.string.pantry_list),
                 listsService,
                 closeMenuWrapper,
                 formType,
                 setFormType,
                 onCreate = {
-                    actionWrapper("Created new Pantry List") {
+                    actionWrapper(createdNewPantryList) {
                         val list = listsService.createNewPantryList()
                         openPopup(list)
                         closeMenuWrapper()
                     }
                 },
                 onImport = {
-                    actionWrapper("Imported new Pantry List") {
+                    actionWrapper(importedNewPantryList) {
                         val list = listsService.importNewPantryList()
                         openPopup(list)
                         closeMenuWrapper()
@@ -128,7 +136,7 @@ fun ListsBottomSheetMenu(
                 onScan = {
                     listsService.newListCode.value = it
                     setFormType(1)
-                    snackbarController.showDismissibleSnackbar("Scanned $it")
+                    snackbarController.showDismissibleSnackbar(scanned + it)
                 },
                 onSearch = {
                     openPopup(it)
@@ -142,20 +150,20 @@ fun ListsBottomSheetMenu(
         }
         1 -> {
             ListBottomMenu(
-                title = "Shopping List",
+                title = stringResource(R.string.shopping_list),
                 listsService,
                 closeMenuWrapper,
                 formType,
                 setFormType,
                 onCreate = {
-                    actionWrapper("Created new Shopping List") {
+                    actionWrapper(createdNewShoppingList) {
                         val list = listsService.createNewShoppingList()
                         openPopup(list)
                         closeMenuWrapper()
                     }
                 },
                 onImport = {
-                    actionWrapper("Imported new Shopping List") {
+                    actionWrapper(importedNewShoppingList) {
                         val list = listsService.importNewShoppingList()
                         openPopup(list)
                         closeMenuWrapper()

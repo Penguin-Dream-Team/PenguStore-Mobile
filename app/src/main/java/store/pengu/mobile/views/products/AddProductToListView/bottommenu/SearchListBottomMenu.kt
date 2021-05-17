@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import io.ktor.util.*
 import kotlinx.coroutines.launch
+import store.pengu.mobile.R
 import store.pengu.mobile.data.UserList
 import store.pengu.mobile.services.ListsService
 import store.pengu.mobile.utils.Border
@@ -80,7 +82,7 @@ fun <T : UserList> SearchListBottomMenu(
                 description = "close search popup"
             )
             Text(
-                text = "Choose ${title.toLowerCase(Locale.current)}",
+                text = stringResource(R.string.choose) + title.toLowerCase(Locale.current),
                 fontSize = MaterialTheme.typography.h5.fontSize,
                 fontWeight = FontWeight.Bold
             )
@@ -97,7 +99,7 @@ fun <T : UserList> SearchListBottomMenu(
 
         AnimatedVisibility (selectedList != null) {
             Text(
-                text = "Choose ${title.toLowerCase(Locale.current)}:",
+                text = stringResource(R.string.choose) + title.toLowerCase(Locale.current) + ":",
                 modifier = Modifier
                     .padding(bottom = 3.dp)
                     .alpha(0.8f),
@@ -115,7 +117,7 @@ fun <T : UserList> SearchListBottomMenu(
                         .fillMaxWidth(),
                 ) {
                     Text(
-                        text = "Choose ${title.toLowerCase(Locale.current)}:",
+                        text = stringResource(R.string.choose) + title.toLowerCase(Locale.current) + ":",
                         modifier = Modifier.weight(1.0f, true)
                     )
 
@@ -208,7 +210,7 @@ fun <T : UserList> SearchListBottomMenu(
                 .padding(top = 15.dp)
                 .fillMaxWidth(),
         ) {
-            Text(text = "Add to $title")
+            Text(text = stringResource(R.string.add_to) + title)
         }
 
         Row(
@@ -223,7 +225,7 @@ fun <T : UserList> SearchListBottomMenu(
                     .weight(0.5f, true)
             )
             Text(
-                text = "or",
+                text = stringResource(R.string.or),
                 modifier = Modifier
                     .weight(0.2f, true),
                 textAlign = TextAlign.Center
@@ -246,10 +248,10 @@ fun <T : UserList> SearchListBottomMenu(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "import $title",
+                    contentDescription = stringResource(R.string.import_string_lower_case) + title,
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(text = "Create")
+                Text(text = stringResource(R.string.create_without_space))
             }
             Button(
                 onClick = onImport,
@@ -259,10 +261,10 @@ fun <T : UserList> SearchListBottomMenu(
             ) {
                 Icon(
                     imageVector = Icons.Filled.AddAPhoto,
-                    contentDescription = "search $title",
+                    contentDescription = stringResource(R.string.search_lower_case) + title,
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(text = "Import")
+                Text(text = stringResource(R.string.import_without_space))
             }
         }
     }
