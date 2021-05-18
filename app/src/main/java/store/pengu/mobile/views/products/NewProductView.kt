@@ -144,7 +144,7 @@ private fun ProductForm(
     pantryId: Long?,
     navController: NavHostController
 ) {
-    var name by remember { mutableStateOf("test") }
+    var name by remember { mutableStateOf("") }
     var barcode by remember { mutableStateOf("") }
     var image by remember { mutableStateOf(null as Uri?) }
     var productImage by remember { mutableStateOf("") }
